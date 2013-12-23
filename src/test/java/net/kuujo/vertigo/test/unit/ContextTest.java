@@ -43,7 +43,6 @@ public class ContextTest {
     Serializer<NetworkContext> serializer = SerializerFactory.getSerializer(NetworkContext.class);
     Network network = new Network("test");
     network.setNumAuditors(2);
-    network.enableAcking();
 
     network.addFeeder("test1", "net.kuujo.vertigo.TestFeeder");
     network.addWorker("test2", "net.kuujo.vertigo.TestWorker").addInput("test1");

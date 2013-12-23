@@ -45,6 +45,7 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
 /**
@@ -136,7 +137,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     this.vertx = vertx;
     this.eventBus = vertx.eventBus();
     this.container = container;
-    this.logger = container.logger();
+    this.logger = LoggerFactory.getLogger(context.id());
     this.context = context;
     this.acker = new DefaultAcker(context.id(), eventBus);
     this.instanceId = context.id();

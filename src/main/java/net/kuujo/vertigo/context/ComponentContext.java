@@ -47,12 +47,13 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  */
 @SuppressWarnings("rawtypes")
 public class ComponentContext<T extends net.kuujo.vertigo.component.Component> implements Serializable {
+  private static final long FIXED_HEARTBEAT_INTERVAL = 5000;
   private String address;
   private Class<T> type;
+  private boolean debug;
   private String main;
   private Map<String, Object> config;
   private List<InstanceContext<T>> instances = new ArrayList<>();
-  private long heartbeat = 5000;
   private List<ComponentHook> hooks = new ArrayList<>();
   private List<Input> inputs = new ArrayList<>();
   private @JsonIgnore NetworkContext network;
@@ -133,6 +134,18 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
   }
 
   /**
+   * Returns a boolean indicating whether debug logging is enabled for the component.
+   * If debug logging is enabled for the network, the return value will always
+   * be <code>true</code>.
+   *
+   * @return
+   *   Indicates whether debug logging is enabled for the component.
+   */
+  public boolean isDebug() {
+    return network.getConfig().isDebug() ? true : debug;
+  }
+
+  /**
    * Returns a boolean indicating whether the component is a module.
    *
    * @return
@@ -179,7 +192,17 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    *   The component configuration.
    */
   public JsonObject getConfig() {
-    return config != null ? new JsonObject(config) : new JsonObject();
+    return config != null ? new JsonObject(config) : network.getConfig().getDefaultConfig();
+  }
+
+  /**
+   * Gets the number of component instances.
+   *
+   * @return
+   *   The number of component instances.
+   */
+  public int getNumInstances() {
+    return instances.size();
   }
 
   /**
@@ -219,7 +242,7 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    *   The component heartbeat interval.
    */
   public long getHeartbeatInterval() {
-    return heartbeat;
+    return FIXED_HEARTBEAT_INTERVAL;
   }
 
   /**

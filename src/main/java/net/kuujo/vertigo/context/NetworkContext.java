@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.vertx.java.core.json.JsonObject;
 
+import net.kuujo.vertigo.network.Config;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
@@ -34,9 +35,8 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  */
 public final class NetworkContext implements Serializable {
   private String address;
+  private Config config = new Config();
   private List<String> auditors = new ArrayList<>();
-  private boolean acking = true;
-  private long timeout = 30000;
   private Map<String, ComponentContext<?>> components = new HashMap<>();
 
   private NetworkContext() {
@@ -80,6 +80,16 @@ public final class NetworkContext implements Serializable {
   }
 
   /**
+   * Gets the network configuration.
+   *
+   * @return
+   *   The network configuration.
+   */
+  public Config getConfig() {
+    return config;
+  }
+
+  /**
    * Returns a list of network auditor addresses.
    *
    * @return
@@ -90,13 +100,23 @@ public final class NetworkContext implements Serializable {
   }
 
   /**
+   * Returns the number of network auditors.
+   *
+   * @return
+   *   The number of network auditors.
+   */
+  public int getNumAuditors() {
+    return config.getNumAuditors();
+  }
+
+  /**
    * Returns a boolean indicating whether acking is enabled.
    *
    * @return
    *   Indicates whether acking is enabled for the network.
    */
   public boolean isAckingEnabled() {
-    return acking;
+    return config.isAckingEnabled();
   }
 
   /**
@@ -106,7 +126,7 @@ public final class NetworkContext implements Serializable {
    *   Ack timeout for the network.
    */
   public long getAckTimeout() {
-    return timeout;
+    return config.getAckTimeout();
   }
 
   /**

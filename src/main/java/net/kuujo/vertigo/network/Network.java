@@ -40,12 +40,24 @@ import org.vertx.java.core.json.JsonObject;
  * @author Jordan Halterman
  */
 public final class Network implements Serializable {
-  private static final long DEFAULT_ACK_TIMEOUT = 30000;
+
+  /**
+   * The network address.
+   */
+  public static final String NETWORK_ADDRESS = "address";
+
+  /**
+   * The network configuration. In Json terms, this is a {@link JsonObject} instance.
+   */
+  public static final String NETWORK_CONFIG = "config";
+
+  /**
+   * A {@link JsonObject} of network components.
+   */
+  public static final String NETWORK_COMPONENTS = "components";
 
   private String address;
-  private int auditors = 1;
-  private boolean acking = true;
-  private long timeout = DEFAULT_ACK_TIMEOUT;
+  private Config config = new Config();
   private Map<String, Component<?>> components = new HashMap<String, Component<?>>();
 
   public Network() {
@@ -89,6 +101,73 @@ public final class Network implements Serializable {
   }
 
   /**
+   * Sets the network configuration.
+   *
+   * @param jsonConfig
+   *   A Json network configuration.
+   * @return
+   *   The network instance.
+   */
+  public Network setConfig(JsonObject jsonConfig) {
+    config = SerializerFactory.getSerializer(Config.class).deserialize(jsonConfig);
+    return this;
+  }
+
+  /**
+   * Sets the network configuration.
+   *
+   * @param config
+   *   The network configuration.
+   * @return
+   *   The network instance.
+   */
+  public Network setConfig(Config config) {
+    this.config = config;
+    return this;
+  }
+
+  /**
+   * Gets the network configuration.
+   *
+   * @return
+   *   The network configuration.
+   */
+  public Config getConfig() {
+    return config;
+  }
+
+  /**
+   * Gets the network configuration as Json object.
+   *
+   * @return
+   *   The Json network configuration.
+   */
+  public JsonObject getConfigAsJson() {
+    return SerializerFactory.getSerializer(Config.class).serialize(config);
+  }
+
+  /**
+   * Enables debugging for the network.
+   *
+   * @return
+   *   The network instance.
+   */
+  public Network debug() {
+    config.debug();
+    return this;
+  }
+
+  /**
+   * Indicates whether debugging is enabled for the network.
+   *
+   * @return
+   *   Indicates whether debugging is enabled for the network.
+   */
+  public boolean isDebug() {
+    return config.isDebug();
+  }
+
+  /**
    * Enables acking on the network.
    *
    * When acking is enabled, network auditors will track message trees throughout
@@ -97,8 +176,9 @@ public final class Network implements Serializable {
    * @return
    *   The called network instance.
    */
+  @Deprecated
   public Network enableAcking() {
-    acking = true;
+    config.enableAcking();
     return this;
   }
 
@@ -112,8 +192,9 @@ public final class Network implements Serializable {
    * @return
    *   The called network instance.
    */
+  @Deprecated
   public Network disableAcking() {
-    acking = false;
+    config.disableAcking();
     return this;
   }
 
@@ -125,8 +206,9 @@ public final class Network implements Serializable {
    * @return
    *   The called network instance.
    */
+  @Deprecated
   public Network setAckingEnabled(boolean enabled) {
-    acking = enabled;
+    config.setAckingEnabled(enabled);
     return this;
   }
 
@@ -137,7 +219,7 @@ public final class Network implements Serializable {
    *   Indicates whether acking is enabled for the network.
    */
   public boolean isAckingEnabled() {
-    return acking;
+    return config.isAckingEnabled();
   }
 
   /**
@@ -147,7 +229,7 @@ public final class Network implements Serializable {
    *   The number of network auditors.
    */
   public int getNumAuditors() {
-    return auditors;
+    return config.getNumAuditors();
   }
 
   /**
@@ -165,7 +247,7 @@ public final class Network implements Serializable {
    *   The called network instance.
    */
   public Network setNumAuditors(int numAuditors) {
-    this.auditors = numAuditors;
+    config.setNumAuditors(numAuditors);
     return this;
   }
 
@@ -181,7 +263,7 @@ public final class Network implements Serializable {
    *   The called network instance.
    */
   public Network setAckTimeout(long timeout) {
-    this.timeout = timeout;
+    config.setAckTimeout(timeout);
     return this;
   }
 
@@ -192,7 +274,7 @@ public final class Network implements Serializable {
    *   Ack timeout for the network. Defaults to 30000
    */
   public long getAckTimeout() {
-    return timeout;
+    return config.getAckTimeout();
   }
 
   /**
@@ -232,7 +314,7 @@ public final class Network implements Serializable {
    */
   @SuppressWarnings("rawtypes")
   public <T extends net.kuujo.vertigo.component.Component> Component<T> addComponent(Component<T> component) {
-    components.put(component.getAddress(), component);
+    components.put(component.getAddress(), component.setNetwork(this));
     return component;
   }
 
@@ -288,7 +370,7 @@ public final class Network implements Serializable {
    *   The new feeder component instance.
    */
   public Component<Feeder> addFeeder(String address, String moduleOrMain, int instances) {
-    return addComponent(new Component<Feeder>(Feeder.class, address, moduleOrMain).setInstances(instances));
+    return addComponent(new Component<Feeder>(Feeder.class, address, moduleOrMain).setNumInstances(instances));
   }
 
   /**
@@ -311,7 +393,7 @@ public final class Network implements Serializable {
    *   The new feeder component instance.
    */
   public Component<Feeder> addFeeder(String address, String moduleOrMain, JsonObject config, int instances) {
-    return addComponent(new Component<Feeder>(Feeder.class, address, moduleOrMain).setConfig(config).setInstances(instances));
+    return addComponent(new Component<Feeder>(Feeder.class, address, moduleOrMain).setConfig(config).setNumInstances(instances));
   }
 
   /**
@@ -366,7 +448,7 @@ public final class Network implements Serializable {
    *   The new executor component instance.
    */
   public Component<Executor> addExecutor(String address, String moduleOrMain, int instances) {
-    return addComponent(new Component<Executor>(Executor.class, address, moduleOrMain).setInstances(instances));
+    return addComponent(new Component<Executor>(Executor.class, address, moduleOrMain).setNumInstances(instances));
   }
 
   /**
@@ -389,7 +471,7 @@ public final class Network implements Serializable {
    *   The new executor component instance.
    */
   public Component<Executor> addExecutor(String address, String moduleOrMain, JsonObject config, int instances) {
-    return addComponent(new Component<Executor>(Executor.class, address, moduleOrMain).setConfig(config).setInstances(instances));
+    return addComponent(new Component<Executor>(Executor.class, address, moduleOrMain).setConfig(config).setNumInstances(instances));
   }
 
   /**
@@ -444,7 +526,7 @@ public final class Network implements Serializable {
    *   The new worker component instance.
    */
   public Component<Worker> addWorker(String address, String moduleOrMain, int instances) {
-    return addComponent(new Component<Worker>(Worker.class, address, moduleOrMain).setInstances(instances));
+    return addComponent(new Component<Worker>(Worker.class, address, moduleOrMain).setNumInstances(instances));
   }
 
   /**
@@ -467,7 +549,7 @@ public final class Network implements Serializable {
    *   The new worker component instance.
    */
   public Component<Worker> addWorker(String address, String moduleOrMain, JsonObject config, int instances) {
-    return addComponent(new Component<Worker>(Worker.class, address, moduleOrMain).setConfig(config).setInstances(instances));
+    return addComponent(new Component<Worker>(Worker.class, address, moduleOrMain).setConfig(config).setNumInstances(instances));
   }
 
 }

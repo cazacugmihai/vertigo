@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.vertx.java.core.json.JsonObject;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
@@ -51,12 +52,66 @@ import static net.kuujo.vertigo.util.Component.deserializeType;
  */
 @SuppressWarnings("rawtypes")
 public class Component<T extends net.kuujo.vertigo.component.Component> implements Serializable {
+
+  /**
+   * The component address.
+   */
+  public static final String COMPONENT_ADDRESS = "address";
+
+  /**
+   * The component type. This can be either "feeder", "worker", or "executor".
+   */
+  public static final String COMPONENT_TYPE = "type";
+
+  /**
+   * Whether debug logging is enabled on the component. Note that if debug logging
+   * is enabled for the network, the component will inherit that configuration.
+   */
+  public static final String COMPONENT_DEBUG = "debug";
+
+  /**
+   * The component verticle main.
+   */
+  public static final String COMPONENT_MAIN = "main";
+
+  /**
+   * The component module name.
+   */
+  public static final String COMPONENT_MODULE = "main";
+
+  /**
+   * The component configuration. If no configuration is specified then the
+   * configuration will be inherited from the network configuration.
+   */
+  public static final String COMPONENT_CONFIG = "config";
+
+  /**
+   * The number of component instances. If instances are not specified then the
+   * number of instances will be inherited from the network configuration. If the
+   * number of instances is not specified in network configuration then the number
+   * of component instances will default to 1.
+   */
+  public static final String COMPONENT_NUM_INSTANCES = "instances";
+
+  /**
+   * A list of component hooks.
+   */
+  public static final String COMPONENT_HOOKS = "hooks";
+
+  /**
+   * A list of component inputs.
+   */
+  public static final String COMPONENT_INPUTS = "inputs";
+
+  private static final long FIXED_HEARTBEAT_INTERVAL = 5000;
+
   private String address;
+  private @JsonBackReference Network network;
   private Class<T> type;
+  private boolean debug;
   private String main;
   private Map<String, Object> config;
-  private int instances = 1;
-  private long heartbeat = 5000;
+  private Integer instances;
   private List<ComponentHook> hooks = new ArrayList<>();
   private List<Input> inputs = new ArrayList<>();
 
@@ -88,6 +143,11 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
     catch (SerializationException e) {
       throw new MalformedNetworkException(e);
     }
+  }
+
+  Component<T> setNetwork(Network network) {
+    this.network = network;
+    return this;
   }
 
   /**
@@ -136,6 +196,43 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   @SuppressWarnings("unchecked")
   private void setSerializedType(String type) {
     this.type = (Class<T>) deserializeType(type);
+  }
+
+  /**
+   * Enables debug logging for the component.<p>
+   *
+   * Note that if debug logging is already enabled for the entire network, the
+   * component's configuration will not have any effect. Enabling debug logging
+   * for the network automatically enables debug logging for all components.
+   *
+   * @return
+   *   The component configuration.
+   */
+  public Component<T> debug() {
+    return setDebug(true);
+  }
+
+  /**
+   * Sets the debug logging option for the component.
+   *
+   * @param isDebug
+   *   Indicates whether to enable debug logging for the component.
+   * @return
+   *   The component configuration.
+   */
+  public Component<T> setDebug(boolean isDebug) {
+    this.debug = isDebug;
+    return this;
+  }
+
+  /**
+   * Indicates whether debug logging is enabled for the component.
+   *
+   * @return
+   *   Indicates whether debug logging is enabled for the component.
+   */
+  public boolean isDebug() {
+    return network.getConfig().isDebug() ? true : debug;
   }
 
   /**
@@ -217,7 +314,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The component configuration.
    */
   public JsonObject getConfig() {
-    return config != null ? new JsonObject(config) : new JsonObject();
+    return config != null ? new JsonObject(config) : network.getConfig().getDefaultConfig();
   }
 
   /**
@@ -239,11 +336,40 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   /**
    * Returns the number of component instances.
    *
+   * Use {@link #getNumInstances()} instead.
+   *
    * @return
    *   The number of component instances.
    */
+  @Deprecated
   public int getInstances() {
-    return instances;
+    return getNumInstances();
+  }
+
+  /**
+   * Sets the number of component instances.
+   *
+   * Use {@link #setNumInstances(int)} instead.
+   *
+   * @param instances
+   *   The number of component instances.
+   * @return
+   *   The called component instance.
+   */
+  @Deprecated
+  public Component<T> setInstances(int instances) {
+    return setNumInstances(instances);
+  }
+
+  /**
+   * Returns the number of component instances.
+   *
+   * @return
+   *   The number of component instances.
+   */
+  @JsonGetter("instances")
+  public int getNumInstances() {
+    return instances != null ? instances : network.getConfig().getDefaultNumInstances();
   }
 
   /**
@@ -254,40 +380,22 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    * @return
    *   The called component instance.
    */
-  public Component<T> setInstances(int instances) {
-    this.instances = instances;
+  @JsonSetter("instances")
+  public Component<T> setNumInstances(int numInstances) {
+    this.instances = numInstances;
     for (Input input : inputs) {
-      input.setCount(instances);
+      input.setCount(numInstances);
     }
     return this;
   }
 
-  /**
-   * Returns the component heartbeat interval.
-   *
-   * @return
-   *   The component heartbeat interval.
-   */
   @Deprecated
   public long getHeartbeatInterval() {
-    return heartbeat;
+    return FIXED_HEARTBEAT_INTERVAL;
   }
 
-  /**
-   * Sets the component heartbeat interval.
-   *
-   * This is the interval at which the component will send heartbeat messages to
-   * the network's coordinator. It may be necessary to increase heartbeat frequency
-   * if the component blocks frequently.
-   *
-   * @param interval
-   *   The component heartbeat interval.
-   * @return
-   *   The called component instance.
-   */
   @Deprecated
   public Component<T> setHeartbeatInterval(long interval) {
-    heartbeat = interval;
     return this;
   }
 
