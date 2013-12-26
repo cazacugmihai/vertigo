@@ -129,7 +129,7 @@ public class Config implements Serializable {
    *   The default component configuration.
    */
   public JsonObject defaultConfig() {
-    return components.config != null ? new JsonObject(components.config) : new JsonObject();
+    return (components.config != null ? new JsonObject(components.config) : new JsonObject()).copy();
   }
 
 }
