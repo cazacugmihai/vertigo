@@ -178,28 +178,53 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
   }
 
   @Override
-  public Vertx getVertx() {
+  public Vertx vertx() {
     return vertx;
   }
 
   @Override
-  public Container getContainer() {
+  public Vertx getVertx() {
+    return vertx();
+  }
+
+  @Override
+  public Container container() {
     return container;
   }
 
   @Override
-  public InputCollector getInput() {
+  public Container getContainer() {
+    return container();
+  }
+
+  @Override
+  public InputCollector input() {
     return input;
   }
 
   @Override
-  public OutputCollector getOutput() {
+  public InputCollector getInput() {
+    return input();
+  }
+
+  @Override
+  public OutputCollector output() {
     return output;
   }
 
   @Override
-  public InstanceContext<T> getContext() {
+  public OutputCollector getOutput() {
+    return output();
+  }
+
+  @Override
+  public InstanceContext<T> context() {
     return context;
+  }
+
+  @Override
+  public InstanceContext<T> getContext() {
+    return context();
   }
 
   @Override

@@ -37,6 +37,9 @@ public interface Component<T extends Component<T>> {
    * @return
    *   The component Vertx instance.
    */
+  Vertx vertx();
+
+  @Deprecated
   Vertx getVertx();
 
   /**
@@ -45,6 +48,9 @@ public interface Component<T extends Component<T>> {
    * @return
    *   The component container instance.
    */
+  Container container();
+
+  @Deprecated
   Container getContainer();
 
   /**
@@ -54,6 +60,9 @@ public interface Component<T extends Component<T>> {
    * @return
    *   The components {@link InputCollector}.
    */
+  InputCollector input();
+
+  @Deprecated
   InputCollector getInput();
 
   /**
@@ -63,6 +72,9 @@ public interface Component<T extends Component<T>> {
    * @return
    *   The component's {@link OutputCollector}.
    */
+  OutputCollector output();
+
+  @Deprecated
   OutputCollector getOutput();
 
   /**
@@ -74,6 +86,9 @@ public interface Component<T extends Component<T>> {
    * @return
    *   The instance context.
    */
+  InstanceContext<T> context();
+
+  @Deprecated
   InstanceContext<T> getContext();
 
   /**
