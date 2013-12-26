@@ -58,7 +58,7 @@ public final class ContextBuilder {
         JsonObject jsonComponent = jsonComponents.getObject(component.getAddress());
         JsonArray instances = new JsonArray();
         for (int i = 1; i <= component.getNumInstances(); i++) {
-          instances.add(new JsonObject().putString("id", String.format("%s.%d", component.getAddress(), i)));
+          instances.add(new JsonObject().putString("id", String.format("%s-%d", component.getAddress(), i)));
         }
         jsonComponent.putArray("instances", instances);
       }
