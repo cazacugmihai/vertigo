@@ -19,12 +19,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 import net.kuujo.vertigo.feeder.Feeder;
+import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.rpc.Executor;
 import net.kuujo.vertigo.worker.Worker;
 
@@ -57,15 +59,20 @@ public final class Network implements Serializable {
   public static final String NETWORK_COMPONENTS = "components";
 
   private String address;
-  private Config config = new Config();
+  private Config config;
   private Map<String, Component<?>> components = new HashMap<String, Component<?>>();
 
   public Network() {
-    address = UUID.randomUUID().toString();
+    this(UUID.randomUUID().toString(), new Config());
   }
 
   public Network(String address) {
+    this(address, new Config());
+  }
+
+  public Network(String address, Config config) {
     this.address = address;
+    this.config = config;
   }
 
   /**
@@ -80,11 +87,33 @@ public final class Network implements Serializable {
    */
   public static Network fromJson(JsonObject json) {
     try {
-      return SerializerFactory.getSerializer(Network.class).deserialize(json);
+      Network network = SerializerFactory.getSerializer(Network.class).deserialize(adaptJson(json));
+      for (Component<?> component : network.getComponents()) {
+        component.setNetwork(network);
+      }
+      return network;
     }
     catch (SerializationException e) {
       throw new MalformedNetworkException(e);
     }
+  }
+
+  /**
+   * Adapts a network json configuration in order to support deprecated properties.
+   */
+  private static JsonObject adaptJson(JsonObject json) {
+    Set<String> fieldNames = json.getFieldNames();
+    JsonObject config = fieldNames.contains(NETWORK_CONFIG) ? json.getObject(NETWORK_CONFIG) : new JsonObject();
+    json.putObject(NETWORK_CONFIG, config);
+    if (fieldNames.contains("auditors")) {
+      config.putNumber(Config.NETWORK_NUM_AUDITORS, json.getInteger("auditors"));
+      json.removeField("auditors");
+    }
+    if (fieldNames.contains("timeout")) {
+      config.putNumber(Config.NETWORK_ACK_TIMEOUT, json.getLong("timeout"));
+      json.removeField("timeout");
+    }
+    return json;
   }
 
   /**
@@ -153,7 +182,7 @@ public final class Network implements Serializable {
    *   The network instance.
    */
   public Network debug() {
-    config.debug();
+    config.setLogLevel(Level.DEBUG);
     return this;
   }
 
@@ -164,7 +193,7 @@ public final class Network implements Serializable {
    *   Indicates whether debugging is enabled for the network.
    */
   public boolean isDebug() {
-    return config.isDebug();
+    return config.getLogLevel().equals(Level.DEBUG) || config.getLogLevel().equals(Level.TRACE);
   }
 
   /**
@@ -218,6 +247,7 @@ public final class Network implements Serializable {
    * @return
    *   Indicates whether acking is enabled for the network.
    */
+  @Deprecated
   public boolean isAckingEnabled() {
     return config.isAckingEnabled();
   }
@@ -228,6 +258,7 @@ public final class Network implements Serializable {
    * @return
    *   The number of network auditors.
    */
+  @Deprecated
   public int getNumAuditors() {
     return config.getNumAuditors();
   }
@@ -246,6 +277,7 @@ public final class Network implements Serializable {
    * @return
    *   The called network instance.
    */
+  @Deprecated
   public Network setNumAuditors(int numAuditors) {
     config.setNumAuditors(numAuditors);
     return this;
@@ -262,6 +294,7 @@ public final class Network implements Serializable {
    * @return
    *   The called network instance.
    */
+  @Deprecated
   public Network setAckTimeout(long timeout) {
     config.setAckTimeout(timeout);
     return this;
@@ -273,6 +306,7 @@ public final class Network implements Serializable {
    * @return
    *   Ack timeout for the network. Defaults to 30000
    */
+  @Deprecated
   public long getAckTimeout() {
     return config.getAckTimeout();
   }
@@ -301,7 +335,10 @@ public final class Network implements Serializable {
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <T extends net.kuujo.vertigo.component.Component> Component<T> getComponent(String address) {
-    return (Component<T>) components.get(address);
+    if (components.containsKey(address)) {
+      return (Component<T>) components.get(address);
+    }
+    throw new IllegalArgumentException("Invalid network component " + address);
   }
 
   /**

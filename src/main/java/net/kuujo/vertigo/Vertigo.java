@@ -25,6 +25,7 @@ import net.kuujo.vertigo.cluster.RemoteCluster;
 import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.context.NetworkContext;
+import net.kuujo.vertigo.network.Config;
 import net.kuujo.vertigo.network.Network;
 
 /**
@@ -98,6 +99,28 @@ public interface Vertigo<T extends Component<T>> {
    *   A new network instance.
    */
   public Network createNetwork(String address);
+
+  /**
+   * Creates a new network.
+   *
+   * @param address
+   *   The network address.
+   * @param config
+   *   The network configuration.
+   * @return
+   *   A new network instance.
+   */
+  public Network createNetwork(String address, Config config);
+
+  /**
+   * Creates a new network from json.
+   *
+   * @param json
+   *   A Json representation of the network.
+   * @return
+   *   A new network instance.
+   */
+  public Network createNetworkFromJson(JsonObject json);
 
   /**
    * Deploys a network within the current Vert.x instance.<p>

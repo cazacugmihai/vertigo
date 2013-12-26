@@ -29,6 +29,7 @@ import net.kuujo.vertigo.cluster.RemoteCluster;
 import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.context.NetworkContext;
+import net.kuujo.vertigo.network.Config;
 import net.kuujo.vertigo.network.Network;
 
 /**
@@ -84,6 +85,16 @@ public final class DefaultVertigo<T extends Component<T>> implements Vertigo<T> 
   @Override
   public Network createNetwork(String address) {
     return new Network(address);
+  }
+
+  @Override
+  public Network createNetwork(String address, Config config) {
+    return new Network(address, config);
+  }
+
+  @Override
+  public Network createNetworkFromJson(JsonObject json) {
+    return Network.fromJson(json);
   }
 
   @Override

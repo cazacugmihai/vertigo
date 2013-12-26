@@ -38,9 +38,25 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  * @author Jordan Halterman
  */
 public final class Input implements Serializable {
+
+  /**
+   * The input address.
+   */
+  public static final String INPUT_ADDRESS = "address";
+
+  /**
+   * The input stream.
+   */
+  public static final String INPUT_STREAM = "stream";
+
+  /**
+   * The input grouping.
+   */
+  public static final String INPUT_GROUPING = "grouping";
+
   private static final String DEFAULT_STREAM = "default";
   private String id;
-  private String stream;
+  private String stream = DEFAULT_STREAM;
   private int count = 1;
   private String address;
   private Grouping grouping;

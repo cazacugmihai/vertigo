@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.hooks.ComponentHook;
 import net.kuujo.vertigo.input.Input;
 import net.kuujo.vertigo.input.grouping.Grouping;
@@ -64,10 +65,10 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   public static final String COMPONENT_TYPE = "type";
 
   /**
-   * Whether debug logging is enabled on the component. Note that if debug logging
-   * is enabled for the network, the component will inherit that configuration.
+   * The component log level. If the log level is not set then the component will
+   * inherit the log level from the network.
    */
-  public static final String COMPONENT_DEBUG = "debug";
+  public static final String COMPONENT_LOG_LEVEL = "log";
 
   /**
    * The component verticle main.
@@ -108,7 +109,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   private String address;
   private @JsonBackReference Network network;
   private Class<T> type;
-  private boolean debug;
+  private Level log;
   private String main;
   private Map<String, Object> config;
   private Integer instances;
@@ -147,7 +148,14 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
 
   Component<T> setNetwork(Network network) {
     this.network = network;
+    setInputCounts();
     return this;
+  }
+
+  private void setInputCounts() {
+    for (Input input : inputs) {
+      input.setCount(getNumInstances());
+    }
   }
 
   /**
@@ -199,6 +207,63 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   }
 
   /**
+   * Sets the component log level. This setting overrides the network log level.
+   *
+   * @param level
+   *   The component log level.
+   * @return
+   *   The component configuration.
+   */
+  public Component<T> setLogLevel(Level level) {
+    log = level;
+    return this;
+  }
+
+  /**
+   * Sets the component log level. This setting overrides the network log level.
+   *
+   * @param level
+   *   The component log level.
+   * @return
+   *   The component configuration.
+   */
+  @JsonSetter("log")
+  public Component<T> setLogLevel(String level) {
+    if (level != null) {
+      log = Level.parse(level.toUpperCase());
+    }
+    return this;
+  }
+
+  /**
+   * Sets the component log level. This setting overrides the network log level.
+   *
+   * @param level
+   *   The component log level.
+   * @return
+   *   The component configuration.
+   */
+  public Component<T> setLogLevel(int level) {
+    log = Level.parse(level);
+    return this;
+  }
+
+  /**
+   * Gets the component log level.
+   *
+   * @return
+   *   The component log level. Defaults to the network log level.
+   */
+  public Level getLogLevel() {
+    return log != null ? log : network.getConfig().getLogLevel();
+  }
+
+  @JsonGetter("log")
+  private String getLogLevelString() {
+    return log != null ? log.getName() : null;
+  }
+
+  /**
    * Enables debug logging for the component.<p>
    *
    * Note that if debug logging is already enabled for the entire network, the
@@ -209,19 +274,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The component configuration.
    */
   public Component<T> debug() {
-    return setDebug(true);
-  }
-
-  /**
-   * Sets the debug logging option for the component.
-   *
-   * @param isDebug
-   *   Indicates whether to enable debug logging for the component.
-   * @return
-   *   The component configuration.
-   */
-  public Component<T> setDebug(boolean isDebug) {
-    this.debug = isDebug;
+    log = Level.DEBUG;
     return this;
   }
 
@@ -232,7 +285,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   Indicates whether debug logging is enabled for the component.
    */
   public boolean isDebug() {
-    return network.getConfig().isDebug() ? true : debug;
+    return network.isDebug() ? true : (log.equals(Level.DEBUG) || log.equals(Level.TRACE));
   }
 
   /**
@@ -258,7 +311,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The component module name.
    */
   public String getModule() {
-    return main;
+    return isModule() ? main : null;
   }
 
   /**
@@ -284,7 +337,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The component verticle main.
    */
   public String getMain() {
-    return main;
+    return isVerticle() ? main : null;
   }
 
   /**
@@ -367,7 +420,6 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    * @return
    *   The number of component instances.
    */
-  @JsonGetter("instances")
   public int getNumInstances() {
     return instances != null ? instances : network.getConfig().getDefaultNumInstances();
   }
@@ -380,13 +432,19 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    * @return
    *   The called component instance.
    */
-  @JsonSetter("instances")
   public Component<T> setNumInstances(int numInstances) {
     this.instances = numInstances;
-    for (Input input : inputs) {
-      input.setCount(numInstances);
-    }
+    setInputCounts();
     return this;
+  }
+
+  // Use a special setter that allows us to set input counts when instances is set.
+  @JsonSetter("instances")
+  private void setStaticNumInstances(Integer instances) {
+    if (instances != null) {
+      this.instances = instances;
+    }
+    setInputCounts();
   }
 
   @Deprecated
@@ -450,6 +508,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The new input instance.
    */
   public Input addInput(Input input) {
+    input.setCount(getNumInstances());
     inputs.add(input);
     return input;
   }
