@@ -57,7 +57,6 @@ public final class Input implements Serializable {
   private static final String DEFAULT_STREAM = "default";
   private String id;
   private String stream = DEFAULT_STREAM;
-  private int count = 1;
   private String address;
   private Grouping grouping;
 
@@ -85,31 +84,6 @@ public final class Input implements Serializable {
    */
   public String id() {
     return id;
-  }
-
-  /**
-   * Returns the input count.
-   *
-   * @return
-   *   The input count.
-   */
-  public int getCount() {
-    return count;
-  }
-
-  /**
-   * Sets the input count. This indicates the total number of expected
-   * subscriptions from the input component and helps ensure consistency in
-   * message distribution between multiple component instances.
-   *
-   * @param count
-   *   The input count.
-   * @return
-   *   The called input instance.
-   */
-  public Input setCount(int count) {
-    this.count = count;
-    return this;
   }
 
   /**

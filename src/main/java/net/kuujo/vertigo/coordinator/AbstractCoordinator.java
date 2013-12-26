@@ -63,7 +63,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
     super.start();
     events = new Events(eb);
     context = NetworkContext.fromJson(config);
-    eb.registerHandler(context.getAddress(), this);
+    eb.registerHandler(context.address(), this);
     doDeploy();
   }
 
@@ -176,8 +176,8 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
    * Deploys the network.
    */
   private void doDeploy() {
-    if (context.isAckingEnabled()) {
-      recursiveDeployAuditors(copyList(context.getAuditors()), new DefaultFutureResult<Void>().setHandler(new Handler<AsyncResult<Void>>() {
+    if (context.config().isAckingEnabled()) {
+      recursiveDeployAuditors(copyList(context.auditors()), new DefaultFutureResult<Void>().setHandler(new Handler<AsyncResult<Void>>() {
         @Override
         public void handle(AsyncResult<Void> result) {
           if (result.failed()) {
@@ -193,7 +193,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   container.exit();
                 }
                 else {
-                  events.trigger(Events.Network.Deploy.class, context.getAddress(), context);
+                  events.trigger(Events.Network.Deploy.class, context.address(), context);
                 }
               }
             });
@@ -210,7 +210,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
             container.exit();
           }
           else {
-            events.trigger(Events.Network.Deploy.class, context.getAddress(), context);
+            events.trigger(Events.Network.Deploy.class, context.address(), context);
           }
         }
       });
@@ -236,7 +236,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
       final String address = auditors.iterator().next();
       JsonObject auditorConfig = new JsonObject()
         .putString(AuditorVerticle.ADDRESS, address)
-        .putNumber(AuditorVerticle.TIMEOUT, context.getAckTimeout());
+        .putNumber(AuditorVerticle.TIMEOUT, context.config().ackTimeout());
       deployVerticle(AuditorVerticle.class.getName(), auditorConfig, new Handler<AsyncResult<String>>() {
         @Override
         public void handle(AsyncResult<String> result) {
@@ -310,32 +310,32 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
           deploymentMap.remove(id);
           if (contextMap.containsKey(id)) {
             final InstanceContext<?> context = contextMap.get(id);
-            if (context.getComponent().isModule()) {
-              JsonObject config = context.getComponent().getConfig().copy();
+            if (context.componentContext().isModule()) {
+              JsonObject config = context.componentContext().config().copy();
               config.putObject("__context__", InstanceContext.toJson(context));
-              deployModule(context.getComponent().getModule(), config, new Handler<AsyncResult<String>>() {
+              deployModule(context.componentContext().module(), config, new Handler<AsyncResult<String>>() {
                 @Override
                 public void handle(AsyncResult<String> result) {
                   if (result.succeeded()) {
                     deploymentMap.put(context.id(), result.result());
                   }
                   else {
-                    container.logger().error(String.format("Failed to deploy %s instance %s.", context.getComponent().getAddress(), context.id()));
+                    container.logger().error(String.format("Failed to deploy %s instance %s.", context.componentContext().address(), context.id()));
                   }
                 }
               });
             }
-            else if (context.getComponent().isVerticle()) {
-              JsonObject config = context.getComponent().getConfig().copy();
+            else if (context.componentContext().isVerticle()) {
+              JsonObject config = context.componentContext().config().copy();
               config.putObject("__context__", InstanceContext.toJson(context));
-              deployVerticle(context.getComponent().getMain(), config, new Handler<AsyncResult<String>>() {
+              deployVerticle(context.componentContext().main(), config, new Handler<AsyncResult<String>>() {
                 @Override
                 public void handle(AsyncResult<String> result) {
                   if (result.succeeded()) {
                     deploymentMap.put(context.id(), result.result());
                   }
                   else {
-                    container.logger().error(String.format("Failed to deploy %s instance %s.", context.getComponent().getAddress(), context.id()));
+                    container.logger().error(String.format("Failed to deploy %s instance %s.", context.componentContext().address(), context.id()));
                   }
                 }
               });
@@ -356,7 +356,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
         for (String address : auditorDeploymentIds) {
           undeployVerticle(address);
         }
-        events.trigger(Events.Network.Shutdown.class, context.getAddress(), context);
+        events.trigger(Events.Network.Shutdown.class, context.address(), context);
         message.reply(result.succeeded());
       }
     });
@@ -387,9 +387,9 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
     if (id != null) {
       ready.put(id, message);
       InstanceContext<?> context = contextMap.get(id);
-      events.trigger(Events.Component.Start.class, context.getComponent().getAddress(), context);
+      events.trigger(Events.Component.Start.class, context.componentContext().address(), context);
       if (ready.size() == instances.size()) {
-        events.trigger(Events.Network.Start.class, this.context.getAddress(), this.context);
+        events.trigger(Events.Network.Start.class, this.context.address(), this.context);
         for (Message<JsonObject> replyMessage : ready.values()) {
           replyMessage.reply();
         }
@@ -418,7 +418,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
      */
     public void deploy(Handler<AsyncResult<Void>> doneHandler) {
       List<ComponentContext> components = new ArrayList<>();
-      for (ComponentContext<?> component : context.getComponents()) {
+      for (ComponentContext<?> component : context.componentContexts()) {
         components.add(component);
       }
       RecursiveComponentDeployer deployer = new RecursiveComponentDeployer(components);
@@ -433,7 +433,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
      */
     public void undeploy(Handler<AsyncResult<Void>> doneHandler) {
       List<ComponentContext> components = new ArrayList<>();
-      for (ComponentContext<?> component : context.getComponents()) {
+      for (ComponentContext<?> component : context.componentContexts()) {
         components.add(component);
       }
       RecursiveComponentDeployer deployer = new RecursiveComponentDeployer(components);
@@ -545,7 +545,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
       @Override
       protected void doDeploy(ComponentContext context, Handler<AsyncResult<String>> resultHandler) {
         final Future<String> future = new DefaultFutureResult<String>().setHandler(resultHandler);
-        RecursiveInstanceDeployer deployer = new RecursiveInstanceDeployer(context.getInstances());
+        RecursiveInstanceDeployer deployer = new RecursiveInstanceDeployer(context.instanceContexts());
         deployer.deploy(new Handler<AsyncResult<Void>>() {
           @Override
           public void handle(AsyncResult<Void> result) {
@@ -562,7 +562,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
       @Override
       protected void doUndeploy(ComponentContext context, Handler<AsyncResult<Void>> doneHandler) {
         final Future<Void> future = new DefaultFutureResult<Void>().setHandler(doneHandler);
-        RecursiveInstanceDeployer executor = new RecursiveInstanceDeployer(context.getInstances());
+        RecursiveInstanceDeployer executor = new RecursiveInstanceDeployer(context.instanceContexts());
         executor.undeploy(new Handler<AsyncResult<Void>>() {
           @Override
           public void handle(AsyncResult<Void> result) {
@@ -594,7 +594,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
         contextMap.put(context.id(), context);
         future.setHandler(resultHandler);
 
-        JsonObject config = context.getComponent().getConfig().copy();
+        JsonObject config = context.componentContext().config().copy();
 
         try {
           config.putObject("__context__", InstanceContext.toJson(context));
@@ -604,8 +604,8 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
           return;
         }
 
-        if (context.getComponent().isVerticle()) {
-          deployVerticle(context.getComponent().getMain(), config, new Handler<AsyncResult<String>>() {
+        if (context.componentContext().isVerticle()) {
+          deployVerticle(context.componentContext().main(), config, new Handler<AsyncResult<String>>() {
             @Override
             public void handle(AsyncResult<String> result) {
               if (result.succeeded()) {
@@ -613,14 +613,14 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                 future.setResult(result.result());
               }
               else {
-                events.trigger(Events.Component.Deploy.class, context.getComponent().getAddress(), context);
+                events.trigger(Events.Component.Deploy.class, context.componentContext().address(), context);
                 future.setFailure(result.cause());
               }
             }
           });
         }
-        else if (context.getComponent().isModule()) {
-          deployModule(context.getComponent().getModule(), config, new Handler<AsyncResult<String>>() {
+        else if (context.componentContext().isModule()) {
+          deployModule(context.componentContext().module(), config, new Handler<AsyncResult<String>>() {
             @Override
             public void handle(AsyncResult<String> result) {
               if (result.succeeded()) {
@@ -628,7 +628,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                 future.setResult(result.result());
               }
               else {
-                events.trigger(Events.Component.Deploy.class, context.getComponent().getAddress(), context);
+                events.trigger(Events.Component.Deploy.class, context.componentContext().address(), context);
                 future.setFailure(result.cause());
               }
             }
@@ -643,7 +643,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
         String id = context.id();
         if (deploymentMap.containsKey(id)) {
           String deploymentID = deploymentMap.get(id);
-          if (context.getComponent().isVerticle()) {
+          if (context.componentContext().isVerticle()) {
             undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
               @Override
               public void handle(AsyncResult<Void> result) {
@@ -651,13 +651,13 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   future.setFailure(result.cause());
                 }
                 else {
-                  events.trigger(Events.Component.Shutdown.class, context.getComponent().getAddress(), context);
+                  events.trigger(Events.Component.Shutdown.class, context.componentContext().address(), context);
                   future.setResult(result.result());
                 }
               }
             });
           }
-          else if (context.getComponent().isModule()) {
+          else if (context.componentContext().isModule()) {
             undeployModule(deploymentID, new Handler<AsyncResult<Void>>() {
               @Override
               public void handle(AsyncResult<Void> result) {
@@ -665,7 +665,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   future.setFailure(result.cause());
                 }
                 else {
-                  events.trigger(Events.Component.Shutdown.class, context.getComponent().getAddress(), context);
+                  events.trigger(Events.Component.Shutdown.class, context.componentContext().address(), context);
                   future.setResult(result.result());
                 }
               }

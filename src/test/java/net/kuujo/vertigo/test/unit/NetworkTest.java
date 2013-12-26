@@ -315,7 +315,6 @@ public class NetworkTest {
     worker2.addInput(worker1);
     assertEquals(1, worker2.getInputs().size());
     assertEquals("test.worker1", worker2.getInputs().get(0).getAddress());
-    assertEquals(2, worker2.getInputs().get(0).getCount());
   }
 
   @Test
@@ -462,7 +461,6 @@ public class NetworkTest {
     assertEquals("test.feeder", input.getAddress());
     assertEquals("nondefault", input.getStream());
     assertTrue(input.getGrouping() instanceof AllGrouping);
-    assertEquals(2, input.getCount());
 
     List<ComponentHook> hooks = worker.getHooks();
     assertEquals(1, hooks.size());

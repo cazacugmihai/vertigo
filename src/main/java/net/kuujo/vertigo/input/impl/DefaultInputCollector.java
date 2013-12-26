@@ -21,9 +21,9 @@ import java.util.List;
 
 import net.kuujo.vertigo.acker.Acker;
 import net.kuujo.vertigo.acker.DefaultAcker;
+import net.kuujo.vertigo.context.InputContext;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.hooks.InputHook;
-import net.kuujo.vertigo.input.Input;
 import net.kuujo.vertigo.input.InputCollector;
 import net.kuujo.vertigo.input.Listener;
 import net.kuujo.vertigo.message.JsonMessage;
@@ -174,7 +174,7 @@ public class DefaultInputCollector implements InputCollector {
       @Override
       public void handle(AsyncResult<Void> result) {
         listeners = new ArrayList<Listener>();
-        recursiveStart(context.getComponent().getInputs().iterator(), future);
+        recursiveStart(context.componentContext().inputContexts().iterator(), future);
       }
     });
     return this;
@@ -187,7 +187,7 @@ public class DefaultInputCollector implements InputCollector {
       @Override
       public void handle(AsyncResult<Void> result) {
         listeners = new ArrayList<Listener>();
-        recursiveStart(context.getComponent().getInputs().iterator(), future);
+        recursiveStart(context.componentContext().inputContexts().iterator(), future);
       }
     });
     return this;
@@ -196,9 +196,9 @@ public class DefaultInputCollector implements InputCollector {
   /**
    * Recursively starts inputs.
    */
-  private void recursiveStart(final Iterator<Input> inputs, final Future<Void> future) {
+  private void recursiveStart(final Iterator<InputContext> inputs, final Future<Void> future) {
     if (inputs.hasNext()) {
-      Input input = inputs.next();
+      InputContext input = inputs.next();
       Listener listener = new DefaultListener(input, vertx).setAutoAck(false).messageHandler(messageHandler);
       listeners.add(listener);
       listener.start(new Handler<AsyncResult<Void>>() {

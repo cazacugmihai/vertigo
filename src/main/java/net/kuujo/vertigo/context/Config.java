@@ -17,18 +17,22 @@ package net.kuujo.vertigo.context;
 
 import java.util.Map;
 
+import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.serializer.Serializable;
 
 import org.vertx.java.core.json.JsonObject;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * An immutable network configuration.
  *
  * @author Jordan Halterman
  */
-public class Config {
+public class Config implements Serializable {
   private static final long DEFAULT_ACK_TIMEOUT = 30000;
-  private boolean debug;
+  private Level log;
   private int auditors = 1;
   private boolean acking = true;
   private long timeout = DEFAULT_ACK_TIMEOUT;
@@ -45,13 +49,25 @@ public class Config {
   }
 
   /**
-   * Indicates whether debug logging is enabled on the network.
+   * Gets the network log level.
    *
    * @return
-   *   Indicates whether debug logging is enabled on the network.
+   *   The network log level.
    */
-  public boolean isDebug() {
-    return debug;
+  public Level logLevel() {
+    return log;
+  }
+
+  @JsonGetter("log")
+  private String getLogLevelString() {
+    return log != null ? log.getName() : null;
+  }
+
+  @JsonSetter("log")
+  private void setLogLevelString(String level) {
+    if (level != null) {
+      log = Level.parse(level);
+    }
   }
 
   /**
@@ -70,7 +86,7 @@ public class Config {
    * @return
    *   The number of network auditors.
    */
-  public int getNumAuditors() {
+  public int numAuditors() {
     return auditors;
   }
 
@@ -80,7 +96,7 @@ public class Config {
    * @return
    *   Ack timeout for the network. Defaults to 30000
    */
-  public long getAckTimeout() {
+  public long ackTimeout() {
     return timeout;
   }
 
@@ -90,7 +106,7 @@ public class Config {
    * @return
    *   The default number of component instances.
    */
-  public int getDefaultNumInstances() {
+  public int defaultNumInstances() {
     return components.instances;
   }
 
@@ -100,7 +116,7 @@ public class Config {
    * @return
    *   The default component configuration.
    */
-  public JsonObject getDefaultConfig() {
+  public JsonObject defaultConfig() {
     return components.config != null ? new JsonObject(components.config) : new JsonObject();
   }
 

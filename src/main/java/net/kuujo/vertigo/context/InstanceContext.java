@@ -53,7 +53,7 @@ public final class InstanceContext<T extends Component> implements Serializable 
     Serializer<InstanceContext> serializer = SerializerFactory.getSerializer(InstanceContext.class);
     InstanceContext<T> instance = serializer.deserialize(context.getObject("instance"));
     ComponentContext<T> component = ComponentContext.fromJson(context);
-    return instance.setParent(component);
+    return instance.setComponentContext(component);
   }
 
   /**
@@ -66,14 +66,14 @@ public final class InstanceContext<T extends Component> implements Serializable 
    */
   public static JsonObject toJson(InstanceContext<?> context) {
     Serializer<InstanceContext> serializer = SerializerFactory.getSerializer(InstanceContext.class);
-    JsonObject json = ComponentContext.toJson(context.getComponent());
+    JsonObject json = ComponentContext.toJson(context.componentContext());
     return json.putObject("instance", serializer.serialize(context));
   }
 
   /**
    * Sets the instance parent.
    */
-  InstanceContext<T> setParent(ComponentContext<T> component) {
+  InstanceContext<T> setComponentContext(ComponentContext<T> component) {
     this.component = component;
     return this;
   }
@@ -88,13 +88,18 @@ public final class InstanceContext<T extends Component> implements Serializable 
     return id;
   }
 
+  @Deprecated
+  public ComponentContext<T> getComponent() {
+    return componentContext();
+  }
+
   /**
    * Returns the parent component context.
    *
    * @return
    *   The parent component context.
    */
-  public ComponentContext<T> getComponent() {
+  public ComponentContext<T> componentContext() {
     return component;
   }
 

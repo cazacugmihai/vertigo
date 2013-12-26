@@ -19,6 +19,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import net.kuujo.vertigo.context.NetworkContext;
+import net.kuujo.vertigo.network.Component;
 import net.kuujo.vertigo.network.MalformedNetworkException;
 import net.kuujo.vertigo.network.Network;
 import net.kuujo.vertigo.serializer.SerializationException;
@@ -47,20 +48,19 @@ public final class ContextBuilder {
       Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
       JsonObject serialized = serializer.serialize(network);
       JsonArray auditors = new JsonArray();
-      for (int i = 1; i < network.getNumAuditors()+1; i++) {
+      for (int i = 1; i < network.getConfig().getNumAuditors()+1; i++) {
         auditors.add(String.format("%s.auditor.%d", network.getAddress(), i));
       }
       serialized.putArray("auditors", auditors);
 
-      JsonObject components = serialized.getObject("components");
-      for (String fieldName : components.getFieldNames()) {
-        JsonObject component = components.getObject(fieldName);
+      JsonObject jsonComponents = serialized.getObject(Network.NETWORK_COMPONENTS);
+      for (Component<?> component : network.getComponents()) {
+        JsonObject jsonComponent = jsonComponents.getObject(component.getAddress());
         JsonArray instances = new JsonArray();
-        int numInstances = component.getInteger("instances");
-        for (int i = 1; i < numInstances+1; i++) {
-          instances.add(new JsonObject().putString("id", String.format("%s.%d", component.getString("address"), i)));
+        for (int i = 1; i <= component.getNumInstances(); i++) {
+          instances.add(new JsonObject().putString("id", String.format("%s.%d", component.getAddress(), i)));
         }
-        component.putArray("instances", instances);
+        jsonComponent.putArray("instances", instances);
       }
       return SerializerFactory.getSerializer(NetworkContext.class).deserialize(serialized);
     }

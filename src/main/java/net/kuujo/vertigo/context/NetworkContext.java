@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.vertx.java.core.json.JsonObject;
 
-import net.kuujo.vertigo.network.Config;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
@@ -69,14 +68,24 @@ public final class NetworkContext implements Serializable {
     return new JsonObject().putObject("network", SerializerFactory.getSerializer(NetworkContext.class).serialize(context));
   }
 
+  @Deprecated
+  public String getAddress() {
+    return address();
+  }
+
   /**
    * Returns the network address.
    *
    * @return
    *   The network address.
    */
-  public String getAddress() {
+  public String address() {
     return address;
+  }
+
+  @Deprecated
+  public Config getConfig() {
+    return config();
   }
 
   /**
@@ -85,8 +94,13 @@ public final class NetworkContext implements Serializable {
    * @return
    *   The network configuration.
    */
-  public Config getConfig() {
+  public Config config() {
     return config;
+  }
+
+  @Deprecated
+  public List<String> getAuditors() {
+    return auditors();
   }
 
   /**
@@ -95,7 +109,7 @@ public final class NetworkContext implements Serializable {
    * @return
    *   A list of network auditors.
    */
-  public List<String> getAuditors() {
+  public List<String> auditors() {
     return auditors;
   }
 
@@ -105,8 +119,9 @@ public final class NetworkContext implements Serializable {
    * @return
    *   The number of network auditors.
    */
+  @Deprecated
   public int getNumAuditors() {
-    return config.getNumAuditors();
+    return config.numAuditors();
   }
 
   /**
@@ -115,6 +130,7 @@ public final class NetworkContext implements Serializable {
    * @return
    *   Indicates whether acking is enabled for the network.
    */
+  @Deprecated
   public boolean isAckingEnabled() {
     return config.isAckingEnabled();
   }
@@ -125,8 +141,14 @@ public final class NetworkContext implements Serializable {
    * @return
    *   Ack timeout for the network.
    */
+  @Deprecated
   public long getAckTimeout() {
-    return config.getAckTimeout();
+    return config.ackTimeout();
+  }
+
+  @Deprecated
+  public List<ComponentContext<?>> getComponents() {
+    return componentContexts();
   }
 
   /**
@@ -135,12 +157,18 @@ public final class NetworkContext implements Serializable {
    * @return
    *   A list of network component contexts.
    */
-  public List<ComponentContext<?>> getComponents() {
+  public List<ComponentContext<?>> componentContexts() {
     List<ComponentContext<?>> components = new ArrayList<>();
     for (ComponentContext<?> component : this.components.values()) {
-      components.add(component.setParent(this));
+      components.add(component.setNetworkContext(this));
     }
     return components;
+  }
+
+  @Deprecated
+  @SuppressWarnings("rawtypes")
+  public <T extends net.kuujo.vertigo.component.Component> ComponentContext<T> getComponent(String address) {
+    return componentContext(address);
   }
 
   /**
@@ -152,8 +180,11 @@ public final class NetworkContext implements Serializable {
    *   A component context, or null if the component does not exist.
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public <T extends net.kuujo.vertigo.component.Component> ComponentContext<T> getComponent(String address) {
-    return components.get(address).setParent(this);
+  public <T extends net.kuujo.vertigo.component.Component> ComponentContext<T> componentContext(String address) {
+    if (components.containsKey(address)) {
+      return components.get(address).setNetworkContext(this);
+    }
+    throw new IllegalArgumentException("Invalid component " + address);
   }
 
 }

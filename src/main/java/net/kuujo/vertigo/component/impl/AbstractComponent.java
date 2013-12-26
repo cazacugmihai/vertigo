@@ -76,18 +76,21 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleReceive(MessageId id) {
+      debug("receive", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleReceive(id);
       }
     }
     @Override
     public void handleAck(MessageId id) {
+      debug("ack", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleAck(id);
       }
     }
     @Override
     public void handleFail(MessageId id) {
+      debug("fail", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleFail(id);
       }
@@ -105,24 +108,28 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleEmit(MessageId id) {
+      debug("emit", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleEmit(id);
       }
     }
     @Override
     public void handleAcked(MessageId id) {
+      debug("acked", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleAcked(id);
       }
     }
     @Override
     public void handleFailed(MessageId id) {
+      debug("failed", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleFailed(id);
       }
     }
     @Override
     public void handleTimeout(MessageId id) {
+      debug("timeout", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleTimeout(id);
       }
@@ -137,14 +144,16 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     this.vertx = vertx;
     this.eventBus = vertx.eventBus();
     this.container = container;
-    this.logger = LoggerFactory.getLogger(context.id());
+    String loggerName = context.componentContext().networkContext().address()
+        + "-" + context.componentContext().address() + "-" + context.id();
+    this.logger = LoggerFactory.getLogger(loggerName);
     this.context = context;
     this.acker = new DefaultAcker(context.id(), eventBus);
     this.instanceId = context.id();
-    this.address = context.getComponent().getAddress();
-    NetworkContext networkContext = context.getComponent().getNetwork();
-    networkAddress = networkContext.getAddress();
-    List<String> auditorAddresses = networkContext.getAuditors();
+    this.address = context.componentContext().address();
+    NetworkContext networkContext = context.componentContext().networkContext();
+    networkAddress = networkContext.address();
+    List<String> auditorAddresses = networkContext.auditors();
     auditors = new ArrayList<String>();
     for (String auditorAddress : auditorAddresses) {
       auditors.add(auditorAddress);
@@ -152,8 +161,19 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     heartbeat = new DefaultHeartbeatEmitter(vertx);
     input = new DefaultInputCollector(vertx, container, context, acker);
     output = new DefaultOutputCollector(vertx, container, context, acker);
-    for (ComponentHook hook : context.getComponent().getHooks()) {
+    for (ComponentHook hook : context.componentContext().hooks()) {
       addHook(hook);
+    }
+    input.addHook(inputHook);
+    output.addHook(outputHook);
+  }
+
+  /**
+   * Logs a debug message for the component.
+   */
+  protected final void debug(String event, String message) {
+    if (logger.isDebugEnabled()) {
+      logger.debug(String.format("[%s]: [%s] %s", instanceId, event, message));
     }
   }
 
@@ -185,10 +205,6 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
   @Override
   @SuppressWarnings("unchecked")
   public T addHook(ComponentHook hook) {
-    if (hooks.isEmpty()) {
-      input.addHook(inputHook);
-      output.addHook(outputHook);
-    }
     hooks.add(hook);
     return (T) this;
   }
@@ -286,7 +302,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
         if (result.succeeded()) {
           String heartbeatAddress = result.result().body();
           heartbeat.setAddress(heartbeatAddress);
-          heartbeat.setInterval(context.getComponent().getHeartbeatInterval());
+          heartbeat.setInterval(context.componentContext().heartbeatInterval());
           heartbeat.start();
           future.setResult(null);
         }

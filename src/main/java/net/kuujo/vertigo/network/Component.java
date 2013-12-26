@@ -148,14 +148,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
 
   Component<T> setNetwork(Network network) {
     this.network = network;
-    setInputCounts();
     return this;
-  }
-
-  private void setInputCounts() {
-    for (Input input : inputs) {
-      input.setCount(getNumInstances());
-    }
   }
 
   /**
@@ -434,17 +427,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    */
   public Component<T> setNumInstances(int numInstances) {
     this.instances = numInstances;
-    setInputCounts();
     return this;
-  }
-
-  // Use a special setter that allows us to set input counts when instances is set.
-  @JsonSetter("instances")
-  private void setStaticNumInstances(Integer instances) {
-    if (instances != null) {
-      this.instances = instances;
-    }
-    setInputCounts();
   }
 
   @Deprecated
@@ -508,7 +491,6 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The new input instance.
    */
   public Input addInput(Input input) {
-    input.setCount(getNumInstances());
     inputs.add(input);
     return input;
   }

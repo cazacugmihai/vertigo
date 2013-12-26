@@ -23,9 +23,9 @@ import java.util.Random;
 
 import net.kuujo.vertigo.acker.Acker;
 import net.kuujo.vertigo.acker.DefaultAcker;
+import net.kuujo.vertigo.context.InputContext;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.hooks.OutputHook;
-import net.kuujo.vertigo.input.Input;
 import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.message.MessageId;
 import net.kuujo.vertigo.message.impl.JsonMessageBuilder;
@@ -79,9 +79,9 @@ public class DefaultOutputCollector implements OutputCollector {
     this.context = context;
     acker = new DefaultAcker(context.id(), eventBus);
     messageBuilder = new JsonMessageBuilder(context.id());
-    ackingEnabled = context.getComponent().getNetwork().isAckingEnabled();
-    auditors = context.getComponent().getNetwork().getAuditors();
-    componentAddress = context.getComponent().getAddress();
+    ackingEnabled = context.componentContext().networkContext().config().isAckingEnabled();
+    auditors = context.componentContext().networkContext().auditors();
+    componentAddress = context.componentContext().address();
   }
 
   public DefaultOutputCollector(Vertx vertx, Container container, InstanceContext<?> context, Acker acker) {
@@ -94,9 +94,9 @@ public class DefaultOutputCollector implements OutputCollector {
     this.context = context;
     this.acker = acker;
     messageBuilder = new JsonMessageBuilder(context.id());
-    ackingEnabled = context.getComponent().getNetwork().isAckingEnabled();
-    auditors = context.getComponent().getNetwork().getAuditors();
-    componentAddress = context.getComponent().getAddress();
+    ackingEnabled = context.componentContext().networkContext().config().isAckingEnabled();
+    auditors = context.componentContext().networkContext().auditors();
+    componentAddress = context.componentContext().address();
   }
 
   private Handler<Message<JsonObject>> handler = new Handler<Message<JsonObject>>() {
@@ -122,9 +122,9 @@ public class DefaultOutputCollector implements OutputCollector {
       return;
     }
 
-    Serializer<Input> serializer = SerializerFactory.getSerializer(Input.class);
-    Input input = serializer.deserialize(info);
-    Output output = new Output(input.id(), input.getStream(), input.getCount(), input.getGrouping().createSelector());
+    Serializer<InputContext> serializer = SerializerFactory.getSerializer(InputContext.class);
+    InputContext input = serializer.deserialize(info);
+    Output output = new Output(input.id(), input.stream(), input.count(), input.grouping().createSelector());
 
     final Channel channel = findChannel(output);
     if (!channel.containsConnection(address)) {
@@ -180,7 +180,7 @@ public class DefaultOutputCollector implements OutputCollector {
 
   @Override
   public String getAddress() {
-    return context.getComponent().getAddress();
+    return context.componentContext().address();
   }
 
   @Override
@@ -357,7 +357,7 @@ public class DefaultOutputCollector implements OutputCollector {
 
   @Override
   public OutputCollector start() {
-    eventBus.registerHandler(context.getComponent().getAddress(), handler);
+    eventBus.registerHandler(context.componentContext().address(), handler);
     hookStart();
     return this;
   }
@@ -365,7 +365,7 @@ public class DefaultOutputCollector implements OutputCollector {
   @Override
   public OutputCollector start(Handler<AsyncResult<Void>> doneHandler) {
     final Future<Void> future = new DefaultFutureResult<Void>().setHandler(doneHandler);
-    eventBus.registerHandler(context.getComponent().getAddress(), handler, new Handler<AsyncResult<Void>>() {
+    eventBus.registerHandler(context.componentContext().address(), handler, new Handler<AsyncResult<Void>>() {
       @Override
       public void handle(AsyncResult<Void> result) {
         if (result.failed()) {
@@ -382,14 +382,14 @@ public class DefaultOutputCollector implements OutputCollector {
 
   @Override
   public void stop() {
-    eventBus.unregisterHandler(context.getComponent().getAddress(), handler);
+    eventBus.unregisterHandler(context.componentContext().address(), handler);
     hookStop();
   }
 
   @Override
   public void stop(Handler<AsyncResult<Void>> doneHandler) {
     final Future<Void> future = new DefaultFutureResult<Void>().setHandler(doneHandler);
-    eventBus.unregisterHandler(context.getComponent().getAddress(), handler, new Handler<AsyncResult<Void>>() {
+    eventBus.unregisterHandler(context.componentContext().address(), handler, new Handler<AsyncResult<Void>>() {
       @Override
       public void handle(AsyncResult<Void> result) {
         if (result.failed()) {
