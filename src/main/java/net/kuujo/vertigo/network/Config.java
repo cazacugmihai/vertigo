@@ -61,6 +61,11 @@ public class Config implements Serializable {
   public static final String NETWORK_ACK_TIMEOUT = "timeout";
 
   /**
+   * The interval at which components will send heartbeat messages to network monitors.
+   */
+  public static final String NETWORK_HEARTBEAT_INTERVAL = "heartbeat";
+
+  /**
    * A Json container for default component configuration options.
    */
   public static final String COMPONENTS = "components";
@@ -76,11 +81,13 @@ public class Config implements Serializable {
   public static final String COMPONENT_NUM_INSTANCES = "instances";
 
   private static final long DEFAULT_ACK_TIMEOUT = 30000;
+  private static final long DEFAULT_HEARTBEAT_INTERVAL = 5000;
 
   private Level log = Level.INFO;
   private int auditors = 1;
   private boolean acking = true;
   private long timeout = DEFAULT_ACK_TIMEOUT;
+  private long heartbeat = DEFAULT_HEARTBEAT_INTERVAL;
   private ComponentDefaults components = new ComponentDefaults();
 
   /**
@@ -255,6 +262,29 @@ public class Config implements Serializable {
    */
   public Config setAckTimeout(long timeout) {
     this.timeout = timeout;
+    return this;
+  }
+
+  /**
+   * Gets the interval at which network components will send heartbeats to monitors.
+   *
+   * @return
+   *   The network heartbeat interval.
+   */
+  public long getHeartbeatInterval() {
+    return heartbeat;
+  }
+
+  /**
+   * Sets the network and component heartbeat interval.
+   *
+   * @param interval
+   *   The interval at which to send heartbeats to network monitors.
+   * @return
+   *   The network configuration instance.
+   */
+  public Config setHeartbeatInterval(long interval) {
+    this.heartbeat = interval;
     return this;
   }
 

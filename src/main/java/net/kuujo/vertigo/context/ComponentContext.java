@@ -306,10 +306,6 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
     return FIXED_HEARTBEAT_INTERVAL;
   }
 
-  public long heartbeatInterval() {
-    return FIXED_HEARTBEAT_INTERVAL;
-  }
-
   @Deprecated
   public List<ComponentHook> getHooks() {
     return hooks();

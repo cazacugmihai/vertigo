@@ -104,8 +104,6 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    */
   public static final String COMPONENT_INPUTS = "inputs";
 
-  private static final long FIXED_HEARTBEAT_INTERVAL = 5000;
-
   private String address;
   private @JsonBackReference Network network;
   private Class<T> type;
@@ -432,7 +430,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
 
   @Deprecated
   public long getHeartbeatInterval() {
-    return FIXED_HEARTBEAT_INTERVAL;
+    return network.getConfig().getHeartbeatInterval();
   }
 
   @Deprecated

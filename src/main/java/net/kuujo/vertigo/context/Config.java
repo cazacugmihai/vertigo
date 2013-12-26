@@ -32,10 +32,12 @@ import com.fasterxml.jackson.annotation.JsonSetter;
  */
 public class Config implements Serializable {
   private static final long DEFAULT_ACK_TIMEOUT = 30000;
+  private static final long DEFAULT_HEARTBEAT_INTERVAL = 5000;
   private Level log;
   private int auditors = 1;
   private boolean acking = true;
   private long timeout = DEFAULT_ACK_TIMEOUT;
+  private long heartbeat = DEFAULT_HEARTBEAT_INTERVAL;
   private ComponentDefaults components = new ComponentDefaults();
 
   /**
@@ -98,6 +100,16 @@ public class Config implements Serializable {
    */
   public long ackTimeout() {
     return timeout;
+  }
+
+  /**
+   * Gets the network heartbeat interval.
+   *
+   * @return
+   *   The interval at which components will send heartbeat messages to network monitors.
+   */
+  public long heartbeatInterval() {
+    return heartbeat;
   }
 
   /**
