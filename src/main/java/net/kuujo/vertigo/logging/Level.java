@@ -26,7 +26,8 @@ public enum Level {
   INFO("INFO", 3),
   WARN("WARN", 4),
   ERROR("ERROR", 5),
-  FATAL("FATAL", 6);
+  FATAL("FATAL", 6),
+  OFF("OFF", 7);
 
   /**
    * Parse a level string into a level.
@@ -50,6 +51,8 @@ public enum Level {
         return ERROR;
       case "FATAL":
         return FATAL;
+      case "OFF":
+        return OFF;
       default:
         throw new IllegalArgumentException("Invalid level name.");
     }
@@ -77,6 +80,8 @@ public enum Level {
         return ERROR;
       case 6:
         return FATAL;
+      case 7:
+        return OFF;
       default:
         throw new IllegalArgumentException("Invalid level value.");
     }
