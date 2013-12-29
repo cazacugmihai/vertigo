@@ -33,9 +33,9 @@ public final class JsonMessageBuilder {
   private long counter;
   private final Random random = new Random();
 
-  public JsonMessageBuilder(String address) {
+  public JsonMessageBuilder(String address, String prefix) {
     this.address = address;
-    this.prefix = address + ":";
+    this.prefix = prefix;
   }
 
   /**

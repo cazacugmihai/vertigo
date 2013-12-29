@@ -78,7 +78,7 @@ public class DefaultOutputCollector implements OutputCollector {
     this.eventBus = eventBus;
     this.context = context;
     acker = new DefaultAcker(context.id(), eventBus);
-    messageBuilder = new JsonMessageBuilder(context.id());
+    messageBuilder = new JsonMessageBuilder(context.id(), String.format("%s-%s-", context.componentContext().networkContext().address(), context.id()));
     ackingEnabled = context.componentContext().networkContext().config().isAckingEnabled();
     auditors = context.componentContext().networkContext().auditors();
     componentAddress = context.componentContext().address();
@@ -93,7 +93,7 @@ public class DefaultOutputCollector implements OutputCollector {
     this.eventBus = eventBus;
     this.context = context;
     this.acker = acker;
-    messageBuilder = new JsonMessageBuilder(context.id());
+    messageBuilder = new JsonMessageBuilder(context.id(), String.format("%s-%s-", context.componentContext().networkContext().address(), context.id()));
     ackingEnabled = context.componentContext().networkContext().config().isAckingEnabled();
     auditors = context.componentContext().networkContext().auditors();
     componentAddress = context.componentContext().address();
