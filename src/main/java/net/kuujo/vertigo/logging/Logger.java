@@ -89,12 +89,6 @@ public class Logger extends org.vertx.java.core.logging.Logger {
     }
   }
 
-  public void fatal(final String format, final Object... args) {
-    if (isLoggable(Level.FATAL)) {
-      logger.fatal(String.format(format, args));
-    }
-  }
-
   @Override
   public void error(final Object message) {
     if (isLoggable(Level.ERROR)) {
@@ -106,12 +100,6 @@ public class Logger extends org.vertx.java.core.logging.Logger {
   public void error(final Object message, final Throwable t) {
     if (isLoggable(Level.ERROR)) {
       logger.error(message, t);
-    }
-  }
-
-  public void error(final String format, final Object... args) {
-    if (isLoggable(Level.ERROR)) {
-      logger.error(String.format(format, args));
     }
   }
 
@@ -129,12 +117,6 @@ public class Logger extends org.vertx.java.core.logging.Logger {
     }
   }
 
-  public void warn(final String format, final Object... args) {
-    if (isLoggable(Level.WARN)) {
-      logger.warn(String.format(format, args));
-    }
-  }
-
   @Override
   public void info(final Object message) {
     if (isLoggable(Level.INFO)) {
@@ -146,12 +128,6 @@ public class Logger extends org.vertx.java.core.logging.Logger {
   public void info(final Object message, final Throwable t) {
     if (isLoggable(Level.INFO)) {
       logger.info(message, t);
-    }
-  }
-
-  public void info(final String format, final Object... args) {
-    if (isLoggable(Level.INFO)) {
-      logger.info(String.format(format, args));
     }
   }
 
@@ -169,12 +145,6 @@ public class Logger extends org.vertx.java.core.logging.Logger {
     }
   }
 
-  public void debug(final String format, final Object... args) {
-    if (isLoggable(Level.DEBUG)) {
-      logger.debug(String.format(format, args));
-    }
-  }
-
   @Override
   public void trace(final Object message) {
     if (isLoggable(Level.DEBUG)) {
@@ -186,12 +156,6 @@ public class Logger extends org.vertx.java.core.logging.Logger {
   public void trace(final Object message, final Throwable t) {
     if (isLoggable(Level.DEBUG)) {
       logger.trace(message, t);
-    }
-  }
-
-  public void trace(final String format, final Object... args) {
-    if (isLoggable(Level.TRACE)) {
-      logger.trace(String.format(format, args));
     }
   }
 

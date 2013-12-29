@@ -76,21 +76,27 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleReceive(MessageId id) {
-      logger.debug("Received message %s", id.correlationId());
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Received message %s", id.correlationId()));
+      }
       for (ComponentHook hook : hooks) {
         hook.handleReceive(id);
       }
     }
     @Override
     public void handleAck(MessageId id) {
-      logger.debug("Acked message %s", id.correlationId());
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Acked message %s", id.correlationId()));
+      }
       for (ComponentHook hook : hooks) {
         hook.handleAck(id);
       }
     }
     @Override
     public void handleFail(MessageId id) {
-      logger.debug("Failed message %s", id.correlationId());
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Failed message %s", id.correlationId()));
+      }
       for (ComponentHook hook : hooks) {
         hook.handleFail(id);
       }
@@ -108,28 +114,36 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleEmit(MessageId id) {
-      logger.debug("Emitted message %s", id.correlationId());
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Emitted message %s", id.correlationId()));
+      }
       for (ComponentHook hook : hooks) {
         hook.handleEmit(id);
       }
     }
     @Override
     public void handleAcked(MessageId id) {
-      logger.debug("Message %s was acked", id.correlationId());
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Message %s was acked", id.correlationId()));
+      }
       for (ComponentHook hook : hooks) {
         hook.handleAcked(id);
       }
     }
     @Override
     public void handleFailed(MessageId id) {
-      logger.debug("Message %s was failed", id.correlationId());
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Message %s was failed", id.correlationId()));
+      }
       for (ComponentHook hook : hooks) {
         hook.handleFailed(id);
       }
     }
     @Override
     public void handleTimeout(MessageId id) {
-      logger.debug("Message %s timed out", id.correlationId());
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("Message %s timed out", id.correlationId()));
+      }
       for (ComponentHook hook : hooks) {
         hook.handleTimeout(id);
       }
