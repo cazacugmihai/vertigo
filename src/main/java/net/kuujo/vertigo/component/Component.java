@@ -24,6 +24,7 @@ import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.hooks.ComponentHook;
 import net.kuujo.vertigo.input.InputCollector;
 import net.kuujo.vertigo.output.OutputCollector;
+import net.kuujo.vertigo.logging.Logger;
 import net.kuujo.vertigo.message.schema.MessageSchema;
 
 /**
@@ -90,6 +91,14 @@ public interface Component<T extends Component<T>> {
 
   @Deprecated
   InstanceContext<T> getContext();
+
+  /**
+   * Returns a component logger. This logger may be configured separately from Vert.x logging.
+   *
+   * @return
+   *   A component logger.
+   */
+  Logger logger();
 
   /**
    * Adds a hook to the component.

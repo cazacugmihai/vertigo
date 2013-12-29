@@ -233,6 +233,11 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
   }
 
   @Override
+  public Logger logger() {
+    return logger;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public T addHook(ComponentHook hook) {
     hooks.add(hook);
