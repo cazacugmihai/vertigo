@@ -50,7 +50,7 @@ public class SelectorTest {
     add(new DefaultPseudoConnection(null));
   }};
 
-  private JsonMessage testMessage = new JsonMessageBuilder("test").createNew("auditor")
+  private JsonMessage testMessage = new JsonMessageBuilder("test", "test-").createNew("auditor")
       .setBody(new JsonObject().putString("body", "Hello world!")).toMessage();
 
   @Test
@@ -94,7 +94,7 @@ public class SelectorTest {
   public void testFieldsSelector() {
     Selector selector = new FieldsSelector("test");
 
-    JsonMessageBuilder builder = new JsonMessageBuilder("test");
+    JsonMessageBuilder builder = new JsonMessageBuilder("test", "test-");
 
     JsonMessage test1 = builder.createNew("auditor").setBody(new JsonObject().putString("test", "a")).toMessage();
     List<Connection> connections1 = selector.select(test1, testConnections);

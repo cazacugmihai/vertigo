@@ -101,7 +101,7 @@ public class AuditorTest extends TestVerticle {
           @Override
           public void handle(AsyncResult<Void> result) {
             assertTrue(result.succeeded());
-            JsonMessageBuilder builder = new JsonMessageBuilder("test");
+            JsonMessageBuilder builder = new JsonMessageBuilder("test", "test-");
             JsonMessage message = builder.createNew(auditor).toMessage();
             MessageId source = message.messageId();
             acker.ackHandler(ackHandler(source));
@@ -134,7 +134,7 @@ public class AuditorTest extends TestVerticle {
           public void handle(AsyncResult<Void> result) {
             assertTrue(result.succeeded());
 
-            JsonMessageBuilder builder = new JsonMessageBuilder("test");
+            JsonMessageBuilder builder = new JsonMessageBuilder("test", "test-");
             JsonMessage message = builder.createNew(auditor).toMessage();
             MessageId source = message.messageId();
             acker.failHandler(failHandler(source));
@@ -167,7 +167,7 @@ public class AuditorTest extends TestVerticle {
           @Override
           public void handle(AsyncResult<Void> result) {
             assertTrue(result.succeeded());
-            JsonMessageBuilder builder = new JsonMessageBuilder("test");
+            JsonMessageBuilder builder = new JsonMessageBuilder("test", "test-");
             JsonMessage message = builder.createNew(auditor).toMessage();
             MessageId source = message.messageId();
             acker.timeoutHandler(timeoutHandler(source));
