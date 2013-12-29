@@ -57,6 +57,7 @@ public class NetworkTest extends TestVerticle {
   @Test
   public void testAckingFeeder() {
     Network network = new Network("test");
+    network.debug();
     network.addFeeder("feeder", TestAckingFeeder.class.getName(), new JsonObject().putString("body", "Hello world"));
     network.addWorker("worker", TestAckingWorker.class.getName()).addInput("feeder");
     deployNetwork(network);

@@ -192,16 +192,11 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>${maven.failsafe.plugin.version}</version>
         <configuration>
-          <systemProperties>
-            <property>
-              <name>vertx.mods</name>
-              <value>target/mods</value>
-            </property>
-            <property>
-              <name>vertx.test.timeout</name>
-              <value>30</value>
-            </property>
-          </systemProperties>
+          <systemPropertyVariables>
+            <vertx.mods>target/mods</vertx.mods>
+            <vertx.test.timeout>30</vertx.test.timeout>
+          </systemPropertyVariables>
+          <argLine>-Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties</argLine>
           <includes>
             <include>**/integration/**</include>
           </includes>

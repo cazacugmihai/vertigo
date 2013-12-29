@@ -32,6 +32,8 @@ import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.coordinator.heartbeat.HeartbeatMonitor;
 import net.kuujo.vertigo.coordinator.heartbeat.impl.DefaultHeartbeatMonitor;
 import net.kuujo.vertigo.events.Events;
+import net.kuujo.vertigo.logging.Logger;
+import net.kuujo.vertigo.logging.impl.LoggerFactory;
 import net.kuujo.vertigo.serializer.SerializationException;
 
 import org.vertx.java.busmods.BusModBase;
@@ -50,6 +52,7 @@ import org.vertx.java.core.json.JsonObject;
 @SuppressWarnings({"unchecked", "rawtypes"})
 abstract class AbstractCoordinator extends BusModBase implements Handler<Message<JsonObject>> {
   protected NetworkContext context;
+  protected Logger logger;
   protected Events events;
   protected Map<String, String> deploymentMap = new HashMap<>();
   protected Map<String, InstanceContext<?>> contextMap = new HashMap<>();
@@ -61,6 +64,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
   @Override
   public void start() {
     super.start();
+    logger = LoggerFactory.getLogger(getClass());
     events = new Events(eb);
     context = NetworkContext.fromJson(config);
     eb.registerHandler(context.address(), this);

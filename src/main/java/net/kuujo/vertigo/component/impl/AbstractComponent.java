@@ -26,6 +26,8 @@ import net.kuujo.vertigo.message.schema.MessageSchema;
 import net.kuujo.vertigo.acker.Acker;
 import net.kuujo.vertigo.acker.DefaultAcker;
 import net.kuujo.vertigo.component.Component;
+import net.kuujo.vertigo.logging.impl.LoggerFactory;
+import net.kuujo.vertigo.logging.Logger;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.coordinator.heartbeat.HeartbeatEmitter;
@@ -44,8 +46,6 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
 /**
@@ -76,21 +76,21 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleReceive(MessageId id) {
-      debug("receive", id.correlationId());
+      logger.debug("Received message %s", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleReceive(id);
       }
     }
     @Override
     public void handleAck(MessageId id) {
-      debug("ack", id.correlationId());
+      logger.debug("Acked message %s", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleAck(id);
       }
     }
     @Override
     public void handleFail(MessageId id) {
-      debug("fail", id.correlationId());
+      logger.debug("Failed message %s", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleFail(id);
       }
@@ -108,28 +108,28 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleEmit(MessageId id) {
-      debug("emit", id.correlationId());
+      logger.debug("Emitted message %s", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleEmit(id);
       }
     }
     @Override
     public void handleAcked(MessageId id) {
-      debug("acked", id.correlationId());
+      logger.debug("Message %s was acked", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleAcked(id);
       }
     }
     @Override
     public void handleFailed(MessageId id) {
-      debug("failed", id.correlationId());
+      logger.debug("Message %s was failed", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleFailed(id);
       }
     }
     @Override
     public void handleTimeout(MessageId id) {
-      debug("timeout", id.correlationId());
+      logger.debug("Message %s timed out", id.correlationId());
       for (ComponentHook hook : hooks) {
         hook.handleTimeout(id);
       }
@@ -146,6 +146,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     this.container = container;
     String loggerName = context.componentContext().networkContext().address() + "-" + context.id();
     this.logger = LoggerFactory.getLogger(loggerName);
+    logger.setLevel(context.componentContext().logLevel());
     this.context = context;
     this.acker = new DefaultAcker(context.id(), eventBus);
     this.instanceId = context.id();
@@ -165,15 +166,6 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     input.addHook(inputHook);
     output.addHook(outputHook);
-  }
-
-  /**
-   * Logs a debug message for the component.
-   */
-  protected final void debug(String event, String message) {
-    if (logger.isDebugEnabled()) {
-      logger.debug(String.format("[%s]: [%s] %s", instanceId, event, message));
-    }
   }
 
   @Override
