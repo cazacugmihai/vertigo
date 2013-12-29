@@ -21,6 +21,8 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 
 /**
  * Default heartbeat monitor implementation.
@@ -28,6 +30,7 @@ import org.vertx.java.core.eventbus.Message;
  * @author Jordan Halterman
  */
 public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
+  private static final Logger log = LoggerFactory.getLogger(HeartbeatMonitor.class);
   private String address;
   private Vertx vertx;
   private EventBus eventBus;
@@ -108,6 +111,9 @@ public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
     * Starts the monitor.
     */
     private void start() {
+      if (log.isInfoEnabled()) {
+        log.info(String.format("Starting heartbeat monitor at %s", address));
+      }
       eventBus.registerHandler(address, handler);
     }
 
@@ -115,8 +121,14 @@ public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
     * Stops the monitor.
     */
     private void stop() {
+      if (log.isInfoEnabled()) {
+        log.info(String.format("Stopping heartbeat monitor at %s", address));
+      }
       eventBus.unregisterHandler(address, handler);
       if (timerID != 0) {
+        if (log.isDebugEnabled()) {
+          log.debug(String.format("Cancelling periodic timer %d", timerID));
+        }
         vertx.cancelTimer(timerID);
       }
     }
@@ -125,10 +137,18 @@ public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
     * Resets the monitor timer.
     */
     private void resetTimer() {
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("Resetting heartbeat timer for %s", address));
+      }
+
       // First, cancel the old timer.
       if (timerID != 0) {
+        if (log.isDebugEnabled()) {
+          log.debug(String.format("Cancelling timer %d", timerID));
+        }
         vertx.cancelTimer(timerID);
       }
+
       // Then, create a new timer that triggers the timeoutHandler if called.
       timerID = vertx.setTimer(interval, new Handler<Long>() {
         @Override
@@ -137,6 +157,10 @@ public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
           timeoutHandler.handle(address);
         }
       });
+
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("Set timer %d", timerID));
+      }
     }
   }
 

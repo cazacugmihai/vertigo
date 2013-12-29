@@ -20,6 +20,8 @@ import net.kuujo.vertigo.coordinator.heartbeat.HeartbeatEmitter;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 
 /**
  * Default heartbeat emitter implementation.
@@ -27,6 +29,7 @@ import org.vertx.java.core.eventbus.EventBus;
  * @author Jordan Halterman
  */
 public class DefaultHeartbeatEmitter implements HeartbeatEmitter {
+  private static final Logger log = LoggerFactory.getLogger(HeartbeatEmitter.class);
   private String address;
   private Vertx vertx;
   private EventBus eventBus;
@@ -68,17 +71,34 @@ public class DefaultHeartbeatEmitter implements HeartbeatEmitter {
 
   @Override
   public void start() {
+    if (log.isInfoEnabled()) {
+      log.info(String.format("Starting heartbeats to %s", address));
+    }
+
     timerID = vertx.setPeriodic(interval, new Handler<Long>() {
       @Override
-      public void handle(Long event) {
+      public void handle(Long timerID) {
         eventBus.send(address, true);
+        if (log.isDebugEnabled()) {
+          log.debug(String.format("Sent heartbeat message to %s", address));
+        }
       }
     });
+
+    if (log.isDebugEnabled()) {
+      log.debug(String.format("Set periodic timer %d", timerID));
+    }
   }
 
   @Override
   public void stop() {
+    if (log.isInfoEnabled()) {
+      log.info(String.format("Stopping heartbeats to %s", address));
+    }
     if (timerID != 0) {
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("Cancelling periodic timer %d", timerID));
+      }
       vertx.cancelTimer(timerID);
     }
   }
