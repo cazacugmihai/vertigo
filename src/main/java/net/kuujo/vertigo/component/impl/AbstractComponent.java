@@ -26,8 +26,6 @@ import net.kuujo.vertigo.message.schema.MessageSchema;
 import net.kuujo.vertigo.acker.Acker;
 import net.kuujo.vertigo.acker.DefaultAcker;
 import net.kuujo.vertigo.component.Component;
-import net.kuujo.vertigo.logging.impl.LoggerFactory;
-import net.kuujo.vertigo.logging.Logger;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.coordinator.heartbeat.HeartbeatEmitter;
@@ -46,6 +44,8 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
 /**
@@ -160,7 +160,6 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     this.container = container;
     String loggerName = context.componentContext().networkContext().address() + "-" + context.id();
     this.logger = LoggerFactory.getLogger(loggerName);
-    logger.setLevel(context.componentContext().logLevel());
     this.context = context;
     this.acker = new DefaultAcker(context.id(), eventBus);
     this.instanceId = context.id();
@@ -172,7 +171,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     for (String auditorAddress : auditorAddresses) {
       auditors.add(auditorAddress);
     }
-    heartbeat = new DefaultHeartbeatEmitter(vertx);
+    heartbeat = new DefaultHeartbeatEmitter(vertx, context);
     input = new DefaultInputCollector(vertx, container, context, acker);
     output = new DefaultOutputCollector(vertx, container, context, acker);
     for (ComponentHook hook : context.componentContext().hooks()) {
@@ -331,7 +330,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
       future.setHandler(doneHandler);
     }
 
-    eventBus.sendWithTimeout(networkAddress, new JsonObject().putString("action", "register").putString("address", address), 10000, new Handler<AsyncResult<Message<String>>>() {
+    eventBus.sendWithTimeout(networkAddress, new JsonObject().putString("action", "register").putString("address", instanceId), 10000, new Handler<AsyncResult<Message<String>>>() {
       @Override
       public void handle(AsyncResult<Message<String>> result) {
         if (result.succeeded()) {

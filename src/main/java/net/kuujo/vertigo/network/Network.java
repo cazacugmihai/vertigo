@@ -26,7 +26,6 @@ import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 import net.kuujo.vertigo.feeder.Feeder;
-import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.rpc.Executor;
 import net.kuujo.vertigo.worker.Worker;
 
@@ -173,27 +172,6 @@ public final class Network implements Serializable {
    */
   public JsonObject getConfigAsJson() {
     return SerializerFactory.getSerializer(Config.class).serialize(config);
-  }
-
-  /**
-   * Enables debugging for the network.
-   *
-   * @return
-   *   The network instance.
-   */
-  public Network debug() {
-    config.setLogLevel(Level.DEBUG);
-    return this;
-  }
-
-  /**
-   * Indicates whether debugging is enabled for the network.
-   *
-   * @return
-   *   Indicates whether debugging is enabled for the network.
-   */
-  public boolean isDebug() {
-    return config.getLogLevel().equals(Level.DEBUG) || config.getLogLevel().equals(Level.TRACE);
   }
 
   /**

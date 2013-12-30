@@ -32,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 
 import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.hooks.ComponentHook;
-import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
@@ -50,7 +49,6 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
   private static final long FIXED_HEARTBEAT_INTERVAL = 5000;
   private String address;
   private Class<T> type;
-  private Level log;
   private String main;
   private Map<String, Object> config;
   private List<InstanceContext<T>> instances = new ArrayList<>();
@@ -141,34 +139,6 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
   @SuppressWarnings("unchecked")
   private void setSerializedType(String type) {
     this.type = (Class<T>) deserializeType(type);
-  }
-
-  @Deprecated
-  public Level getLogLevel() {
-    return logLevel();
-  }
-
-  /**
-   * Gets the component log level. If the component does not have an explicit
-   * log level then the level will be inherited from the network configuration.
-   *
-   * @return
-   *   The component log level.
-   */
-  public Level logLevel() {
-    return log != null ? log : network.config().logLevel();
-  }
-
-  @JsonSetter("log")
-  private void setLogLevel(String level) {
-    if (level != null) {
-      log = Level.parse(level);
-    }
-  }
-
-  @JsonGetter("log")
-  private String getLogLevelString() {
-    return log != null ? log.getName() : null;
   }
 
   /**

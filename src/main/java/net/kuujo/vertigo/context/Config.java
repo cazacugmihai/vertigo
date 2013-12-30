@@ -17,13 +17,9 @@ package net.kuujo.vertigo.context;
 
 import java.util.Map;
 
-import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.serializer.Serializable;
 
 import org.vertx.java.core.json.JsonObject;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * An immutable network configuration.
@@ -33,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 public class Config implements Serializable {
   private static final long DEFAULT_ACK_TIMEOUT = 30000;
   private static final long DEFAULT_HEARTBEAT_INTERVAL = 5000;
-  private Level log;
   private int auditors = 1;
   private boolean acking = true;
   private long timeout = DEFAULT_ACK_TIMEOUT;
@@ -48,28 +43,6 @@ public class Config implements Serializable {
   private static class ComponentDefaults implements Serializable {
     private Map<String, Object> config;
     private int instances = 1;
-  }
-
-  /**
-   * Gets the network log level.
-   *
-   * @return
-   *   The network log level.
-   */
-  public Level logLevel() {
-    return log;
-  }
-
-  @JsonGetter("log")
-  private String getLogLevelString() {
-    return log != null ? log.getName() : null;
-  }
-
-  @JsonSetter("log")
-  private void setLogLevelString(String level) {
-    if (level != null) {
-      log = Level.parse(level);
-    }
   }
 
   /**

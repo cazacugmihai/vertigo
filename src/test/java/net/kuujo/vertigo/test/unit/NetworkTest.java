@@ -24,7 +24,6 @@ import net.kuujo.vertigo.input.grouping.AllGrouping;
 import net.kuujo.vertigo.input.grouping.FieldsGrouping;
 import net.kuujo.vertigo.input.grouping.RandomGrouping;
 import net.kuujo.vertigo.input.grouping.RoundGrouping;
-import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.message.MessageId;
 import net.kuujo.vertigo.network.Component;
 import net.kuujo.vertigo.network.Config;
@@ -57,7 +56,6 @@ public class NetworkTest {
     Network network = new Network("test");
     assertNotNull(network.getConfig());
     assertEquals("test", network.getAddress());
-    assertFalse(network.isDebug());
     assertEquals(0, network.getComponents().size());
     try {
       network.getComponent("foo");
@@ -69,7 +67,6 @@ public class NetworkTest {
   @Test
   public void testConfigDefaults() {
     Config config = new Config();
-    assertTrue(config.getLogLevel().equals(Level.INFO));
     assertTrue(config.isAckingEnabled());
     assertEquals(1, config.getNumAuditors());
     assertEquals(30000, config.getAckTimeout());
@@ -81,12 +78,6 @@ public class NetworkTest {
   public void testNetworkConfig() {
     Network network = new Network("test");
     Config config = new Config();
-    config.setLogLevel(Level.DEBUG);
-    assertTrue(config.getLogLevel().equals(Level.DEBUG));
-    config.setLogLevel("INFO");
-    assertTrue(config.getLogLevel().equals(Level.INFO));
-    config.setLogLevel("warn");
-    assertTrue(config.getLogLevel().equals(Level.WARN));
     config.setAckTimeout(10000);
     assertEquals(10000, config.getAckTimeout());
     config.setNumAuditors(3);
@@ -96,9 +87,6 @@ public class NetworkTest {
     config.setDefaultConfig(new JsonObject().putString("foo", "bar"));
     assertEquals("bar", config.getDefaultConfig().getString("foo"));
     network.setConfig(config);
-    network.debug();
-    assertTrue(network.isDebug());
-    assertTrue(network.getConfig().getLogLevel().equals(Level.DEBUG));
     assertEquals(10000, network.getConfig().getAckTimeout());
     assertEquals(3, network.getConfig().getNumAuditors());
     assertEquals(2, network.getConfig().getDefaultNumInstances());
@@ -110,7 +98,6 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setLogLevel(Level.WARN)
       .setDefaultConfig(new JsonObject().putString("foo", "bar"))
       .setDefaultNumInstances(2);
     network.setConfig(config);
@@ -124,12 +111,6 @@ public class NetworkTest {
     assertEquals(2, feeder.getNumInstances());
     feeder.setNumInstances(1);
     assertEquals(1, feeder.getNumInstances());
-    assertEquals(Level.WARN, feeder.getLogLevel());
-    feeder.setLogLevel(Level.INFO);
-    assertEquals(Level.INFO, feeder.getLogLevel());
-    feeder.debug();
-    assertTrue(feeder.isDebug());
-    assertEquals(Level.DEBUG, feeder.getLogLevel());
     assertEquals("bar", feeder.getConfig().getString("foo"));
     feeder.setConfig(new JsonObject().putString("foo", "baz"));
     assertEquals("baz", feeder.getConfig().getString("foo"));
@@ -140,7 +121,6 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setLogLevel(Level.WARN)
       .setDefaultConfig(new JsonObject().putString("foo", "bar"))
       .setDefaultNumInstances(2);
     network.setConfig(config);
@@ -154,12 +134,6 @@ public class NetworkTest {
     assertEquals(2, feeder.getNumInstances());
     feeder.setNumInstances(1);
     assertEquals(1, feeder.getNumInstances());
-    assertEquals(Level.WARN, feeder.getLogLevel());
-    feeder.setLogLevel(Level.INFO);
-    assertEquals(Level.INFO, feeder.getLogLevel());
-    feeder.debug();
-    assertTrue(feeder.isDebug());
-    assertEquals(Level.DEBUG, feeder.getLogLevel());
     assertEquals("bar", feeder.getConfig().getString("foo"));
     feeder.setConfig(new JsonObject().putString("foo", "baz"));
     assertEquals("baz", feeder.getConfig().getString("foo"));
@@ -170,7 +144,6 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setLogLevel(Level.WARN)
       .setDefaultConfig(new JsonObject().putString("foo", "bar"))
       .setDefaultNumInstances(2);
     network.setConfig(config);
@@ -184,12 +157,6 @@ public class NetworkTest {
     assertEquals(2, executor.getNumInstances());
     executor.setNumInstances(1);
     assertEquals(1, executor.getNumInstances());
-    assertEquals(Level.WARN, executor.getLogLevel());
-    executor.setLogLevel(Level.INFO);
-    assertEquals(Level.INFO, executor.getLogLevel());
-    executor.debug();
-    assertTrue(executor.isDebug());
-    assertEquals(Level.DEBUG, executor.getLogLevel());
     assertEquals("bar", executor.getConfig().getString("foo"));
     executor.setConfig(new JsonObject().putString("foo", "baz"));
     assertEquals("baz", executor.getConfig().getString("foo"));
@@ -200,7 +167,6 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setLogLevel(Level.WARN)
       .setDefaultConfig(new JsonObject().putString("foo", "bar"))
       .setDefaultNumInstances(2);
     network.setConfig(config);
@@ -214,12 +180,6 @@ public class NetworkTest {
     assertEquals(2, executor.getNumInstances());
     executor.setNumInstances(1);
     assertEquals(1, executor.getNumInstances());
-    assertEquals(Level.WARN, executor.getLogLevel());
-    executor.setLogLevel(Level.INFO);
-    assertEquals(Level.INFO, executor.getLogLevel());
-    executor.debug();
-    assertTrue(executor.isDebug());
-    assertEquals(Level.DEBUG, executor.getLogLevel());
     assertEquals("bar", executor.getConfig().getString("foo"));
     executor.setConfig(new JsonObject().putString("foo", "baz"));
     assertEquals("baz", executor.getConfig().getString("foo"));
@@ -230,7 +190,6 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setLogLevel(Level.WARN)
       .setDefaultConfig(new JsonObject().putString("foo", "bar"))
       .setDefaultNumInstances(2);
     network.setConfig(config);
@@ -244,12 +203,6 @@ public class NetworkTest {
     assertEquals(2, worker.getNumInstances());
     worker.setNumInstances(1);
     assertEquals(1, worker.getNumInstances());
-    assertEquals(Level.WARN, worker.getLogLevel());
-    worker.setLogLevel(Level.INFO);
-    assertEquals(Level.INFO, worker.getLogLevel());
-    worker.debug();
-    assertTrue(worker.isDebug());
-    assertEquals(Level.DEBUG, worker.getLogLevel());
     assertEquals("bar", worker.getConfig().getString("foo"));
     worker.setConfig(new JsonObject().putString("foo", "baz"));
     assertEquals("baz", worker.getConfig().getString("foo"));
@@ -260,7 +213,6 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setLogLevel(Level.WARN)
       .setDefaultConfig(new JsonObject().putString("foo", "bar"))
       .setDefaultNumInstances(2);
     network.setConfig(config);
@@ -274,12 +226,6 @@ public class NetworkTest {
     assertEquals(2, worker.getNumInstances());
     worker.setNumInstances(1);
     assertEquals(1, worker.getNumInstances());
-    assertEquals(Level.WARN, worker.getLogLevel());
-    worker.setLogLevel(Level.INFO);
-    assertEquals(Level.INFO, worker.getLogLevel());
-    worker.debug();
-    assertTrue(worker.isDebug());
-    assertEquals(Level.DEBUG, worker.getLogLevel());
     assertEquals("bar", worker.getConfig().getString("foo"));
     worker.setConfig(new JsonObject().putString("foo", "baz"));
     assertEquals("baz", worker.getConfig().getString("foo"));
@@ -332,7 +278,6 @@ public class NetworkTest {
     Network network = new Network("test");
     network.getConfig().setNumAuditors(2);
     network.getConfig().setAckTimeout(10000);
-    network.getConfig().setLogLevel(Level.DEBUG);
     network.getConfig().setDefaultConfig(new JsonObject().putString("foo", "bar"));
     network.getConfig().setDefaultNumInstances(2);
 
@@ -344,7 +289,6 @@ public class NetworkTest {
     assertNotNull(config);
     assertTrue(config.getInteger(Config.NETWORK_NUM_AUDITORS) == 2);
     assertTrue(config.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
-    assertEquals("DEBUG", config.getString(Config.NETWORK_LOG_LEVEL));
     JsonObject componentConfig = config.getObject(Config.COMPONENTS);
     assertNotNull(componentConfig);
     assertEquals("bar", componentConfig.getObject(Config.COMPONENT_CONFIG).getString("foo"));
@@ -356,7 +300,6 @@ public class NetworkTest {
     assertNotNull(result.getConfig());
     assertEquals(2, result.getConfig().getNumAuditors());
     assertEquals(10000, result.getConfig().getAckTimeout());
-    assertEquals(Level.DEBUG, result.getConfig().getLogLevel());
     assertNotNull(result.getConfig().getDefaultConfig());
     assertEquals("bar", result.getConfig().getDefaultConfig().getString("foo"));
     assertEquals(2, result.getConfig().getDefaultNumInstances());
@@ -367,14 +310,12 @@ public class NetworkTest {
     Network network = new Network("test");
     network.getConfig().setNumAuditors(2);
     network.getConfig().setAckTimeout(10000);
-    network.getConfig().setLogLevel(Level.DEBUG);
     network.getConfig().setDefaultConfig(new JsonObject().putString("foo", "bar"));
     network.getConfig().setDefaultNumInstances(2);
 
     Component<Feeder> feeder = network.addFeeder("test.feeder", "test_feeder.py");
     feeder.setConfig(new JsonObject().putString("bar", "baz"));
     feeder.setNumInstances(3);
-    feeder.setLogLevel(Level.WARN);
 
     Component<Worker> worker = network.addWorker("test.worker", "com.test~test-worker~1.0");
     worker.addInput("test.feeder", "nondefault").allGrouping();
@@ -387,7 +328,6 @@ public class NetworkTest {
     assertNotNull(config);
     assertTrue(config.getInteger(Config.NETWORK_NUM_AUDITORS) == 2);
     assertTrue(config.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
-    assertEquals("DEBUG", config.getString(Config.NETWORK_LOG_LEVEL));
     JsonObject componentConfig = config.getObject(Config.COMPONENTS);
     assertNotNull(componentConfig);
     assertEquals("bar", componentConfig.getObject(Config.COMPONENT_CONFIG).getString("foo"));
@@ -401,7 +341,6 @@ public class NetworkTest {
     assertEquals("test.feeder", jsonFeeder.getString(Component.COMPONENT_ADDRESS));
     assertTrue(jsonFeeder.getInteger(Component.COMPONENT_NUM_INSTANCES) == 3);
     assertEquals("baz", jsonFeeder.getObject(Component.COMPONENT_CONFIG).getString("bar"));
-    assertEquals("WARN", jsonFeeder.getString(Component.COMPONENT_LOG_LEVEL));
     assertEquals(0, jsonFeeder.getArray(Component.COMPONENT_INPUTS).size());
     assertEquals(0, jsonFeeder.getArray(Component.COMPONENT_HOOKS).size());
 
@@ -410,7 +349,6 @@ public class NetworkTest {
     assertEquals("test.worker", jsonWorker.getString(Component.COMPONENT_ADDRESS));
     assertNull(jsonWorker.getInteger(Component.COMPONENT_NUM_INSTANCES));
     assertNull(jsonWorker.getObject(Component.COMPONENT_CONFIG));
-    assertNull(jsonWorker.getString(Component.COMPONENT_LOG_LEVEL));
 
     JsonArray jsonInputs = jsonWorker.getArray(Component.COMPONENT_INPUTS);
     assertEquals(1, jsonInputs.size());
@@ -429,7 +367,6 @@ public class NetworkTest {
     assertNotNull(result.getConfig());
     assertEquals(2, result.getConfig().getNumAuditors());
     assertEquals(10000, result.getConfig().getAckTimeout());
-    assertEquals(Level.DEBUG, result.getConfig().getLogLevel());
     assertNotNull(result.getConfig().getDefaultConfig());
     assertEquals("bar", result.getConfig().getDefaultConfig().getString("foo"));
     assertEquals(2, result.getConfig().getDefaultNumInstances());
@@ -442,7 +379,6 @@ public class NetworkTest {
     assertEquals("test.feeder", feeder.getAddress());
     assertEquals(3, feeder.getNumInstances());
     assertEquals("baz", feeder.getConfig().getString("bar"));
-    assertEquals(Level.WARN, feeder.getLogLevel());
     assertEquals(0, feeder.getInputs().size());
     assertEquals(0, feeder.getHooks().size());
 
@@ -453,7 +389,6 @@ public class NetworkTest {
     assertEquals("test.worker", worker.getAddress());
     assertEquals(2, worker.getNumInstances());
     assertEquals("bar", worker.getConfig().getString("foo"));
-    assertEquals(Level.DEBUG, worker.getLogLevel());
 
     List<Input> inputs = worker.getInputs();
     assertEquals(1, inputs.size());
@@ -484,7 +419,6 @@ public class NetworkTest {
     json.putString(Network.NETWORK_ADDRESS, "test");
 
     JsonObject jsonConfig = new JsonObject();
-    jsonConfig.putString(Config.NETWORK_LOG_LEVEL, "debug");
     jsonConfig.putNumber(Config.NETWORK_NUM_AUDITORS, 2);
     jsonConfig.putNumber(Config.NETWORK_ACK_TIMEOUT, 10000);
     jsonConfig.putObject(Config.COMPONENTS, new JsonObject()
@@ -498,8 +432,6 @@ public class NetworkTest {
     Network network = Network.fromJson(json);
     assertEquals("test", network.getAddress());
     Config config = network.getConfig();
-    assertTrue(network.isDebug());
-    assertEquals(Level.DEBUG, config.getLogLevel());
     assertEquals(2, config.getNumAuditors());
     assertEquals(10000, config.getAckTimeout());
     assertEquals("bar", config.getDefaultConfig().getString("foo"));
@@ -518,7 +450,6 @@ public class NetworkTest {
     jsonFeeder.putString(Component.COMPONENT_ADDRESS, "test.feeder");
     jsonFeeder.putString(Component.COMPONENT_TYPE, "feeder");
     jsonFeeder.putString(Component.COMPONENT_MAIN, "test_feeder.py");
-    jsonFeeder.putString(Component.COMPONENT_LOG_LEVEL, "debug");
     jsonFeeder.putNumber(Component.COMPONENT_NUM_INSTANCES, 2);
     jsonComponents.putObject("test.feeder", jsonFeeder);
 
@@ -526,7 +457,6 @@ public class NetworkTest {
     jsonWorker.putString(Component.COMPONENT_ADDRESS, "test.worker");
     jsonWorker.putString(Component.COMPONENT_TYPE, "worker");
     jsonWorker.putString(Component.COMPONENT_MODULE, "com.test~test-worker~1.0");
-    jsonWorker.putString(Component.COMPONENT_LOG_LEVEL, "debug");
     jsonWorker.putNumber(Component.COMPONENT_NUM_INSTANCES, 2);
 
     JsonArray jsonInputs = new JsonArray();
@@ -549,7 +479,6 @@ public class NetworkTest {
     assertFalse(feeder.isModule());
     assertEquals("test_feeder.py", feeder.getMain());
     assertNull(feeder.getModule());
-    assertEquals(Level.DEBUG, feeder.getLogLevel());
     assertEquals(2, feeder.getNumInstances());
 
     Component<Worker> worker = network.getComponent("test.worker");
@@ -559,7 +488,6 @@ public class NetworkTest {
     assertFalse(worker.isVerticle());
     assertEquals("com.test~test-worker~1.0", worker.getModule());
     assertNull(worker.getMain());
-    assertEquals(Level.DEBUG, worker.getLogLevel());
     assertEquals(2, worker.getNumInstances());
 
     List<Input> inputs = worker.getInputs();
@@ -591,7 +519,6 @@ public class NetworkTest {
     jsonWorker.putString(Component.COMPONENT_ADDRESS, "test.worker");
     jsonWorker.putString(Component.COMPONENT_TYPE, "worker");
     jsonWorker.putString(Component.COMPONENT_MODULE, "com.test~test-worker~1.0");
-    jsonWorker.putString(Component.COMPONENT_LOG_LEVEL, "debug");
     jsonWorker.putNumber(Component.COMPONENT_NUM_INSTANCES, 2);
 
     JsonArray jsonInputs = new JsonArray();

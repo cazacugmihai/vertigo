@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.hooks.ComponentHook;
 import net.kuujo.vertigo.input.Input;
 import net.kuujo.vertigo.input.grouping.Grouping;
@@ -65,12 +64,6 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   public static final String COMPONENT_TYPE = "type";
 
   /**
-   * The component log level. If the log level is not set then the component will
-   * inherit the log level from the network.
-   */
-  public static final String COMPONENT_LOG_LEVEL = "log";
-
-  /**
    * The component verticle main.
    */
   public static final String COMPONENT_MAIN = "main";
@@ -107,7 +100,6 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   private String address;
   private @JsonBackReference Network network;
   private Class<T> type;
-  private Level log;
   private String main;
   private Map<String, Object> config;
   private Integer instances;
@@ -195,88 +187,6 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   @SuppressWarnings("unchecked")
   private void setSerializedType(String type) {
     this.type = (Class<T>) deserializeType(type);
-  }
-
-  /**
-   * Sets the component log level. This setting overrides the network log level.
-   *
-   * @param level
-   *   The component log level.
-   * @return
-   *   The component configuration.
-   */
-  public Component<T> setLogLevel(Level level) {
-    log = level;
-    return this;
-  }
-
-  /**
-   * Sets the component log level. This setting overrides the network log level.
-   *
-   * @param level
-   *   The component log level.
-   * @return
-   *   The component configuration.
-   */
-  @JsonSetter("log")
-  public Component<T> setLogLevel(String level) {
-    if (level != null) {
-      log = Level.parse(level.toUpperCase());
-    }
-    return this;
-  }
-
-  /**
-   * Sets the component log level. This setting overrides the network log level.
-   *
-   * @param level
-   *   The component log level.
-   * @return
-   *   The component configuration.
-   */
-  public Component<T> setLogLevel(int level) {
-    log = Level.parse(level);
-    return this;
-  }
-
-  /**
-   * Gets the component log level.
-   *
-   * @return
-   *   The component log level. Defaults to the network log level.
-   */
-  public Level getLogLevel() {
-    return log != null ? log : network.getConfig().getLogLevel();
-  }
-
-  @JsonGetter("log")
-  private String getLogLevelString() {
-    return log != null ? log.getName() : null;
-  }
-
-  /**
-   * Enables debug logging for the component.<p>
-   *
-   * Note that if debug logging is already enabled for the entire network, the
-   * component's configuration will not have any effect. Enabling debug logging
-   * for the network automatically enables debug logging for all components.
-   *
-   * @return
-   *   The component configuration.
-   */
-  public Component<T> debug() {
-    log = Level.DEBUG;
-    return this;
-  }
-
-  /**
-   * Indicates whether debug logging is enabled for the component.
-   *
-   * @return
-   *   Indicates whether debug logging is enabled for the component.
-   */
-  public boolean isDebug() {
-    return network.isDebug() ? true : (log.equals(Level.DEBUG) || log.equals(Level.TRACE));
   }
 
   /**

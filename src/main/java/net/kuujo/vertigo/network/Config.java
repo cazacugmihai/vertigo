@@ -19,10 +19,6 @@ import java.util.Map;
 
 import org.vertx.java.core.json.JsonObject;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonSetter;
-
-import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.serializer.Serializable;
 
 /**
@@ -37,11 +33,6 @@ import net.kuujo.vertigo.serializer.Serializable;
  * @author Jordan Halterman
  */
 public class Config implements Serializable {
-
-  /**
-   * The global log level for the network.
-   */
-  public static final String NETWORK_LOG_LEVEL = "log";
 
   /**
    * The number of network auditors to use.
@@ -83,7 +74,6 @@ public class Config implements Serializable {
   private static final long DEFAULT_ACK_TIMEOUT = 30000;
   private static final long DEFAULT_HEARTBEAT_INTERVAL = 5000;
 
-  private Level log = Level.INFO;
   private int auditors = 1;
   private boolean acking = true;
   private long timeout = DEFAULT_ACK_TIMEOUT;
@@ -98,63 +88,6 @@ public class Config implements Serializable {
   private static class ComponentDefaults implements Serializable {
     private Map<String, Object> config;
     private int instances = 1;
-  }
-
-  /**
-   * Sets the network log level.
-   *
-   * @param level
-   *   The network log level.
-   * @return
-   *   The network configuration.
-   */
-  public Config setLogLevel(Level level) {
-    log = level;
-    return this;
-  }
-
-  /**
-   * Sets the network log level.
-   *
-   * @param level
-   *   The network log level.
-   * @return
-   *   The network configuration.
-   */
-  @JsonSetter("log")
-  public Config setLogLevel(String level) {
-    if (level != null) {
-      log = Level.parse(level.toUpperCase());
-    }
-    return this;
-  }
-
-  /**
-   * Sets the network log level.
-   *
-   * @param level
-   *   The network log level.
-   * @return
-   *   The network configuration.
-   */
-  public Config setLogLevel(int level) {
-    log = Level.parse(level);
-    return this;
-  }
-
-  /**
-   * Gets the network log level.
-   *
-   * @return
-   *   The current network log level. Defaults to INFO.
-   */
-  public Level getLogLevel() {
-    return log;
-  }
-
-  @JsonGetter("log")
-  private String getLogLevelString() {
-    return log.getName();
   }
 
   /**

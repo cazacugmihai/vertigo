@@ -25,7 +25,6 @@ import net.kuujo.vertigo.context.impl.ContextBuilder;
 import net.kuujo.vertigo.feeder.Feeder;
 import net.kuujo.vertigo.input.grouping.AllGrouping;
 import net.kuujo.vertigo.input.grouping.FieldsGrouping;
-import net.kuujo.vertigo.logging.Level;
 import net.kuujo.vertigo.network.Component;
 import net.kuujo.vertigo.network.Network;
 import net.kuujo.vertigo.worker.Worker;
@@ -48,14 +47,12 @@ public class ContextTest {
 
   private NetworkContext createTestNetworkContext() {
     Network network = new Network("test");
-    network.getConfig().setLogLevel(Level.DEBUG);
     network.getConfig().setAckTimeout(10000);
     network.getConfig().setNumAuditors(2);
     network.getConfig().setDefaultConfig(new JsonObject().putString("foo", "bar"));
     network.getConfig().setDefaultNumInstances(2);
 
     Component<Feeder> feeder = network.addFeeder("test.feeder", "test_feeder.js");
-    feeder.setLogLevel(Level.WARN);
     feeder.setNumInstances(3);
     feeder.setConfig(new JsonObject().putString("bar", "baz"));
 
@@ -75,7 +72,6 @@ public class ContextTest {
   private void validateTestNetworkContext(NetworkContext networkContext) {
     assertEquals("test", networkContext.address());
     assertNotNull(networkContext.config());
-    assertEquals(Level.DEBUG, networkContext.config().logLevel());
     assertEquals(10000, networkContext.config().ackTimeout());
     assertEquals(2, networkContext.config().numAuditors());
     assertEquals("bar", networkContext.config().defaultConfig().getString("foo"));
@@ -103,7 +99,6 @@ public class ContextTest {
     assertEquals("test.feeder", feederContext.address());
     assertFalse(feederContext.isModule());
     assertTrue(feederContext.isVerticle());
-    assertEquals(Level.WARN, feederContext.logLevel());
     assertEquals("baz", feederContext.config().getString("bar"));
     assertEquals(3, feederContext.numInstances());
     assertEquals(3, feederContext.instanceContexts().size());
@@ -114,7 +109,6 @@ public class ContextTest {
     assertEquals("test.worker", workerContext.address());
     assertTrue(workerContext.isModule());
     assertFalse(workerContext.isVerticle());
-    assertEquals(Level.DEBUG, workerContext.logLevel());
     assertEquals("bar", workerContext.config().getString("foo"));
     assertEquals(2, workerContext.numInstances());
     assertEquals(2, workerContext.instanceContexts().size());
