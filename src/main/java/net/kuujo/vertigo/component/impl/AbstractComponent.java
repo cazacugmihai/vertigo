@@ -76,27 +76,18 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleReceive(MessageId id) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[%s] received message [%s]", instanceId, id.correlationId()));
-      }
       for (ComponentHook hook : hooks) {
         hook.handleReceive(id);
       }
     }
     @Override
     public void handleAck(MessageId id) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[%s] acked message [%s]", instanceId, id.correlationId()));
-      }
       for (ComponentHook hook : hooks) {
         hook.handleAck(id);
       }
     }
     @Override
     public void handleFail(MessageId id) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[%s] failed message [%s]", instanceId, id.correlationId()));
-      }
       for (ComponentHook hook : hooks) {
         hook.handleFail(id);
       }
@@ -114,36 +105,24 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
     @Override
     public void handleEmit(MessageId id) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[%s] emitted message [%s]", instanceId, id.correlationId()));
-      }
       for (ComponentHook hook : hooks) {
         hook.handleEmit(id);
       }
     }
     @Override
     public void handleAcked(MessageId id) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[%s] received ack [%s]", instanceId, id.correlationId()));
-      }
       for (ComponentHook hook : hooks) {
         hook.handleAcked(id);
       }
     }
     @Override
     public void handleFailed(MessageId id) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[%s] received failure [%s]", instanceId, id.correlationId()));
-      }
       for (ComponentHook hook : hooks) {
         hook.handleFailed(id);
       }
     }
     @Override
     public void handleTimeout(MessageId id) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("[%s] received timeout [%s]", instanceId, id.correlationId()));
-      }
       for (ComponentHook hook : hooks) {
         hook.handleTimeout(id);
       }
@@ -158,8 +137,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     this.vertx = vertx;
     this.eventBus = vertx.eventBus();
     this.container = container;
-    String loggerName = context.componentContext().networkContext().address() + "-" + context.id();
-    this.logger = LoggerFactory.getLogger(loggerName);
+    this.logger = LoggerFactory.getLogger(context.toString());
     this.context = context;
     this.acker = new DefaultAcker(context.id(), eventBus);
     this.instanceId = context.id();

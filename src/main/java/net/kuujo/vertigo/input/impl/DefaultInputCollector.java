@@ -37,6 +37,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
 /**
@@ -56,14 +57,14 @@ public class DefaultInputCollector implements InputCollector {
 
   public DefaultInputCollector(Vertx vertx, Container container, InstanceContext<?> context) {
     this.vertx = vertx;
-    this.logger = container.logger();
+    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
     this.context = context;
     this.acker = new DefaultAcker(context.id(), vertx.eventBus());
   }
 
   public DefaultInputCollector(Vertx vertx, Container container, InstanceContext<?> context, Acker acker) {
     this.vertx = vertx;
-    this.logger = container.logger();
+    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
     this.context = context;
     this.acker = acker;
   }
@@ -148,10 +149,16 @@ public class DefaultInputCollector implements InputCollector {
       @Override
       public void handle(JsonMessage message) {
         if (hasValidSchema(message)) {
+          if (logger.isDebugEnabled()) {
+            logger.debug(String.format("Received [%s]: %s", message.messageId().correlationId(), message.body().encode()));
+          }
           handler.handle(message);
           hookReceived(message.messageId());
         }
         else {
+          if (logger.isDebugEnabled()) {
+            logger.debug(String.format("Received [%s]: %s", message.messageId().correlationId(), message.body().encode()));
+          }
           fail(message);
         }
       }
@@ -214,6 +221,9 @@ public class DefaultInputCollector implements InputCollector {
       });
     }
     else {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Input started");
+      }
       future.setResult(null);
       hookStart();
     }
@@ -247,6 +257,7 @@ public class DefaultInputCollector implements InputCollector {
       public void handle(AsyncResult<Void> result) {
         listeners = null;
         if (result.failed()) {
+          logger.error("Failed to stop input");
           new DefaultFutureResult<Void>().setHandler(doneHandler).setFailure(result.cause());
         }
         else {
@@ -281,6 +292,9 @@ public class DefaultInputCollector implements InputCollector {
       });
     }
     else {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Input stopped");
+      }
       future.setResult(null);
       hookStop();
     }
@@ -288,6 +302,9 @@ public class DefaultInputCollector implements InputCollector {
 
   @Override
   public InputCollector ack(JsonMessage message) {
+    if (logger.isDebugEnabled()) {
+      logger.debug(String.format("Acked [%s]", message.messageId().correlationId()));
+    }
     acker.ack(message.messageId());
     hookAck(message.messageId());
     return this;
@@ -295,6 +312,9 @@ public class DefaultInputCollector implements InputCollector {
 
   @Override
   public InputCollector fail(JsonMessage message) {
+    if (logger.isDebugEnabled()) {
+      logger.debug(String.format("Failed [%s]", message.messageId().correlationId()));
+    }
     acker.fail(message.messageId());
     hookFail(message.messageId());
     return this;

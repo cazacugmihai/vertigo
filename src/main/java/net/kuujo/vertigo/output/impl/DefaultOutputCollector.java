@@ -44,6 +44,8 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
 /**
@@ -53,6 +55,7 @@ import org.vertx.java.platform.Container;
  */
 public class DefaultOutputCollector implements OutputCollector {
   private final Vertx vertx;
+  private final Logger logger;
   private final EventBus eventBus;
   private final InstanceContext<?> context;
   private final Acker acker;
@@ -75,6 +78,7 @@ public class DefaultOutputCollector implements OutputCollector {
 
   public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context) {
     this.vertx = vertx;
+    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
     this.eventBus = eventBus;
     this.context = context;
     acker = new DefaultAcker(context.id(), eventBus);
@@ -90,6 +94,7 @@ public class DefaultOutputCollector implements OutputCollector {
 
   public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context, Acker acker) {
     this.vertx = vertx;
+    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
     this.eventBus = eventBus;
     this.context = context;
     this.acker = acker;
@@ -253,6 +258,9 @@ public class DefaultOutputCollector implements OutputCollector {
     return new Handler<MessageId>() {
       @Override
       public void handle(MessageId messageId) {
+        if (logger.isDebugEnabled()) {
+          logger.debug(String.format("[%s] was successful", messageId.correlationId()));
+        }
         handler.handle(messageId);
         hookAcked(messageId);
       }
@@ -269,6 +277,9 @@ public class DefaultOutputCollector implements OutputCollector {
     return new Handler<MessageId>() {
       @Override
       public void handle(MessageId messageId) {
+        if (logger.isDebugEnabled()) {
+          logger.debug(String.format("[%s] failed", messageId.correlationId()));
+        }
         handler.handle(messageId);
         hookFailed(messageId);
       }
@@ -285,6 +296,9 @@ public class DefaultOutputCollector implements OutputCollector {
     return new Handler<MessageId>() {
       @Override
       public void handle(MessageId messageId) {
+        if (logger.isDebugEnabled()) {
+          logger.debug(String.format("[%s] timed out", messageId.correlationId()));
+        }
         handler.handle(messageId);
         hookTimeout(messageId);
       }
@@ -320,6 +334,9 @@ public class DefaultOutputCollector implements OutputCollector {
       }
     }
     acker.create(messageId);
+    if (logger.isDebugEnabled()) {
+      logger.debug(String.format("Message was emitted to %d channels via stream:%s - %s", channels.size(), stream, body));
+    }
     hookEmit(messageId);
     return messageId;
   }
@@ -334,6 +351,9 @@ public class DefaultOutputCollector implements OutputCollector {
       for (Channel channel : channels) {
         acker.fork(parent.messageId(), channel.publish(child));
       }
+    }
+    if (logger.isDebugEnabled()) {
+      logger.debug(String.format("Message was emitted to %d channels via stream:%s - ", channels.size(), stream, body));
     }
     hookEmit(messageId);
     return messageId;
@@ -358,6 +378,9 @@ public class DefaultOutputCollector implements OutputCollector {
   @Override
   public OutputCollector start() {
     eventBus.registerHandler(context.componentContext().address(), handler);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Output collector started");
+    }
     hookStart();
     return this;
   }
@@ -369,9 +392,13 @@ public class DefaultOutputCollector implements OutputCollector {
       @Override
       public void handle(AsyncResult<Void> result) {
         if (result.failed()) {
+          logger.error("Failed to start output");
           future.setFailure(result.cause());
         }
         else {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Output started");
+          }
           future.setResult(null);
           hookStart();
         }
@@ -382,6 +409,9 @@ public class DefaultOutputCollector implements OutputCollector {
 
   @Override
   public void stop() {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Output stopped");
+    }
     eventBus.unregisterHandler(context.componentContext().address(), handler);
     hookStop();
   }
@@ -393,9 +423,13 @@ public class DefaultOutputCollector implements OutputCollector {
       @Override
       public void handle(AsyncResult<Void> result) {
         if (result.failed()) {
+          logger.error("Failed to stop output");
           future.setFailure(result.cause());
         }
         else {
+          if (logger.isDebugEnabled()) {
+            logger.debug("Output stopped");
+          }
           future.setResult(null);
           hookStop();
         }
