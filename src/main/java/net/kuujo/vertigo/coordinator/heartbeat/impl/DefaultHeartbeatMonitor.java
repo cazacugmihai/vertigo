@@ -108,8 +108,8 @@ public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
     * Starts the monitor.
     */
     private void start() {
-      if (log.isInfoEnabled()) {
-        log.info(String.format("Starting heartbeat monitor at %s", address));
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("Starting heartbeat monitor at %s", address));
       }
       eventBus.registerHandler(address, handler);
     }
@@ -118,8 +118,8 @@ public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
     * Stops the monitor.
     */
     private void stop() {
-      if (log.isInfoEnabled()) {
-        log.info(String.format("Stopping heartbeat monitor at %s", address));
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("Stopping heartbeat monitor at %s", address));
       }
       eventBus.unregisterHandler(address, handler);
       if (timerID != 0) {
@@ -156,7 +156,7 @@ public class DefaultHeartbeatMonitor implements HeartbeatMonitor {
       });
 
       if (log.isDebugEnabled()) {
-        log.debug(String.format("Set timer %d", timerID));
+        log.debug(String.format("Set heartbeat timeout timer %d", timerID));
       }
     }
   }

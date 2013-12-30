@@ -321,6 +321,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
    */
   private void doRedeploy(final String id) {
     if (deploymentMap.containsKey(id)) {
+      log.info(String.format("Redeploying %s", id));
       String deploymentID = deploymentMap.get(id);
       undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
         @Override
@@ -338,7 +339,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                     deploymentMap.put(context.id(), result.result());
                   }
                   else {
-                    container.logger().error(String.format("Failed to deploy %s instance %s.", context.componentContext().address(), context.id()));
+                    log.error(String.format("Failed to deploy %s instance %s.", context.componentContext().address(), context.id()));
                   }
                 }
               });
@@ -353,7 +354,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                     deploymentMap.put(context.id(), result.result());
                   }
                   else {
-                    container.logger().error(String.format("Failed to deploy %s instance %s.", context.componentContext().address(), context.id()));
+                    log.error(String.format("Failed to deploy %s instance %s.", context.componentContext().address(), context.id()));
                   }
                 }
               });
@@ -368,6 +369,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
    * Shuts down the network.
    */
   private void doShutdown(final Message<JsonObject> message) {
+    log.info("Shutting down network");
     new RecursiveDeployer(context).undeploy(new Handler<AsyncResult<Void>>() {
       @Override
       public void handle(AsyncResult<Void> result) {
@@ -404,9 +406,13 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
     String id = getMandatoryString("id", message);
     if (id != null) {
       ready.put(id, message);
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("Received ready notification from %s", id));
+      }
       InstanceContext<?> context = contextMap.get(id);
       events.trigger(Events.Component.Start.class, context.componentContext().address(), context);
       if (ready.size() == instances.size()) {
+        log.info("Starting components");
         events.trigger(Events.Network.Start.class, this.context.address(), this.context);
         for (Message<JsonObject> replyMessage : ready.values()) {
           replyMessage.reply();
@@ -606,6 +612,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
 
       @Override
       protected void doDeploy(final InstanceContext<?> context, Handler<AsyncResult<String>> resultHandler) {
+        log.info(String.format("Deploying %s", context.id()));
         instances.add(context.id());
 
         final Future<String> future = new DefaultFutureResult<String>();
@@ -656,6 +663,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
 
       @Override
       protected void doUndeploy(final InstanceContext<?> context, Handler<AsyncResult<Void>> resultHandler) {
+        log.info(String.format("Undeploying %s", context.id()));
         final Future<Void> future = new DefaultFutureResult<Void>();
         future.setHandler(resultHandler);
         String id = context.id();

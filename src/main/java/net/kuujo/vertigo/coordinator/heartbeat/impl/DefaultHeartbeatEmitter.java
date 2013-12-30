@@ -74,8 +74,8 @@ public class DefaultHeartbeatEmitter implements HeartbeatEmitter {
 
   @Override
   public void start() {
-    if (log.isInfoEnabled()) {
-      log.info(String.format("Starting heartbeats to %s", address));
+    if (log.isDebugEnabled()) {
+      log.debug(String.format("Starting heartbeats to %s", address));
     }
 
     timerID = vertx.setPeriodic(interval, new Handler<Long>() {
@@ -95,8 +95,8 @@ public class DefaultHeartbeatEmitter implements HeartbeatEmitter {
 
   @Override
   public void stop() {
-    if (log.isInfoEnabled()) {
-      log.info(String.format("Stopping heartbeats to %s", address));
+    if (log.isDebugEnabled()) {
+      log.debug(String.format("Stopping heartbeats to %s", address));
     }
     if (timerID != 0) {
       if (log.isDebugEnabled()) {
