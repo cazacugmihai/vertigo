@@ -187,4 +187,9 @@ public final class NetworkContext implements Serializable {
     throw new IllegalArgumentException("Invalid component " + address);
   }
 
+  @Override
+  public String toString() {
+    return address;
+  }
+
 }

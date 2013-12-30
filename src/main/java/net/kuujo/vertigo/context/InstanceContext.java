@@ -103,4 +103,9 @@ public final class InstanceContext<T extends Component> implements Serializable 
     return component;
   }
 
+  @Override
+  public String toString() {
+    return component.networkContext().address() + "-" + id;
+  }
+
 }

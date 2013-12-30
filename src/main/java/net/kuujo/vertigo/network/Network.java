@@ -567,4 +567,9 @@ public final class Network implements Serializable {
     return addComponent(new Component<Worker>(Worker.class, address, moduleOrMain).setConfig(config).setNumInstances(instances));
   }
 
+  @Override
+  public String toString() {
+    return address;
+  }
+
 }

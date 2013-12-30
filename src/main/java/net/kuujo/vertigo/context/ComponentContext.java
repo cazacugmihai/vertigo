@@ -324,4 +324,9 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
     return network;
   }
 
+  @Override
+  public String toString() {
+    return network.address() + "-" + address;
+  }
+
 }

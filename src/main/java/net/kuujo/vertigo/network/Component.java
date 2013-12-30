@@ -521,4 +521,9 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
     return addInput(new Input(address, stream).groupBy(grouping));
   }
 
+  @Override
+  public String toString() {
+    return address;
+  }
+
 }
