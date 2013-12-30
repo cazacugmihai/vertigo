@@ -15,6 +15,7 @@
  */
 package net.kuujo.vertigo.coordinator.heartbeat.impl;
 
+import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.coordinator.heartbeat.HeartbeatEmitter;
 
 import org.vertx.java.core.Handler;
@@ -29,21 +30,23 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
  * @author Jordan Halterman
  */
 public class DefaultHeartbeatEmitter implements HeartbeatEmitter {
-  private static final Logger log = LoggerFactory.getLogger(HeartbeatEmitter.class);
   private String address;
   private Vertx vertx;
+  private final Logger log;
   private EventBus eventBus;
   private long interval = 1000;
   private long timerID;
 
-  public DefaultHeartbeatEmitter(Vertx vertx) {
+  public DefaultHeartbeatEmitter(Vertx vertx, InstanceContext<?> context) {
     this.vertx = vertx;
+    this.log = LoggerFactory.getLogger(HeartbeatEmitter.class.getName() + "-" + context);
     this.eventBus = vertx.eventBus();
   }
 
-  public DefaultHeartbeatEmitter(String address, Vertx vertx) {
+  public DefaultHeartbeatEmitter(String address, Vertx vertx, InstanceContext<?> context) {
     this.address = address;
     this.vertx = vertx;
+    this.log = LoggerFactory.getLogger(HeartbeatEmitter.class.getName() + "-" + context);
     this.eventBus = vertx.eventBus();
   }
 
@@ -86,7 +89,7 @@ public class DefaultHeartbeatEmitter implements HeartbeatEmitter {
     });
 
     if (log.isDebugEnabled()) {
-      log.debug(String.format("Set periodic timer %d", timerID));
+      log.debug(String.format("Set periodic heartbeat timer %d", timerID));
     }
   }
 
@@ -97,7 +100,7 @@ public class DefaultHeartbeatEmitter implements HeartbeatEmitter {
     }
     if (timerID != 0) {
       if (log.isDebugEnabled()) {
-        log.debug(String.format("Cancelling periodic timer %d", timerID));
+        log.debug(String.format("Cancelling periodic heartbeat timer %d", timerID));
       }
       vertx.cancelTimer(timerID);
     }

@@ -32,8 +32,6 @@ import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.coordinator.heartbeat.HeartbeatMonitor;
 import net.kuujo.vertigo.coordinator.heartbeat.impl.DefaultHeartbeatMonitor;
 import net.kuujo.vertigo.events.Events;
-import net.kuujo.vertigo.logging.Logger;
-import net.kuujo.vertigo.logging.impl.LoggerFactory;
 import net.kuujo.vertigo.serializer.SerializationException;
 
 import org.vertx.java.busmods.BusModBase;
@@ -43,6 +41,8 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 
 /**
  * An abstract network coordinator.
@@ -52,7 +52,7 @@ import org.vertx.java.core.json.JsonObject;
 @SuppressWarnings({"unchecked", "rawtypes"})
 abstract class AbstractCoordinator extends BusModBase implements Handler<Message<JsonObject>> {
   protected NetworkContext context;
-  protected Logger logger;
+  protected Logger log;
   protected Events events;
   protected Map<String, String> deploymentMap = new HashMap<>();
   protected Map<String, InstanceContext<?>> contextMap = new HashMap<>();
@@ -64,9 +64,9 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
   @Override
   public void start() {
     super.start();
-    logger = LoggerFactory.getLogger(getClass());
     events = new Events(eb);
     context = NetworkContext.fromJson(config);
+    log = LoggerFactory.getLogger(getClass().getName() + "-" + context.address());
     eb.registerHandler(context.address(), this);
     doDeploy();
   }
@@ -180,12 +180,13 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
    * Deploys the network.
    */
   private void doDeploy() {
+    log.info("Deploying network");
     if (context.config().isAckingEnabled()) {
       recursiveDeployAuditors(copyList(context.auditors()), new DefaultFutureResult<Void>().setHandler(new Handler<AsyncResult<Void>>() {
         @Override
         public void handle(AsyncResult<Void> result) {
           if (result.failed()) {
-            logger.error("Failed to deploy auditor verticle.", result.cause());
+            log.error("Failed to deploy auditor verticle.", result.cause());
             container.exit();
           }
           else {
@@ -193,7 +194,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
               @Override
               public void handle(AsyncResult<Void> result) {
                 if (result.failed()) {
-                  container.logger().error("Failed to deploy network.", result.cause());
+                  log.error("Failed to deploy network.", result.cause());
                   container.exit();
                 }
                 else {
@@ -210,7 +211,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
         @Override
         public void handle(AsyncResult<Void> result) {
           if (result.failed()) {
-            container.logger().error("Failed to deploy network.", result.cause());
+            log.error("Failed to deploy network.", result.cause());
             container.exit();
           }
           else {
@@ -237,6 +238,9 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
    */
   private void recursiveDeployAuditors(final List<String> auditors, final Future<Void> future) {
     if (auditors.size() > 0) {
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("Deploying %d auditors", auditors.size()));
+      }
       final String address = auditors.iterator().next();
       JsonObject auditorConfig = new JsonObject()
         .putString(AuditorVerticle.ADDRESS, address)
@@ -245,9 +249,13 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
         @Override
         public void handle(AsyncResult<String> result) {
           if (result.failed()) {
+            log.error(String.format("Failed to deploy auditor at %s", address));
             future.setFailure(result.cause());
           }
           else {
+            if (log.isDebugEnabled()) {
+              log.debug(String.format("Deployed auditor: %s Deployment ID: %s", address, result.result()));
+            }
             auditorDeploymentIds.add(result.result());
             auditors.remove(address);
             if (auditors.size() > 0) {
@@ -274,8 +282,11 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
    */
   private void doRegister(Message<JsonObject> message) {
     final String address = getMandatoryString("address", message);
+    if (log.isDebugEnabled()) {
+      log.debug(String.format("Registering heartbeat from %s", address));
+    }
     String heartbeatAddress = createHeartbeatAddress();
-    HeartbeatMonitor monitor = new DefaultHeartbeatMonitor(heartbeatAddress, vertx);
+    HeartbeatMonitor monitor = new DefaultHeartbeatMonitor(heartbeatAddress, vertx, context);
     monitor.listen(new Handler<String>() {
       @Override
       public void handle(String heartbeatAddress) {
@@ -294,6 +305,9 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
    */
   private void doUnregister(Message<JsonObject> message) {
     final String address = getMandatoryString("address", message);
+    if (log.isDebugEnabled()) {
+      log.debug(String.format("Unregistering heartbeat from %s", address));
+    }
     if (heartbeats.containsKey(address)) {
       HeartbeatMonitor monitor = heartbeats.get(address);
       monitor.unlisten();
