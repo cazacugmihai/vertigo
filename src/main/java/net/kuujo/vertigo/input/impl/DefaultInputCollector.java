@@ -57,14 +57,14 @@ public class DefaultInputCollector implements InputCollector {
 
   public DefaultInputCollector(Vertx vertx, Container container, InstanceContext<?> context) {
     this.vertx = vertx;
-    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
+    this.logger = LoggerFactory.getLogger(InputCollector.class.getCanonicalName() + "-" + context);
     this.context = context;
     this.acker = new DefaultAcker(context.id(), vertx.eventBus());
   }
 
   public DefaultInputCollector(Vertx vertx, Container container, InstanceContext<?> context, Acker acker) {
     this.vertx = vertx;
-    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
+    this.logger = LoggerFactory.getLogger(InputCollector.class.getCanonicalName() + "-" + context);
     this.context = context;
     this.acker = acker;
   }

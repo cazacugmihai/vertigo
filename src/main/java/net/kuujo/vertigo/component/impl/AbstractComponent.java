@@ -58,6 +58,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
   protected final EventBus eventBus;
   protected final Container container;
   protected final Logger logger;
+  protected final Logger instancelogger;
   protected final InstanceContext<T> context;
   protected final Acker acker;
   protected final String instanceId;
@@ -137,7 +138,8 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     this.vertx = vertx;
     this.eventBus = vertx.eventBus();
     this.container = container;
-    this.logger = LoggerFactory.getLogger(context.toString());
+    this.logger = LoggerFactory.getLogger(context.componentContext().type().getCanonicalName() + "-" + context);
+    this.instancelogger = LoggerFactory.getLogger(context.toString());
     this.context = context;
     this.acker = new DefaultAcker(context.id(), eventBus);
     this.instanceId = context.id();
@@ -211,7 +213,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
 
   @Override
   public Logger logger() {
-    return logger;
+    return instancelogger;
   }
 
   @Override

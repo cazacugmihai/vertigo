@@ -78,7 +78,7 @@ public class DefaultOutputCollector implements OutputCollector {
 
   public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context) {
     this.vertx = vertx;
-    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
+    this.logger = LoggerFactory.getLogger(OutputCollector.class.getCanonicalName() + "-" + context);
     this.eventBus = eventBus;
     this.context = context;
     acker = new DefaultAcker(context.id(), eventBus);
@@ -94,7 +94,7 @@ public class DefaultOutputCollector implements OutputCollector {
 
   public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context, Acker acker) {
     this.vertx = vertx;
-    this.logger = LoggerFactory.getLogger(getClass().getName() + "-" + context);
+    this.logger = LoggerFactory.getLogger(OutputCollector.class.getCanonicalName() + "-" + context);
     this.eventBus = eventBus;
     this.context = context;
     this.acker = acker;
