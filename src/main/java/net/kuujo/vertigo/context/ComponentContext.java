@@ -46,13 +46,14 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  */
 @SuppressWarnings("rawtypes")
 public class ComponentContext<T extends net.kuujo.vertigo.component.Component> implements Serializable {
-  private static final long FIXED_HEARTBEAT_INTERVAL = 5000;
+  private String id;
   private String name;
   private String address;
   private Class<T> type;
   private String main;
   private Map<String, Object> config;
   private List<InstanceContext<T>> instances = new ArrayList<>();
+  private long heartbeat = 5000;
   private List<ComponentHook> hooks = new ArrayList<>();
   private List<InputContext> inputs = new ArrayList<>();
   private @JsonIgnore NetworkContext network;
@@ -108,7 +109,7 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    *   The globally unique component identifier.
    */
   public String id() {
-    return String.format("%s-%s", network.id(), name());
+    return id;
   }
 
   /**
@@ -133,7 +134,7 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    *   The component address.
    */
   public String address() {
-    return address != null ? address : String.format("%s.%s", network.address(), name());
+    return address;
   }
 
   @Deprecated
@@ -233,8 +234,7 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    *   The component configuration.
    */
   public JsonObject config() {
-    // Copy the configuration so that it can't be altered.
-    return config != null ? new JsonObject(config).copy() : network.config().defaultConfig().copy();
+    return config != null ? new JsonObject(config).copy() : new JsonObject();
   }
 
   @Deprecated
@@ -294,7 +294,17 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
 
   @Deprecated
   public long getHeartbeatInterval() {
-    return FIXED_HEARTBEAT_INTERVAL;
+    return heartbeatInterval();
+  }
+
+  /**
+   * Gets the component heartbeat interval.
+   *
+   * @return
+   *   The component heartbeat interval.
+   */
+  public long heartbeatInterval() {
+    return heartbeat;
   }
 
   @Deprecated
@@ -347,7 +357,7 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
 
   @Override
   public String toString() {
-    return network + "-" + name();
+    return id();
   }
 
 }

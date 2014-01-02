@@ -71,11 +71,8 @@ public class ContextTest {
 
   private void validateTestNetworkContext(NetworkContext networkContext) {
     assertEquals("test", networkContext.address());
-    assertNotNull(networkContext.config());
-    assertEquals(10000, networkContext.config().ackTimeout());
-    assertEquals(2, networkContext.config().numAuditors());
-    assertEquals("bar", networkContext.config().defaultConfig().getString("foo"));
-    assertEquals(2, networkContext.config().defaultNumInstances());
+    assertEquals(10000, networkContext.ackTimeout());
+    assertEquals(2, networkContext.numAuditors());
 
     assertNotNull(networkContext.componentContexts());
     assertEquals(2, networkContext.componentContexts().size());

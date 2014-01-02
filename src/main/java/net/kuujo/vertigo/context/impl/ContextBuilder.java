@@ -20,11 +20,14 @@ import org.vertx.java.core.json.JsonObject;
 
 import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.network.Component;
+import net.kuujo.vertigo.network.Config;
 import net.kuujo.vertigo.network.MalformedNetworkException;
 import net.kuujo.vertigo.network.Network;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
+import net.kuujo.vertigo.util.Address;
+import net.kuujo.vertigo.util.Identifier;
 
 /**
  * A context builder.
@@ -43,10 +46,19 @@ public final class ContextBuilder {
    * @throws MalformedNetworkException 
    *   If the network is malformed.
    */
+  @SuppressWarnings("deprecation")
   public static NetworkContext buildContext(Network network) throws MalformedNetworkException {
     try {
       Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
       JsonObject serialized = serializer.serialize(network);
+      serialized.putString("id", Identifier.formatNetworkId(network));
+      serialized.putString("address", Address.formatNetworkAddress(network));
+
+      JsonObject config = serialized.getObject(Network.NETWORK_CONFIG);
+      JsonObject networkConfig = config.getObject(Config.NETWORK);
+      serialized.putBoolean(Config.NETWORK_ACKING_ENABLED, networkConfig.getBoolean(Config.NETWORK_ACKING_ENABLED));
+      serialized.putNumber(Config.NETWORK_ACK_TIMEOUT, networkConfig.getLong(Config.NETWORK_ACK_TIMEOUT));
+
       JsonArray auditors = new JsonArray();
       for (int i = 1; i < network.getNetworkConfig().getNetworkNumAuditors()+1; i++) {
         auditors.add(String.format("%s.auditor.%d", network.getAddress(), i));
@@ -56,9 +68,13 @@ public final class ContextBuilder {
       JsonObject jsonComponents = serialized.getObject(Network.NETWORK_COMPONENTS);
       for (Component<?> component : network.getComponents()) {
         JsonObject jsonComponent = jsonComponents.getObject(component.getAddress());
+        jsonComponent.putString("id", Identifier.formatComponentId(component));
+        jsonComponent.putString("address", Address.formatComponentAddress(component));
+
         JsonArray instances = new JsonArray();
         for (int i = 1; i <= component.getNumInstances(); i++) {
-          instances.add(new JsonObject().putString("id", String.format("%s-%d", component.getAddress(), i)));
+          instances.add(new JsonObject().putString("id", Identifier.formatInstanceId(component, i))
+              .putString("address", Address.formatInstanceAddress(component, i)));
         }
         jsonComponent.putArray("instances", instances);
       }

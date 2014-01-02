@@ -76,6 +76,7 @@ public class DefaultOutputCollector implements OutputCollector {
     this(vertx, container, vertx.eventBus(), context);
   }
 
+  @SuppressWarnings("deprecation")
   public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context) {
     this.vertx = vertx;
     this.logger = LoggerFactory.getLogger(OutputCollector.class.getCanonicalName() + "-" + context);
@@ -83,7 +84,7 @@ public class DefaultOutputCollector implements OutputCollector {
     this.context = context;
     acker = new DefaultAcker(context.id(), eventBus);
     messageBuilder = new JsonMessageBuilder(context.id(), String.format("%s-%s-", context.componentContext().networkContext().address(), context.id()));
-    ackingEnabled = context.componentContext().networkContext().config().isAckingEnabled();
+    ackingEnabled = context.componentContext().networkContext().isAckingEnabled();
     auditors = context.componentContext().networkContext().auditors();
     componentAddress = context.componentContext().address();
   }
@@ -92,6 +93,7 @@ public class DefaultOutputCollector implements OutputCollector {
     this(vertx, container, vertx.eventBus(), context, acker);
   }
 
+  @SuppressWarnings("deprecation")
   public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context, Acker acker) {
     this.vertx = vertx;
     this.logger = LoggerFactory.getLogger(OutputCollector.class.getCanonicalName() + "-" + context);
@@ -99,7 +101,7 @@ public class DefaultOutputCollector implements OutputCollector {
     this.context = context;
     this.acker = acker;
     messageBuilder = new JsonMessageBuilder(context.id(), String.format("%s-%s-", context.componentContext().networkContext().address(), context.id()));
-    ackingEnabled = context.componentContext().networkContext().config().isAckingEnabled();
+    ackingEnabled = context.componentContext().networkContext().isAckingEnabled();
     auditors = context.componentContext().networkContext().auditors();
     componentAddress = context.componentContext().address();
   }

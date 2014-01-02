@@ -179,9 +179,10 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
   /**
    * Deploys the network.
    */
+  @SuppressWarnings("deprecation")
   private void doDeploy() {
     log.info("Deploying network");
-    if (context.config().isAckingEnabled()) {
+    if (context.isAckingEnabled()) {
       recursiveDeployAuditors(copyList(context.auditors()), new DefaultFutureResult<Void>().setHandler(new Handler<AsyncResult<Void>>() {
         @Override
         public void handle(AsyncResult<Void> result) {
@@ -244,7 +245,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
       final String address = auditors.iterator().next();
       JsonObject auditorConfig = new JsonObject()
         .putString(AuditorVerticle.ADDRESS, address)
-        .putNumber(AuditorVerticle.TIMEOUT, context.config().ackTimeout());
+        .putNumber(AuditorVerticle.TIMEOUT, context.ackTimeout());
       deployVerticle(AuditorVerticle.class.getName(), auditorConfig, new Handler<AsyncResult<String>>() {
         @Override
         public void handle(AsyncResult<String> result) {

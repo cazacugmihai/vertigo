@@ -32,7 +32,7 @@ import net.kuujo.vertigo.worker.Worker;
 
 import org.vertx.java.core.json.JsonObject;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 /**
  * A Vertigo network definition.<p>
@@ -49,11 +49,6 @@ public final class Network implements Serializable {
    * The network name.
    */
   public static final String NETWORK_NAME = "name";
-
-  /**
-   * The network address.
-   */
-  public static final String NETWORK_ADDRESS = "address";
 
   /**
    * The network configuration. In Json terms, this is a {@link JsonObject} instance.
@@ -123,7 +118,7 @@ public final class Network implements Serializable {
     JsonObject config = fieldNames.contains(NETWORK_CONFIG) ? json.getObject(NETWORK_CONFIG) : new JsonObject();
     json.putObject(NETWORK_CONFIG, config);
     if (!fieldNames.contains(Network.NETWORK_NAME)) {
-      json.putString(Network.NETWORK_NAME, json.getString(Network.NETWORK_ADDRESS));
+      json.putString(Network.NETWORK_NAME, json.getString("address"));
     }
     JsonObject networkConfig = config.getFieldNames().contains(Config.NETWORK) ? config.getObject(Config.NETWORK) : new JsonObject();
     if (fieldNames.contains("auditors")) {
@@ -139,7 +134,12 @@ public final class Network implements Serializable {
   }
 
   /**
-   * Returns the network identifier.
+   * Returns the network identifier.<p>
+   *
+   * The network identifier is used in logging and identifying the network. This
+   * identifier is generated using the network configuration's <code>NETWORK_ID_FORMAT</code>
+   * option and should always result in a unique name. By default, the network
+   * ID will be the network name.
    *
    * @return
    *   The globally unique network identifier.
@@ -149,38 +149,20 @@ public final class Network implements Serializable {
   }
 
   /**
-   * Sets the network name.
+   * Sets an explicit network address.<p>
    *
-   * @param name
-   *   The network name.
-   * @return
-   *   The network configuration.
-   */
-  @JsonSetter("address")
-  public Network setName(String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * Returns the network name.
+   * This is the address of the network coordinator when the network is deployed.
+   * The coordinator is an address on the event bus with which all network components
+   * communicate, thus it is important that this address be globally unique.<p>
    *
-   * @return
-   *   The network name.
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets the network address.
+   * If no explicit network address is set then an address will be generated based
+   * on the network configuration's <code>NETWORK_ADDRESS_FORMAT</code> option.
    *
    * @param address
    *   The network address.
    * @return
    *   The network configuration.
    */
-  @JsonSetter("address")
   public Network setAddress(String address) {
     this.address = address;
     return this;
@@ -195,8 +177,32 @@ public final class Network implements Serializable {
    * @return
    *   The network address.
    */
+  @JsonGetter("address")
   public String getAddress() {
     return address != null ? address : Address.formatNetworkAddress(this);
+  }
+
+  /**
+   * Sets the network name.
+   *
+   * @param name
+   *   The network name.
+   * @return
+   *   The network configuration.
+   */
+  public Network setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Returns the network name.
+   *
+   * @return
+   *   The network name.
+   */
+  public String getName() {
+    return name;
   }
 
   /**

@@ -33,9 +33,11 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  * @author Jordan Halterman
  */
 public final class NetworkContext implements Serializable {
+  private String id;
   private String name;
   private String address;
-  private Config config = new Config();
+  private boolean acking;
+  private long timeout;
   private List<String> auditors = new ArrayList<>();
   private Map<String, ComponentContext<?>> components = new HashMap<>();
 
@@ -76,7 +78,7 @@ public final class NetworkContext implements Serializable {
    *   The globally unique network identifier.
    */
   public String id() {
-    return name;
+    return id;
   }
 
   /**
@@ -101,22 +103,7 @@ public final class NetworkContext implements Serializable {
    *   The network address.
    */
   public String address() {
-    return address != null ? address : name();
-  }
-
-  @Deprecated
-  public Config getConfig() {
-    return config();
-  }
-
-  /**
-   * Gets the network configuration.
-   *
-   * @return
-   *   The network configuration.
-   */
-  public Config config() {
-    return config;
+    return address;
   }
 
   @Deprecated
@@ -142,7 +129,17 @@ public final class NetworkContext implements Serializable {
    */
   @Deprecated
   public int getNumAuditors() {
-    return config.numAuditors();
+    return numAuditors();
+  }
+
+  /**
+   * Returns the number of network auditors.
+   *
+   * @return
+   *   The number of network auditors.
+   */
+  public int numAuditors() {
+    return auditors.size();
   }
 
   /**
@@ -153,7 +150,7 @@ public final class NetworkContext implements Serializable {
    */
   @Deprecated
   public boolean isAckingEnabled() {
-    return config.isAckingEnabled();
+    return acking;
   }
 
   /**
@@ -164,7 +161,17 @@ public final class NetworkContext implements Serializable {
    */
   @Deprecated
   public long getAckTimeout() {
-    return config.ackTimeout();
+    return ackTimeout();
+  }
+
+  /**
+   * Returns network ack timeout.
+   *
+   * @return
+   *   Ack timeout for the network.
+   */
+  public long ackTimeout() {
+    return timeout;
   }
 
   @Deprecated
@@ -210,7 +217,7 @@ public final class NetworkContext implements Serializable {
 
   @Override
   public String toString() {
-    return address;
+    return id();
   }
 
 }

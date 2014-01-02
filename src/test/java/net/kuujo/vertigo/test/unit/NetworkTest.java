@@ -289,7 +289,7 @@ public class NetworkTest {
 
     Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
     JsonObject json = serializer.serialize(network);
-    assertEquals("test", json.getString(Network.NETWORK_ADDRESS));
+    assertEquals("test", json.getString(Network.NETWORK_NAME));
     assertEquals(0, json.getObject(Network.NETWORK_COMPONENTS).size());
     JsonObject config = json.getObject(Network.NETWORK_CONFIG);
     assertNotNull(config);
@@ -329,7 +329,7 @@ public class NetworkTest {
 
     Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
     JsonObject json = serializer.serialize(network);
-    assertEquals("test", json.getString(Network.NETWORK_ADDRESS));
+    assertEquals("test", json.getString(Network.NETWORK_NAME));
     JsonObject config = json.getObject(Network.NETWORK_CONFIG);
     assertNotNull(config);
     assertTrue(config.getInteger(Config.NETWORK_NUM_AUDITORS) == 2);
@@ -412,7 +412,7 @@ public class NetworkTest {
   @Test
   public void testNetworkFromJson() {
     JsonObject json = new JsonObject();
-    json.putString(Network.NETWORK_ADDRESS, "test");
+    json.putString(Network.NETWORK_NAME, "test");
     Network network = Network.fromJson(json);
     assertEquals("test", network.getAddress());
     assertNotNull(network.getNetworkConfig());
@@ -422,7 +422,7 @@ public class NetworkTest {
   @Test
   public void testNetworkConfigFromJson() {
     JsonObject json = new JsonObject();
-    json.putString(Network.NETWORK_ADDRESS, "test");
+    json.putString(Network.NETWORK_NAME, "test");
 
     JsonObject jsonConfig = new JsonObject();
     jsonConfig.putNumber(Config.NETWORK_NUM_AUDITORS, 2);
@@ -447,7 +447,7 @@ public class NetworkTest {
   @Test
   public void testNetworkComponentsFromJson() {
     JsonObject json = new JsonObject();
-    json.putString(Network.NETWORK_ADDRESS, "test");
+    json.putString(Network.NETWORK_NAME, "test");
 
     JsonObject jsonComponents = new JsonObject();
     json.putObject(Network.NETWORK_COMPONENTS, jsonComponents);
@@ -516,7 +516,7 @@ public class NetworkTest {
   @Test
   public void testComponentHooksFromJson() {
     JsonObject json = new JsonObject();
-    json.putString(Network.NETWORK_ADDRESS, "test");
+    json.putString(Network.NETWORK_NAME, "test");
 
     JsonObject jsonComponents = new JsonObject();
     json.putObject(Network.NETWORK_COMPONENTS, jsonComponents);
@@ -552,7 +552,7 @@ public class NetworkTest {
   @Test
   public void testNetworkFromDeprecatedJson() {
     JsonObject json = new JsonObject();
-    json.putString(Network.NETWORK_ADDRESS, "test");
+    json.putString(Network.NETWORK_NAME, "test");
     json.putNumber(Config.NETWORK_NUM_AUDITORS, 2);
     json.putNumber(Config.NETWORK_ACK_TIMEOUT, 10000);
     Network network = Network.fromJson(json);

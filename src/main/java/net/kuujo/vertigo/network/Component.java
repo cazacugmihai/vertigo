@@ -157,13 +157,49 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   }
 
   /**
-   * Returns the component identifier.
+   * Returns the component identifier.<p>
+   *
+   * This unique identifier is generated using the network configuration's
+   * <code>COMPONENT_ID_FORMAT</code> option. The component ID is used in logging
+   * and as a general identifier in other areas.
    *
    * @return
    *   The globally unique component identifier.
    */
   public String id() {
     return Identifier.formatComponentId(this);
+  }
+
+  /**
+   * Explicitly sets component address.<p>
+   *
+   * Note that this address overrides the internally generated address.
+   *
+   * @param address
+   *   The component address.
+   * @return
+   *   The component configuration.
+   */
+  public Component<T> setAddress(String address) {
+    this.address = address;
+    return this;
+  }
+
+  /**
+   * Returns the component address.<p>
+   *
+   * This address is an event bus address at which the component will register
+   * a handler to listen for connections when started. Thus, this address must
+   * be unique. If no explicit address is provided, a component address will be
+   * generated using the network configuration's <code>COMPONENT_ADDRESS_FORMAT</code>
+   * option.
+   *
+   * @return
+   *   The component address.
+   */
+  @JsonGetter("address")
+  public String getAddress() {
+    return address != null ? address : Address.formatComponentAddress(this);
   }
 
   /**
@@ -187,33 +223,6 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    */
   public String getName() {
     return name;
-  }
-
-  /**
-   * Sets the component address.
-   *
-   * @param address
-   *   The component address.
-   * @return
-   *   The component configuration.
-   */
-  public Component<T> setAddress(String address) {
-    this.address = address;
-    return this;
-  }
-
-  /**
-   * Returns the component address.
-   *
-   * This address is an event bus address at which the component will register
-   * a handler to listen for connections when started. Thus, this address must
-   * be unique.
-   *
-   * @return
-   *   The component address.
-   */
-  public String getAddress() {
-    return address != null ? address : Address.formatComponentAddress(this);
   }
 
   /**
@@ -348,6 +357,11 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
     return this;
   }
 
+  @JsonGetter("config")
+  private Map<String, Object> getConfigAsMap() {
+    return getConfig().toMap();
+  }
+
   /**
    * Returns the number of component instances.
    *
@@ -382,6 +396,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    * @return
    *   The number of component instances.
    */
+  @JsonGetter("instances")
   public int getNumInstances() {
     return instances != null ? instances : network.getNetworkConfig().getComponentDefaultNumInstances();
   }
@@ -405,6 +420,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    * @return
    *   The component heartbeat interval.
    */
+  @JsonGetter("heartbeat")
   public long getHeartbeatInterval() {
     return heartbeat != null ? heartbeat : network.getNetworkConfig().getComponentDefaultHeartbeatInterval();
   }

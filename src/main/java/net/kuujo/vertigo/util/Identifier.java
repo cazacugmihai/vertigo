@@ -68,7 +68,7 @@ public final class Identifier {
    * @return
    *   The formatted instance ID.
    */
-  public static String formatInstanceId(String format, net.kuujo.vertigo.network.Component<?> component, int instanceNumber) {
+  public static String formatInstanceId(net.kuujo.vertigo.network.Component<?> component, int instanceNumber) {
     if (component.isModule()) {
       return String.format(component.getNetwork().getNetworkConfig().getInstanceIdFormat(),
           component.getNetwork().getName(), Component.serializeType(component.getType()),

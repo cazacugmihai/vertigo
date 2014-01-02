@@ -316,7 +316,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
         if (result.succeeded()) {
           String heartbeatAddress = result.result().body();
           heartbeat.setAddress(heartbeatAddress);
-          heartbeat.setInterval(context.componentContext().networkContext().config().heartbeatInterval());
+          heartbeat.setInterval(context.componentContext().heartbeatInterval());
           heartbeat.start();
           future.setResult(null);
         }
