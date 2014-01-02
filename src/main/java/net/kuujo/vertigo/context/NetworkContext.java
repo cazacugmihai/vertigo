@@ -34,7 +34,6 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  */
 public final class NetworkContext implements Serializable {
   private String id;
-  private String name;
   private String address;
   private boolean acking;
   private long timeout;
@@ -75,20 +74,10 @@ public final class NetworkContext implements Serializable {
    * Returns the network identifier.
    *
    * @return
-   *   The globally unique network identifier.
+   *   The network id.
    */
   public String id() {
     return id;
-  }
-
-  /**
-   * Returns the network name.
-   *
-   * @return
-   *   The network name.
-   */
-  public String name() {
-    return name;
   }
 
   @Deprecated

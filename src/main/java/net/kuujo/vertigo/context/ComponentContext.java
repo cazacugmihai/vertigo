@@ -47,7 +47,6 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
 @SuppressWarnings("rawtypes")
 public class ComponentContext<T extends net.kuujo.vertigo.component.Component> implements Serializable {
   private String id;
-  private String name;
   private String address;
   private Class<T> type;
   private String main;
@@ -103,23 +102,13 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
   }
 
   /**
-   * Returns the component identifier.
+   * Gets the component identifier.
    *
    * @return
-   *   The globally unique component identifier.
+   *   The component id.
    */
   public String id() {
     return id;
-  }
-
-  /**
-   * Gets the component name.
-   *
-   * @return
-   *   The component name.
-   */
-  public String name() {
-    return name;
   }
 
   @Deprecated

@@ -105,4 +105,28 @@ public final class Component {
     return typeMap.get(type);
   }
 
+  /**
+   * Creates a component ID from a component.
+   *
+   * @param component
+   *   The component for which to create the ID.
+   * @return
+   *   A component ID.
+   */
+  public static String formatComponentId(net.kuujo.vertigo.network.Component<?> component) {
+    if (component.isModule()) {
+      return String.format(component.getNetwork().getNetworkConfig().getComponentIdFormat(),
+          component.getNetwork().getAddress(), component.getNetwork().getNetworkId(),
+          component.getAddress(), Component.serializeType(component.getType()),
+          component.getModule());
+    }
+    else if (component.isVerticle()) {
+      return String.format(component.getNetwork().getNetworkConfig().getComponentIdFormat(),
+          component.getNetwork().getAddress(), component.getNetwork().getNetworkId(),
+          component.getAddress(), Component.serializeType(component.getType()),
+          component.getMain());
+    }
+    return null;
+  }
+
 }

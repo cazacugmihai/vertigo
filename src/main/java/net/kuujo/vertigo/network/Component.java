@@ -32,8 +32,7 @@ import net.kuujo.vertigo.input.grouping.Grouping;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
-import net.kuujo.vertigo.util.Address;
-import net.kuujo.vertigo.util.Identifier;
+import static net.kuujo.vertigo.util.Component.formatComponentId;
 import static net.kuujo.vertigo.util.Component.isModuleName;
 import static net.kuujo.vertigo.util.Component.isVerticleMain;
 import static net.kuujo.vertigo.util.Component.serializeType;
@@ -56,12 +55,13 @@ import static net.kuujo.vertigo.util.Component.deserializeType;
 public class Component<T extends net.kuujo.vertigo.component.Component> implements Serializable {
 
   /**
-   * The component name.
+   * The component identifier. This is used in loggers.
    */
-  public static final String COMPONENT_NAME = "name";
+  public static final String COMPONENT_ID = "id";
 
   /**
-   * The component address.
+   * The component address. This is the unique event bus address used to communicate
+   * with the network and other components.
    */
   public static final String COMPONENT_ADDRESS = "address";
 
@@ -109,7 +109,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    */
   public static final String COMPONENT_INPUTS = "inputs";
 
-  private String name;
+  private String id;
   private String address;
   private @JsonBackReference Network network;
   private Class<T> type;
@@ -121,8 +121,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   private List<Input> inputs = new ArrayList<>();
 
   public Component() {
-    name = UUID.randomUUID().toString();
-    address = name;
+    address = UUID.randomUUID().toString();
   }
 
   public Component(Class<T> type, String address, String main) {
@@ -157,72 +156,38 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   }
 
   /**
-   * Returns the component identifier.<p>
-   *
-   * This unique identifier is generated using the network configuration's
-   * <code>COMPONENT_ID_FORMAT</code> option. The component ID is used in logging
-   * and as a general identifier in other areas.
-   *
-   * @return
-   *   The globally unique component identifier.
-   */
-  public String id() {
-    return Identifier.formatComponentId(this);
-  }
-
-  /**
-   * Explicitly sets component address.<p>
-   *
-   * Note that this address overrides the internally generated address.
-   *
-   * @param address
-   *   The component address.
-   * @return
-   *   The component configuration.
-   */
-  public Component<T> setAddress(String address) {
-    this.address = address;
-    return this;
-  }
-
-  /**
-   * Returns the component address.<p>
-   *
-   * This address is an event bus address at which the component will register
-   * a handler to listen for connections when started. Thus, this address must
-   * be unique. If no explicit address is provided, a component address will be
-   * generated using the network configuration's <code>COMPONENT_ADDRESS_FORMAT</code>
-   * option.
+   * Returns the component address.
    *
    * @return
    *   The component address.
    */
   @JsonGetter("address")
   public String getAddress() {
-    return address != null ? address : Address.formatComponentAddress(this);
+    return address;
   }
 
   /**
-   * Sets the component name.
+   * Sets the component id.
    *
-   * @param name
-   *   The component name.
+   * @param id
+   *   The component identifier.
    * @return
    *   The component configuration.
    */
-  public Component<T> setName(String name) {
-    this.name = name;
+  public Component<T> setComponentId(String id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * Returns the component name.
+   * Returns the component id.
    *
    * @return
-   *   The component name.
+   *   The component identifier.
    */
-  public String getName() {
-    return name;
+  @JsonGetter("id")
+  public String getComponentId() {
+    return id != null ? id : formatComponentId(this);
   }
 
   /**
@@ -623,7 +588,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
 
   @Override
   public String toString() {
-    return id();
+    return getComponentId();
   }
 
 }

@@ -26,8 +26,9 @@ import net.kuujo.vertigo.network.Network;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
-import net.kuujo.vertigo.util.Address;
-import net.kuujo.vertigo.util.Identifier;
+import static net.kuujo.vertigo.util.Network.formatNetworkId;
+import static net.kuujo.vertigo.util.Component.formatComponentId;
+import static net.kuujo.vertigo.util.Instance.formatInstanceId;
 
 /**
  * A context builder.
@@ -51,8 +52,7 @@ public final class ContextBuilder {
     try {
       Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
       JsonObject serialized = serializer.serialize(network);
-      serialized.putString("id", Identifier.formatNetworkId(network));
-      serialized.putString("address", Address.formatNetworkAddress(network));
+      serialized.putString("id", formatNetworkId(network));
 
       JsonObject config = serialized.getObject(Network.NETWORK_CONFIG);
       JsonObject networkConfig = config.getObject(Config.NETWORK);
@@ -68,13 +68,11 @@ public final class ContextBuilder {
       JsonObject jsonComponents = serialized.getObject(Network.NETWORK_COMPONENTS);
       for (Component<?> component : network.getComponents()) {
         JsonObject jsonComponent = jsonComponents.getObject(component.getAddress());
-        jsonComponent.putString("id", Identifier.formatComponentId(component));
-        jsonComponent.putString("address", Address.formatComponentAddress(component));
+        jsonComponent.putString("id", formatComponentId(component));
 
         JsonArray instances = new JsonArray();
         for (int i = 1; i <= component.getNumInstances(); i++) {
-          instances.add(new JsonObject().putString("id", Identifier.formatInstanceId(component, i))
-              .putString("address", Address.formatInstanceAddress(component, i)));
+          instances.add(new JsonObject().putString("id", formatInstanceId(component, i)));
         }
         jsonComponent.putArray("instances", instances);
       }

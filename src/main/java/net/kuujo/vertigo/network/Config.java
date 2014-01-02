@@ -36,16 +36,10 @@ public class Config implements Serializable {
   public static final String NETWORK = "network";
 
   /**
-   * The network identifier format. Defaults to <code>%1$s</code>.<p>
-   * <code>%1</code> is the network name.
+   * The network identifier format. Defaults to <code>%1$s</code><p>
+   * <code>%1</code> is the network address
    */
   public static final String NETWORK_ID_FORMAT = "id";
-
-  /**
-   * The network address format. Defaults to <code>%1$s</code><p>
-   * <code>%1</code> is the network name.
-   */
-  public static final String NETWORK_ADDRESS_FORMAT = "address";
 
   /**
    * Whether acking is enabled for the network.
@@ -71,21 +65,13 @@ public class Config implements Serializable {
 
   /**
    * The component identifier format. Defaults to <code>%1$s-%3$s</code><p>
-   * <code>%1</code> is the network name<p>
-   * <code>%2</code> is the component type<p>
-   * <code>%3</code> is the component name<p>
-   * <code>%4</code> is the component module name or main
+   * <code>%1</code> is the network address<p>
+   * <code>%2</code> is the network identifier<p>
+   * <code>%3</code> is the component address<p>
+   * <code>%4</code> is the component type<p>
+   * <code>%5</code> is the component module name or main
    */
   public static final String COMPONENT_ID_FORMAT = "id";
-
-  /**
-   * The component address format. Defaults to <code>%1$s.%3$s</code><p>
-   * <code>%1</code> is the network name<p>
-   * <code>%2</code> is the component type<p>
-   * <code>%3</code> is the component name<p>
-   * <code>%4</code> is the component module name or main
-   */
-  public static final String COMPONENT_ADDRESS_FORMAT = "address";
 
   /**
    * The default configuration for all components in the network.
@@ -108,24 +94,16 @@ public class Config implements Serializable {
   public static final String INSTANCES = "instances";
 
   /**
-   * The instance identifier format. Defaults to <code>%1$s-%2$s-%3$d</code><p>
-   * <code>%1</code> is the network name<p>
-   * <code>%2</code> is the component type<p>
-   * <code>%3</code> is the component name<p>
-   * <code>%4</code> is the component module name or main<p>
-   * <code>%5</code> is the instance number
+   * The instance identifier format. Defaults to <code>%1$s-%3$s-%7$d</code><p>
+   * <code>%1</code> is the network address<p>
+   * <code>%2</code> is the network identifier<p>
+   * <code>%3</code> is the component address<p>
+   * <code>%4</code> is the component type<p>
+   * <code>%5</code> is the component module name or main<p>
+   * <code>%6</code> is the component identifier<p>
+   * <code>%7</code> is the instance number
    */
   public static final String INSTANCE_ID_FORMAT = "id";
-
-  /**
-   * The instance address format. Defaults to <code>%1$s.%2$s.%3$d</code><p>
-   * <code>%1</code> is the network name<p>
-   * <code>%2</code> is the component type<p>
-   * <code>%3</code> is the component name<p>
-   * <code>%4</code> is the component module name or main<p>
-   * <code>%5</code> is the instance number
-   */
-  public static final String INSTANCE_ADDRESS_FORMAT  = "address";
 
   private NetworkConfig network = new NetworkConfig();
   private ComponentConfig components = new ComponentConfig();
@@ -151,7 +129,6 @@ public class Config implements Serializable {
    */
   private static class NetworkConfig implements Serializable {
     private String id = "%1$s";
-    private String address = "%1$s";
     private boolean acking = true;
     private int auditors = 1;
     private long timeout = 30000;
@@ -162,15 +139,6 @@ public class Config implements Serializable {
 
     public NetworkConfig setIdFormat(String format) {
       id = format;
-      return this;
-    }
-
-    public String getAddressFormat() {
-      return address;
-    }
-
-    public NetworkConfig setAddressFormat(String format) {
-      address = format;
       return this;
     }
 
@@ -204,48 +172,25 @@ public class Config implements Serializable {
   }
 
   /**
-   * Gets the network identifier string format.
+   * Gets the network id string format.
    *
    * @return
-   *   The network identifier format.
+   *   The network id format.
    */
   public String getNetworkIdFormat() {
     return network.getIdFormat();
   }
 
   /**
-   * Sets the network identifier string format.
+   * Sets the network id string format.
    *
    * @param format
-   *   The network identifier format.
+   *   The network id format.
    * @return
    *   The network configuration.
    */
   public Config setNetworkIdFormat(String format) {
     network.setIdFormat(format);
-    return this;
-  }
-
-  /**
-   * Gets the network address string format.
-   *
-   * @return
-   *   The network address format.
-   */
-  public String getNetworkAddressFormat() {
-    return network.getAddressFormat();
-  }
-
-  /**
-   * Sets the network address string format.
-   *
-   * @param format
-   *   The network address format.
-   * @return
-   *   The network configuration.
-   */
-  public Config setNetworkAddressFormat(String format) {
-    network.setAddressFormat(format);
     return this;
   }
 
@@ -332,7 +277,6 @@ public class Config implements Serializable {
    */
   private static class ComponentConfig implements Serializable {
     private String id = "%1$s-%3$s";
-    private String address = "%1$s.%3$s";
     private Map<String, Object> config;
     private int instances = 1;
     private long heartbeat = 5000;
@@ -343,15 +287,6 @@ public class Config implements Serializable {
 
     public ComponentConfig setIdFormat(String format) {
       id = format;
-      return this;
-    }
-
-    public String getAddressFormat() {
-      return address;
-    }
-
-    public ComponentConfig setAddressFormat(String format) {
-      address = format;
       return this;
     }
 
@@ -390,48 +325,25 @@ public class Config implements Serializable {
   }
 
   /**
-   * Gets the component identifier string format.
+   * Gets the component id string format.
    *
    * @return
-   *   The component identifier format.
+   *   The component id format.
    */
   public String getComponentIdFormat() {
     return components.getIdFormat();
   }
 
   /**
-   * Sets the component identifier string format.
+   * Sets the component id string format.
    *
    * @param format
-   *   The component identifier format.
+   *   The component id format.
    * @return
    *   The network configuration.
    */
   public Config setComponentIdFormat(String format) {
     components.setIdFormat(format);
-    return this;
-  }
-
-  /**
-   * Gets the component address string format.
-   *
-   * @return
-   *   The component address format.
-   */
-  public String getComponentAddressFormat() {
-    return components.getAddressFormat();
-  }
-
-  /**
-   * Sets the component address string format.
-   *
-   * @param format
-   *   The component address format.
-   * @return
-   *   The network configuration.
-   */
-  public Config setComponentAddressFormat(String format) {
-    components.setAddressFormat(format);
     return this;
   }
 
@@ -517,8 +429,7 @@ public class Config implements Serializable {
    * @author Jordan Halterman
    */
   private static class InstanceConfig implements Serializable {
-    private String id = "%1$s-%3$s-%5$d";
-    private String address = "%1$s.%3$s.%5$d";
+    private String id = "%1$s-%3$s-%7$d";
 
     public String getIdFormat() {
       return id;
@@ -529,60 +440,28 @@ public class Config implements Serializable {
       return this;
     }
 
-    public String getAddressFormat() {
-      return address;
-    }
-
-    public InstanceConfig setAddressFormat(String format) {
-      address = format;
-      return this;
-    }
-
   }
 
   /**
-   * Gets the instance identifier string format.
+   * Gets the instance id string format.
    *
    * @return
-   *   The instance identifier format.
+   *   The instance id format.
    */
   public String getInstanceIdFormat() {
     return instances.getIdFormat();
   }
 
   /**
-   * Sets the instance identifier string format.
+   * Sets the instance id string format.
    *
    * @param format
-   *   The instance identifier format.
+   *   The instance id format.
    * @return
    *   The network configuration.
    */
   public Config setInstanceIdFormat(String format) {
     instances.setIdFormat(format);
-    return this;
-  }
-
-  /**
-   * Gets the instance address string format.
-   *
-   * @return
-   *   The instance address format.
-   */
-  public String getInstanceAddressFormat() {
-    return instances.getAddressFormat();
-  }
-
-  /**
-   * Sets the instance address string format.
-   *
-   * @param format
-   *   The instance address format.
-   * @return
-   *   The network configuration.
-   */
-  public Config setInstanceAddressFormat(String format) {
-    instances.setAddressFormat(format);
     return this;
   }
 

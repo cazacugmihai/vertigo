@@ -24,11 +24,10 @@ import java.util.Set;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
-import net.kuujo.vertigo.util.Address;
-import net.kuujo.vertigo.util.Identifier;
 import net.kuujo.vertigo.feeder.Feeder;
 import net.kuujo.vertigo.rpc.Executor;
 import net.kuujo.vertigo.worker.Worker;
+import static net.kuujo.vertigo.util.Network.formatNetworkId;
 
 import org.vertx.java.core.json.JsonObject;
 
@@ -46,9 +45,15 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 public final class Network implements Serializable {
 
   /**
-   * The network name.
+   * The network identifier. This id will be used in loggers.
    */
-  public static final String NETWORK_NAME = "name";
+  public static final String NETWORK_ID = "id";
+
+  /**
+   * The network address. This is an event bus address that will be used to
+   * communicate with network components.
+   */
+  public static final String NETWORK_ADDRESS = "address";
 
   /**
    * The network configuration. In Json terms, this is a {@link JsonObject} instance.
@@ -60,7 +65,7 @@ public final class Network implements Serializable {
    */
   public static final String NETWORK_COMPONENTS = "components";
 
-  private String name;
+  private String id;
   private String address;
   private Config config;
   private Map<String, Component<?>> components = new HashMap<String, Component<?>>();
@@ -69,20 +74,11 @@ public final class Network implements Serializable {
     this(null, new Config());
   }
 
-  public Network(String name) {
-    this(name, new Config());
+  public Network(String address) {
+    this(address, new Config());
   }
 
-  public Network(String name, Config config) {
-    this(name, name, config);
-  }
-
-  public Network(String name, String address) {
-    this(name, address, new Config());
-  }
-
-  public Network(String name, String address, Config config) {
-    this.name = name;
+  public Network(String address, Config config) {
     this.address = address;
     this.config = config;
   }
@@ -117,9 +113,6 @@ public final class Network implements Serializable {
     Set<String> fieldNames = json.getFieldNames();
     JsonObject config = fieldNames.contains(NETWORK_CONFIG) ? json.getObject(NETWORK_CONFIG) : new JsonObject();
     json.putObject(NETWORK_CONFIG, config);
-    if (!fieldNames.contains(Network.NETWORK_NAME)) {
-      json.putString(Network.NETWORK_NAME, json.getString("address"));
-    }
     JsonObject networkConfig = config.getFieldNames().contains(Config.NETWORK) ? config.getObject(Config.NETWORK) : new JsonObject();
     if (fieldNames.contains("auditors")) {
       networkConfig.putNumber(Config.NETWORK_NUM_AUDITORS, json.getInteger("auditors"));
@@ -134,41 +127,6 @@ public final class Network implements Serializable {
   }
 
   /**
-   * Returns the network identifier.<p>
-   *
-   * The network identifier is used in logging and identifying the network. This
-   * identifier is generated using the network configuration's <code>NETWORK_ID_FORMAT</code>
-   * option and should always result in a unique name. By default, the network
-   * ID will be the network name.
-   *
-   * @return
-   *   The globally unique network identifier.
-   */
-  public String id() {
-    return Identifier.formatNetworkId(this);
-  }
-
-  /**
-   * Sets an explicit network address.<p>
-   *
-   * This is the address of the network coordinator when the network is deployed.
-   * The coordinator is an address on the event bus with which all network components
-   * communicate, thus it is important that this address be globally unique.<p>
-   *
-   * If no explicit network address is set then an address will be generated based
-   * on the network configuration's <code>NETWORK_ADDRESS_FORMAT</code> option.
-   *
-   * @param address
-   *   The network address.
-   * @return
-   *   The network configuration.
-   */
-  public Network setAddress(String address) {
-    this.address = address;
-    return this;
-  }
-
-  /**
    * Returns the network address.
    *
    * This is the event bus address at which the network's coordinator will register
@@ -177,32 +135,32 @@ public final class Network implements Serializable {
    * @return
    *   The network address.
    */
-  @JsonGetter("address")
   public String getAddress() {
-    return address != null ? address : Address.formatNetworkAddress(this);
+    return address;
   }
 
   /**
-   * Sets the network name.
+   * Sets the network ID.
    *
-   * @param name
-   *   The network name.
+   * @param id
+   *   The network identifier.
    * @return
    *   The network configuration.
    */
-  public Network setName(String name) {
-    this.name = name;
+  public Network setNetworkId(String id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * Returns the network name.
+   * Returns the network id.
    *
    * @return
-   *   The network name.
+   *   The network id.
    */
-  public String getName() {
-    return name;
+  @JsonGetter("id")
+  public String getNetworkId() {
+    return id != null ? id : formatNetworkId(this);
   }
 
   /**
@@ -646,7 +604,7 @@ public final class Network implements Serializable {
 
   @Override
   public String toString() {
-    return id();
+    return getNetworkId();
   }
 
 }
