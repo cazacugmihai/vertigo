@@ -36,13 +36,13 @@ public class Config implements Serializable {
   public static final String NETWORK = "network";
 
   /**
-   * The network identifier format. Defaults to <code>%1</code>.<p>
+   * The network identifier format. Defaults to <code>%1$s</code>.<p>
    * <code>%1</code> is the network name.
    */
   public static final String NETWORK_ID_FORMAT = "id";
 
   /**
-   * The network address format. Defaults to <code>%1</code><p>
+   * The network address format. Defaults to <code>%1$s</code><p>
    * <code>%1</code> is the network name.
    */
   public static final String NETWORK_ADDRESS_FORMAT = "address";
@@ -70,7 +70,7 @@ public class Config implements Serializable {
   public static final String COMPONENTS = "components";
 
   /**
-   * The component identifier format. Defaults to <code>%1-%3</code><p>
+   * The component identifier format. Defaults to <code>%1$s-%3$s</code><p>
    * <code>%1</code> is the network name<p>
    * <code>%2</code> is the component type<p>
    * <code>%3</code> is the component name<p>
@@ -79,7 +79,7 @@ public class Config implements Serializable {
   public static final String COMPONENT_ID_FORMAT = "id";
 
   /**
-   * The component address format. Defaults to <code>%1.%3</code><p>
+   * The component address format. Defaults to <code>%1$s.%3$s</code><p>
    * <code>%1</code> is the network name<p>
    * <code>%2</code> is the component type<p>
    * <code>%3</code> is the component name<p>
@@ -108,7 +108,7 @@ public class Config implements Serializable {
   public static final String INSTANCES = "instances";
 
   /**
-   * The instance identifier format. Defaults to <code>%1-%2-%3</code><p>
+   * The instance identifier format. Defaults to <code>%1$s-%2$s-%3$d</code><p>
    * <code>%1</code> is the network name<p>
    * <code>%2</code> is the component type<p>
    * <code>%3</code> is the component name<p>
@@ -118,7 +118,7 @@ public class Config implements Serializable {
   public static final String INSTANCE_ID_FORMAT = "id";
 
   /**
-   * The instance address format. Defaults to <code>%1.%2.%3</code><p>
+   * The instance address format. Defaults to <code>%1$s.%2$s.%3$d</code><p>
    * <code>%1</code> is the network name<p>
    * <code>%2</code> is the component type<p>
    * <code>%3</code> is the component name<p>
@@ -150,8 +150,8 @@ public class Config implements Serializable {
    * @author Jordan Halterman
    */
   private static class NetworkConfig implements Serializable {
-    private String id = "%1";
-    private String address = "%1";
+    private String id = "%1$s";
+    private String address = "%1$s";
     private boolean acking = true;
     private int auditors = 1;
     private long timeout = 30000;
@@ -331,8 +331,8 @@ public class Config implements Serializable {
    * @author Jordan Halterman
    */
   private static class ComponentConfig implements Serializable {
-    private String id = "%1-%3";
-    private String address = "%1.%3";
+    private String id = "%1$s-%3$s";
+    private String address = "%1$s.%3$s";
     private Map<String, Object> config;
     private int instances = 1;
     private long heartbeat = 5000;
@@ -517,8 +517,8 @@ public class Config implements Serializable {
    * @author Jordan Halterman
    */
   private static class InstanceConfig implements Serializable {
-    private String id = "%1-%3-%5";
-    private String address = "%1.%3.%5";
+    private String id = "%1$s-%3$s-%5$d";
+    private String address = "%1$s.%3$s.%5$d";
 
     public String getIdFormat() {
       return id;

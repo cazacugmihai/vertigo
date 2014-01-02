@@ -67,17 +67,17 @@ public class NetworkTest {
   @Test
   public void testConfigDefaults() {
     Config config = new Config();
-    assertEquals("%1", config.getNetworkIdFormat());
-    assertEquals("%1", config.getNetworkAddressFormat());
+    assertEquals("%1$s", config.getNetworkIdFormat());
+    assertEquals("%1$s", config.getNetworkAddressFormat());
     assertEquals(1, config.getNetworkNumAuditors());
     assertEquals(30000, config.getNetworkAckTimeout());
-    assertEquals("%1-%3", config.getComponentIdFormat());
-    assertEquals("%1.%3", config.getComponentAddressFormat());
+    assertEquals("%1$s-%3$s", config.getComponentIdFormat());
+    assertEquals("%1$s.%3$s", config.getComponentAddressFormat());
     assertEquals(1, config.getComponentDefaultNumInstances());
     assertEquals(new JsonObject(), config.getComponentDefaultConfig());
     assertEquals(5000, config.getComponentDefaultHeartbeatInterval());
-    assertEquals("%1-%3-%5", config.getInstanceIdFormat());
-    assertEquals("%1.%3.%5", config.getInstanceAddressFormat());
+    assertEquals("%1$s-%3$s-%5$d", config.getInstanceIdFormat());
+    assertEquals("%1$s.%3$s.%5$d", config.getInstanceAddressFormat());
   }
 
   @Test
@@ -292,9 +292,10 @@ public class NetworkTest {
     assertEquals("test", json.getString(Network.NETWORK_NAME));
     assertEquals(0, json.getObject(Network.NETWORK_COMPONENTS).size());
     JsonObject config = json.getObject(Network.NETWORK_CONFIG);
-    assertNotNull(config);
-    assertTrue(config.getInteger(Config.NETWORK_NUM_AUDITORS) == 2);
-    assertTrue(config.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
+    JsonObject networkConfig = config.getObject(Config.NETWORK);
+    assertNotNull(networkConfig);
+    assertTrue(networkConfig.getInteger(Config.NETWORK_NUM_AUDITORS) == 2);
+    assertTrue(networkConfig.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
     JsonObject componentConfig = config.getObject(Config.COMPONENTS);
     assertNotNull(componentConfig);
     assertEquals("bar", componentConfig.getObject(Config.COMPONENT_DEFAULT_CONFIG).getString("foo"));
@@ -331,9 +332,10 @@ public class NetworkTest {
     JsonObject json = serializer.serialize(network);
     assertEquals("test", json.getString(Network.NETWORK_NAME));
     JsonObject config = json.getObject(Network.NETWORK_CONFIG);
-    assertNotNull(config);
-    assertTrue(config.getInteger(Config.NETWORK_NUM_AUDITORS) == 2);
-    assertTrue(config.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
+    JsonObject networkConfig = config.getObject(Config.NETWORK);
+    assertNotNull(networkConfig);
+    assertTrue(networkConfig.getInteger(Config.NETWORK_NUM_AUDITORS) == 2);
+    assertTrue(networkConfig.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
     JsonObject componentConfig = config.getObject(Config.COMPONENTS);
     assertNotNull(componentConfig);
     assertEquals("bar", componentConfig.getObject(Config.COMPONENT_DEFAULT_CONFIG).getString("foo"));
@@ -353,8 +355,8 @@ public class NetworkTest {
     JsonObject jsonWorker = jsonComponents.getObject("test.worker");
     assertEquals("worker", jsonWorker.getString(Component.COMPONENT_TYPE));
     assertEquals("test.worker", jsonWorker.getString(Component.COMPONENT_ADDRESS));
-    assertNull(jsonWorker.getInteger(Component.COMPONENT_NUM_INSTANCES));
-    assertNull(jsonWorker.getObject(Component.COMPONENT_CONFIG));
+    assertTrue(jsonWorker.getInteger(Component.COMPONENT_NUM_INSTANCES) == 2);
+    assertEquals("bar", jsonWorker.getObject(Component.COMPONENT_CONFIG).getString("foo"));
 
     JsonArray jsonInputs = jsonWorker.getArray(Component.COMPONENT_INPUTS);
     assertEquals(1, jsonInputs.size());
@@ -425,8 +427,10 @@ public class NetworkTest {
     json.putString(Network.NETWORK_NAME, "test");
 
     JsonObject jsonConfig = new JsonObject();
-    jsonConfig.putNumber(Config.NETWORK_NUM_AUDITORS, 2);
-    jsonConfig.putNumber(Config.NETWORK_ACK_TIMEOUT, 10000);
+    JsonObject networkConfig = new JsonObject();
+    networkConfig.putNumber(Config.NETWORK_NUM_AUDITORS, 2);
+    networkConfig.putNumber(Config.NETWORK_ACK_TIMEOUT, 10000);
+    jsonConfig.putObject(Config.NETWORK, networkConfig);
     jsonConfig.putObject(Config.COMPONENTS, new JsonObject()
       .putObject(Config.COMPONENT_DEFAULT_CONFIG, new JsonObject().putString("foo", "bar"))
       .putNumber(Config.COMPONENT_DEFAULT_NUM_INSTANCES, 2));
