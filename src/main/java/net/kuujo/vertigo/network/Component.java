@@ -32,6 +32,8 @@ import net.kuujo.vertigo.input.grouping.Grouping;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
+import net.kuujo.vertigo.util.Address;
+import net.kuujo.vertigo.util.Identifier;
 import static net.kuujo.vertigo.util.Component.isModuleName;
 import static net.kuujo.vertigo.util.Component.isVerticleMain;
 import static net.kuujo.vertigo.util.Component.serializeType;
@@ -52,6 +54,11 @@ import static net.kuujo.vertigo.util.Component.deserializeType;
  */
 @SuppressWarnings("rawtypes")
 public class Component<T extends net.kuujo.vertigo.component.Component> implements Serializable {
+
+  /**
+   * The component name.
+   */
+  public static final String COMPONENT_NAME = "name";
 
   /**
    * The component address.
@@ -88,6 +95,11 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   public static final String COMPONENT_NUM_INSTANCES = "instances";
 
   /**
+   * The interval at which the component should send heartbeats to network monitors.
+   */
+  public static final String COMPONENT_HEARTBEAT_INTERVAL = "heartbeat";
+
+  /**
    * A list of component hooks.
    */
   public static final String COMPONENT_HOOKS = "hooks";
@@ -97,17 +109,20 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    */
   public static final String COMPONENT_INPUTS = "inputs";
 
+  private String name;
   private String address;
   private @JsonBackReference Network network;
   private Class<T> type;
   private String main;
   private Map<String, Object> config;
   private Integer instances;
+  private Long heartbeat;
   private List<ComponentHook> hooks = new ArrayList<>();
   private List<Input> inputs = new ArrayList<>();
 
   public Component() {
-    address = UUID.randomUUID().toString();
+    name = UUID.randomUUID().toString();
+    address = name;
   }
 
   public Component(Class<T> type, String address, String main) {
@@ -142,6 +157,52 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
   }
 
   /**
+   * Returns the component identifier.
+   *
+   * @return
+   *   The globally unique component identifier.
+   */
+  public String id() {
+    return Identifier.formatComponentId(this);
+  }
+
+  /**
+   * Sets the component name.
+   *
+   * @param name
+   *   The component name.
+   * @return
+   *   The component configuration.
+   */
+  public Component<T> setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Returns the component name.
+   *
+   * @return
+   *   The component name.
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Sets the component address.
+   *
+   * @param address
+   *   The component address.
+   * @return
+   *   The component configuration.
+   */
+  public Component<T> setAddress(String address) {
+    this.address = address;
+    return this;
+  }
+
+  /**
    * Returns the component address.
    *
    * This address is an event bus address at which the component will register
@@ -152,7 +213,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The component address.
    */
   public String getAddress() {
-    return address;
+    return address != null ? address : Address.formatComponentAddress(this);
   }
 
   /**
@@ -268,7 +329,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The component configuration.
    */
   public JsonObject getConfig() {
-    return config != null ? new JsonObject(config) : network.getConfig().getDefaultConfig();
+    return config != null ? new JsonObject(config) : network.getNetworkConfig().getComponentDefaultConfig();
   }
 
   /**
@@ -322,7 +383,7 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
    *   The number of component instances.
    */
   public int getNumInstances() {
-    return instances != null ? instances : network.getConfig().getDefaultNumInstances();
+    return instances != null ? instances : network.getNetworkConfig().getComponentDefaultNumInstances();
   }
 
   /**
@@ -338,13 +399,26 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
     return this;
   }
 
-  @Deprecated
+  /**
+   * Gets the component heartbeat interval.
+   *
+   * @return
+   *   The component heartbeat interval.
+   */
   public long getHeartbeatInterval() {
-    return network.getConfig().getHeartbeatInterval();
+    return heartbeat != null ? heartbeat : network.getNetworkConfig().getComponentDefaultHeartbeatInterval();
   }
 
-  @Deprecated
+  /**
+   * Sets the component heartbeat interval.
+   *
+   * @param interval
+   *   The interval at which the component should send heartbeats to network monitors.
+   * @return
+   *   The component instance.
+   */
   public Component<T> setHeartbeatInterval(long interval) {
+    heartbeat = interval;
     return this;
   }
 
@@ -521,9 +595,19 @@ public class Component<T extends net.kuujo.vertigo.component.Component> implemen
     return addInput(new Input(address, stream).groupBy(grouping));
   }
 
+  /**
+   * Returns the network to which the component belongs.
+   *
+   * @return
+   *   The network to which the component belongs.
+   */
+  public Network getNetwork() {
+    return network;
+  }
+
   @Override
   public String toString() {
-    return address;
+    return id();
   }
 
 }

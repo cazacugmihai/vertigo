@@ -47,10 +47,10 @@ public class ContextTest {
 
   private NetworkContext createTestNetworkContext() {
     Network network = new Network("test");
-    network.getConfig().setAckTimeout(10000);
-    network.getConfig().setNumAuditors(2);
-    network.getConfig().setDefaultConfig(new JsonObject().putString("foo", "bar"));
-    network.getConfig().setDefaultNumInstances(2);
+    network.getNetworkConfig().setNetworkAckTimeout(10000);
+    network.getNetworkConfig().setNetworkNumAuditors(2);
+    network.getNetworkConfig().setComponentDefaultConfig(new JsonObject().putString("foo", "bar"));
+    network.getNetworkConfig().setComponentDefaultNumInstances(2);
 
     Component<Feeder> feeder = network.addFeeder("test.feeder", "test_feeder.js");
     feeder.setNumInstances(3);

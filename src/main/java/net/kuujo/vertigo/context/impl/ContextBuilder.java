@@ -48,7 +48,7 @@ public final class ContextBuilder {
       Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
       JsonObject serialized = serializer.serialize(network);
       JsonArray auditors = new JsonArray();
-      for (int i = 1; i < network.getConfig().getNumAuditors()+1; i++) {
+      for (int i = 1; i < network.getNetworkConfig().getNetworkNumAuditors()+1; i++) {
         auditors.add(String.format("%s.auditor.%d", network.getAddress(), i));
       }
       serialized.putArray("auditors", auditors);

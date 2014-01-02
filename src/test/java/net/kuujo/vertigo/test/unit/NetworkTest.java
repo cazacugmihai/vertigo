@@ -54,7 +54,7 @@ public class NetworkTest {
   @Test
   public void testNetworkDefaults() {
     Network network = new Network("test");
-    assertNotNull(network.getConfig());
+    assertNotNull(network.getNetworkConfig());
     assertEquals("test", network.getAddress());
     assertEquals(0, network.getComponents().size());
     try {
@@ -67,30 +67,36 @@ public class NetworkTest {
   @Test
   public void testConfigDefaults() {
     Config config = new Config();
-    assertTrue(config.isAckingEnabled());
-    assertEquals(1, config.getNumAuditors());
-    assertEquals(30000, config.getAckTimeout());
-    assertEquals(1, config.getDefaultNumInstances());
-    assertEquals(new JsonObject(), config.getDefaultConfig());
+    assertEquals("%1", config.getNetworkIdFormat());
+    assertEquals("%1", config.getNetworkAddressFormat());
+    assertEquals(1, config.getNetworkNumAuditors());
+    assertEquals(30000, config.getNetworkAckTimeout());
+    assertEquals("%1-%3", config.getComponentIdFormat());
+    assertEquals("%1.%3", config.getComponentAddressFormat());
+    assertEquals(1, config.getComponentDefaultNumInstances());
+    assertEquals(new JsonObject(), config.getComponentDefaultConfig());
+    assertEquals(5000, config.getComponentDefaultHeartbeatInterval());
+    assertEquals("%1-%3-%5", config.getInstanceIdFormat());
+    assertEquals("%1.%3.%5", config.getInstanceAddressFormat());
   }
 
   @Test
   public void testNetworkConfig() {
     Network network = new Network("test");
     Config config = new Config();
-    config.setAckTimeout(10000);
-    assertEquals(10000, config.getAckTimeout());
-    config.setNumAuditors(3);
-    assertEquals(3, config.getNumAuditors());
-    config.setDefaultNumInstances(2);
-    assertEquals(2, config.getDefaultNumInstances());
-    config.setDefaultConfig(new JsonObject().putString("foo", "bar"));
-    assertEquals("bar", config.getDefaultConfig().getString("foo"));
-    network.setConfig(config);
-    assertEquals(10000, network.getConfig().getAckTimeout());
-    assertEquals(3, network.getConfig().getNumAuditors());
-    assertEquals(2, network.getConfig().getDefaultNumInstances());
-    assertEquals("bar", network.getConfig().getDefaultConfig().getString("foo"));
+    config.setNetworkAckTimeout(10000);
+    assertEquals(10000, config.getNetworkAckTimeout());
+    config.setNetworkNumAuditors(3);
+    assertEquals(3, config.getNetworkNumAuditors());
+    config.setComponentDefaultNumInstances(2);
+    assertEquals(2, config.getComponentDefaultNumInstances());
+    config.setComponentDefaultConfig(new JsonObject().putString("foo", "bar"));
+    assertEquals("bar", config.getComponentDefaultConfig().getString("foo"));
+    network.setNetworkConfig(config);
+    assertEquals(10000, network.getNetworkConfig().getNetworkAckTimeout());
+    assertEquals(3, network.getNetworkConfig().getNetworkNumAuditors());
+    assertEquals(2, network.getNetworkConfig().getComponentDefaultNumInstances());
+    assertEquals("bar", network.getNetworkConfig().getComponentDefaultConfig().getString("foo"));
   }
 
   @Test
@@ -98,9 +104,9 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setDefaultConfig(new JsonObject().putString("foo", "bar"))
-      .setDefaultNumInstances(2);
-    network.setConfig(config);
+      .setComponentDefaultConfig(new JsonObject().putString("foo", "bar"))
+      .setComponentDefaultNumInstances(2);
+    network.setNetworkConfig(config);
     Component<Feeder> feeder = network.addFeeder("test.feeder", "com.test~test-feeder~1.0");
     assertEquals(Feeder.class, feeder.getType());
     assertEquals("test.feeder", feeder.getAddress());
@@ -121,9 +127,9 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setDefaultConfig(new JsonObject().putString("foo", "bar"))
-      .setDefaultNumInstances(2);
-    network.setConfig(config);
+      .setComponentDefaultConfig(new JsonObject().putString("foo", "bar"))
+      .setComponentDefaultNumInstances(2);
+    network.setNetworkConfig(config);
     Component<Feeder> feeder = network.addFeeder("test.feeder", "test_feeder.py");
     assertEquals(Feeder.class, feeder.getType());
     assertEquals("test.feeder", feeder.getAddress());
@@ -144,9 +150,9 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setDefaultConfig(new JsonObject().putString("foo", "bar"))
-      .setDefaultNumInstances(2);
-    network.setConfig(config);
+      .setComponentDefaultConfig(new JsonObject().putString("foo", "bar"))
+      .setComponentDefaultNumInstances(2);
+    network.setNetworkConfig(config);
     Component<Executor> executor = network.addExecutor("test.executor", "com.test~test-executor~1.0");
     assertEquals(Executor.class, executor.getType());
     assertEquals("test.executor", executor.getAddress());
@@ -167,9 +173,9 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setDefaultConfig(new JsonObject().putString("foo", "bar"))
-      .setDefaultNumInstances(2);
-    network.setConfig(config);
+      .setComponentDefaultConfig(new JsonObject().putString("foo", "bar"))
+      .setComponentDefaultNumInstances(2);
+    network.setNetworkConfig(config);
     Component<Executor> executor = network.addExecutor("test.executor", "test_executor.py");
     assertEquals(Executor.class, executor.getType());
     assertEquals("test.executor", executor.getAddress());
@@ -190,9 +196,9 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setDefaultConfig(new JsonObject().putString("foo", "bar"))
-      .setDefaultNumInstances(2);
-    network.setConfig(config);
+      .setComponentDefaultConfig(new JsonObject().putString("foo", "bar"))
+      .setComponentDefaultNumInstances(2);
+    network.setNetworkConfig(config);
     Component<Worker> worker = network.addWorker("test.worker", "com.test~test-worker~1.0");
     assertEquals(Worker.class, worker.getType());
     assertEquals("test.worker", worker.getAddress());
@@ -213,9 +219,9 @@ public class NetworkTest {
     Network network = new Network("test");
     assertEquals("test", network.getAddress());
     Config config = new Config()
-      .setDefaultConfig(new JsonObject().putString("foo", "bar"))
-      .setDefaultNumInstances(2);
-    network.setConfig(config);
+      .setComponentDefaultConfig(new JsonObject().putString("foo", "bar"))
+      .setComponentDefaultNumInstances(2);
+    network.setNetworkConfig(config);
     Component<Worker> worker = network.addWorker("test.worker", "test_worker.py");
     assertEquals(Worker.class, worker.getType());
     assertEquals("test.worker", worker.getAddress());
@@ -276,10 +282,10 @@ public class NetworkTest {
   @Test
   public void testSerializeNetwork() {
     Network network = new Network("test");
-    network.getConfig().setNumAuditors(2);
-    network.getConfig().setAckTimeout(10000);
-    network.getConfig().setDefaultConfig(new JsonObject().putString("foo", "bar"));
-    network.getConfig().setDefaultNumInstances(2);
+    network.getNetworkConfig().setNetworkNumAuditors(2);
+    network.getNetworkConfig().setNetworkAckTimeout(10000);
+    network.getNetworkConfig().setComponentDefaultConfig(new JsonObject().putString("foo", "bar"));
+    network.getNetworkConfig().setComponentDefaultNumInstances(2);
 
     Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
     JsonObject json = serializer.serialize(network);
@@ -291,27 +297,27 @@ public class NetworkTest {
     assertTrue(config.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
     JsonObject componentConfig = config.getObject(Config.COMPONENTS);
     assertNotNull(componentConfig);
-    assertEquals("bar", componentConfig.getObject(Config.COMPONENT_CONFIG).getString("foo"));
-    assertTrue(componentConfig.getInteger(Config.COMPONENT_NUM_INSTANCES) == 2);
+    assertEquals("bar", componentConfig.getObject(Config.COMPONENT_DEFAULT_CONFIG).getString("foo"));
+    assertTrue(componentConfig.getInteger(Config.COMPONENT_DEFAULT_NUM_INSTANCES) == 2);
 
     Network result = serializer.deserialize(json);
     assertEquals("test", result.getAddress());
     assertEquals(0, result.getComponents().size());
-    assertNotNull(result.getConfig());
-    assertEquals(2, result.getConfig().getNumAuditors());
-    assertEquals(10000, result.getConfig().getAckTimeout());
-    assertNotNull(result.getConfig().getDefaultConfig());
-    assertEquals("bar", result.getConfig().getDefaultConfig().getString("foo"));
-    assertEquals(2, result.getConfig().getDefaultNumInstances());
+    assertNotNull(result.getNetworkConfig());
+    assertEquals(2, result.getNetworkConfig().getNetworkNumAuditors());
+    assertEquals(10000, result.getNetworkConfig().getNetworkAckTimeout());
+    assertNotNull(result.getNetworkConfig().getComponentDefaultConfig());
+    assertEquals("bar", result.getNetworkConfig().getComponentDefaultConfig().getString("foo"));
+    assertEquals(2, result.getNetworkConfig().getComponentDefaultNumInstances());
   }
 
   @Test
   public void testSerializeNetworkWithComponents() {
     Network network = new Network("test");
-    network.getConfig().setNumAuditors(2);
-    network.getConfig().setAckTimeout(10000);
-    network.getConfig().setDefaultConfig(new JsonObject().putString("foo", "bar"));
-    network.getConfig().setDefaultNumInstances(2);
+    network.getNetworkConfig().setNetworkNumAuditors(2);
+    network.getNetworkConfig().setNetworkAckTimeout(10000);
+    network.getNetworkConfig().setComponentDefaultConfig(new JsonObject().putString("foo", "bar"));
+    network.getNetworkConfig().setComponentDefaultNumInstances(2);
 
     Component<Feeder> feeder = network.addFeeder("test.feeder", "test_feeder.py");
     feeder.setConfig(new JsonObject().putString("bar", "baz"));
@@ -330,8 +336,8 @@ public class NetworkTest {
     assertTrue(config.getLong(Config.NETWORK_ACK_TIMEOUT) == 10000);
     JsonObject componentConfig = config.getObject(Config.COMPONENTS);
     assertNotNull(componentConfig);
-    assertEquals("bar", componentConfig.getObject(Config.COMPONENT_CONFIG).getString("foo"));
-    assertTrue(componentConfig.getInteger(Config.COMPONENT_NUM_INSTANCES) == 2);
+    assertEquals("bar", componentConfig.getObject(Config.COMPONENT_DEFAULT_CONFIG).getString("foo"));
+    assertTrue(componentConfig.getInteger(Config.COMPONENT_DEFAULT_NUM_INSTANCES) == 2);
 
     JsonObject jsonComponents = json.getObject(Network.NETWORK_COMPONENTS);
     assertEquals(2, jsonComponents.size());
@@ -364,12 +370,12 @@ public class NetworkTest {
 
     Network result = Network.fromJson(json);
     assertEquals("test", result.getAddress());
-    assertNotNull(result.getConfig());
-    assertEquals(2, result.getConfig().getNumAuditors());
-    assertEquals(10000, result.getConfig().getAckTimeout());
-    assertNotNull(result.getConfig().getDefaultConfig());
-    assertEquals("bar", result.getConfig().getDefaultConfig().getString("foo"));
-    assertEquals(2, result.getConfig().getDefaultNumInstances());
+    assertNotNull(result.getNetworkConfig());
+    assertEquals(2, result.getNetworkConfig().getNetworkNumAuditors());
+    assertEquals(10000, result.getNetworkConfig().getNetworkAckTimeout());
+    assertNotNull(result.getNetworkConfig().getComponentDefaultConfig());
+    assertEquals("bar", result.getNetworkConfig().getComponentDefaultConfig().getString("foo"));
+    assertEquals(2, result.getNetworkConfig().getComponentDefaultNumInstances());
 
     assertEquals(2, result.getComponents().size());
     feeder = result.getComponent("test.feeder");
@@ -409,7 +415,7 @@ public class NetworkTest {
     json.putString(Network.NETWORK_ADDRESS, "test");
     Network network = Network.fromJson(json);
     assertEquals("test", network.getAddress());
-    assertNotNull(network.getConfig());
+    assertNotNull(network.getNetworkConfig());
     assertNotNull(network.getComponents());
   }
 
@@ -422,8 +428,8 @@ public class NetworkTest {
     jsonConfig.putNumber(Config.NETWORK_NUM_AUDITORS, 2);
     jsonConfig.putNumber(Config.NETWORK_ACK_TIMEOUT, 10000);
     jsonConfig.putObject(Config.COMPONENTS, new JsonObject()
-      .putObject(Config.COMPONENT_CONFIG, new JsonObject().putString("foo", "bar"))
-      .putNumber(Config.COMPONENT_NUM_INSTANCES, 2));
+      .putObject(Config.COMPONENT_DEFAULT_CONFIG, new JsonObject().putString("foo", "bar"))
+      .putNumber(Config.COMPONENT_DEFAULT_NUM_INSTANCES, 2));
     json.putObject(Network.NETWORK_CONFIG, jsonConfig);
 
     JsonObject jsonComponents = new JsonObject();
@@ -431,11 +437,11 @@ public class NetworkTest {
 
     Network network = Network.fromJson(json);
     assertEquals("test", network.getAddress());
-    Config config = network.getConfig();
-    assertEquals(2, config.getNumAuditors());
-    assertEquals(10000, config.getAckTimeout());
-    assertEquals("bar", config.getDefaultConfig().getString("foo"));
-    assertEquals(2, config.getDefaultNumInstances());
+    Config config = network.getNetworkConfig();
+    assertEquals(2, config.getNetworkNumAuditors());
+    assertEquals(10000, config.getNetworkAckTimeout());
+    assertEquals("bar", config.getComponentDefaultConfig().getString("foo"));
+    assertEquals(2, config.getComponentDefaultNumInstances());
   }
 
   @Test
@@ -550,8 +556,8 @@ public class NetworkTest {
     json.putNumber(Config.NETWORK_NUM_AUDITORS, 2);
     json.putNumber(Config.NETWORK_ACK_TIMEOUT, 10000);
     Network network = Network.fromJson(json);
-    assertEquals(2, network.getConfig().getNumAuditors());
-    assertEquals(10000, network.getConfig().getAckTimeout());
+    assertEquals(2, network.getNetworkConfig().getNetworkNumAuditors());
+    assertEquals(10000, network.getNetworkConfig().getNetworkAckTimeout());
   }
 
   public static class TestHook implements ComponentHook {

@@ -33,6 +33,7 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  * @author Jordan Halterman
  */
 public final class NetworkContext implements Serializable {
+  private String name;
   private String address;
   private Config config = new Config();
   private List<String> auditors = new ArrayList<>();
@@ -68,6 +69,26 @@ public final class NetworkContext implements Serializable {
     return new JsonObject().putObject("network", SerializerFactory.getSerializer(NetworkContext.class).serialize(context));
   }
 
+  /**
+   * Returns the network identifier.
+   *
+   * @return
+   *   The globally unique network identifier.
+   */
+  public String id() {
+    return name;
+  }
+
+  /**
+   * Returns the network name.
+   *
+   * @return
+   *   The network name.
+   */
+  public String name() {
+    return name;
+  }
+
   @Deprecated
   public String getAddress() {
     return address();
@@ -80,7 +101,7 @@ public final class NetworkContext implements Serializable {
    *   The network address.
    */
   public String address() {
-    return address;
+    return address != null ? address : name();
   }
 
   @Deprecated

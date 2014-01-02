@@ -20,16 +20,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
+import net.kuujo.vertigo.util.Address;
+import net.kuujo.vertigo.util.Identifier;
 import net.kuujo.vertigo.feeder.Feeder;
 import net.kuujo.vertigo.rpc.Executor;
 import net.kuujo.vertigo.worker.Worker;
 
 import org.vertx.java.core.json.JsonObject;
+
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * A Vertigo network definition.<p>
@@ -41,6 +44,11 @@ import org.vertx.java.core.json.JsonObject;
  * @author Jordan Halterman
  */
 public final class Network implements Serializable {
+
+  /**
+   * The network name.
+   */
+  public static final String NETWORK_NAME = "name";
 
   /**
    * The network address.
@@ -57,19 +65,29 @@ public final class Network implements Serializable {
    */
   public static final String NETWORK_COMPONENTS = "components";
 
+  private String name;
   private String address;
   private Config config;
   private Map<String, Component<?>> components = new HashMap<String, Component<?>>();
 
   public Network() {
-    this(UUID.randomUUID().toString(), new Config());
+    this(null, new Config());
   }
 
-  public Network(String address) {
-    this(address, new Config());
+  public Network(String name) {
+    this(name, new Config());
   }
 
-  public Network(String address, Config config) {
+  public Network(String name, Config config) {
+    this(name, name, config);
+  }
+
+  public Network(String name, String address) {
+    this(name, address, new Config());
+  }
+
+  public Network(String name, String address, Config config) {
+    this.name = name;
     this.address = address;
     this.config = config;
   }
@@ -104,15 +122,68 @@ public final class Network implements Serializable {
     Set<String> fieldNames = json.getFieldNames();
     JsonObject config = fieldNames.contains(NETWORK_CONFIG) ? json.getObject(NETWORK_CONFIG) : new JsonObject();
     json.putObject(NETWORK_CONFIG, config);
+    if (!fieldNames.contains(Network.NETWORK_NAME)) {
+      json.putString(Network.NETWORK_NAME, json.getString(Network.NETWORK_ADDRESS));
+    }
+    JsonObject networkConfig = config.getFieldNames().contains(Config.NETWORK) ? config.getObject(Config.NETWORK) : new JsonObject();
     if (fieldNames.contains("auditors")) {
-      config.putNumber(Config.NETWORK_NUM_AUDITORS, json.getInteger("auditors"));
+      networkConfig.putNumber(Config.NETWORK_NUM_AUDITORS, json.getInteger("auditors"));
       json.removeField("auditors");
     }
     if (fieldNames.contains("timeout")) {
-      config.putNumber(Config.NETWORK_ACK_TIMEOUT, json.getLong("timeout"));
+      networkConfig.putNumber(Config.NETWORK_ACK_TIMEOUT, json.getLong("timeout"));
       json.removeField("timeout");
     }
+    config.putObject(Config.NETWORK, networkConfig);
     return json;
+  }
+
+  /**
+   * Returns the network identifier.
+   *
+   * @return
+   *   The globally unique network identifier.
+   */
+  public String id() {
+    return Identifier.formatNetworkId(this);
+  }
+
+  /**
+   * Sets the network name.
+   *
+   * @param name
+   *   The network name.
+   * @return
+   *   The network configuration.
+   */
+  @JsonSetter("address")
+  public Network setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Returns the network name.
+   *
+   * @return
+   *   The network name.
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Sets the network address.
+   *
+   * @param address
+   *   The network address.
+   * @return
+   *   The network configuration.
+   */
+  @JsonSetter("address")
+  public Network setAddress(String address) {
+    this.address = address;
+    return this;
   }
 
   /**
@@ -125,7 +196,7 @@ public final class Network implements Serializable {
    *   The network address.
    */
   public String getAddress() {
-    return address;
+    return address != null ? address : Address.formatNetworkAddress(this);
   }
 
   /**
@@ -136,8 +207,8 @@ public final class Network implements Serializable {
    * @return
    *   The network instance.
    */
-  public Network setConfig(JsonObject jsonConfig) {
-    config = SerializerFactory.getSerializer(Config.class).deserialize(jsonConfig);
+  public Network setNetworkConfig(JsonObject jsonConfig) {
+    config = Config.fromJson(jsonConfig);
     return this;
   }
 
@@ -149,18 +220,18 @@ public final class Network implements Serializable {
    * @return
    *   The network instance.
    */
-  public Network setConfig(Config config) {
+  public Network setNetworkConfig(Config config) {
     this.config = config;
     return this;
   }
 
   /**
-   * Gets the network configuration.
+   * Gets the network configuration container.
    *
    * @return
-   *   The network configuration.
+   *   The network configuration container.
    */
-  public Config getConfig() {
+  public Config getNetworkConfig() {
     return config;
   }
 
@@ -185,7 +256,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public Network enableAcking() {
-    config.enableAcking();
+    config.setNetworkAckingEnabled(true);
     return this;
   }
 
@@ -201,7 +272,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public Network disableAcking() {
-    config.disableAcking();
+    config.setNetworkAckingEnabled(false);
     return this;
   }
 
@@ -215,7 +286,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public Network setAckingEnabled(boolean enabled) {
-    config.setAckingEnabled(enabled);
+    config.setNetworkAckingEnabled(enabled);
     return this;
   }
 
@@ -227,7 +298,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public boolean isAckingEnabled() {
-    return config.isAckingEnabled();
+    return config.isNetworkAckingEnabled();
   }
 
   /**
@@ -238,7 +309,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public int getNumAuditors() {
-    return config.getNumAuditors();
+    return config.getNetworkNumAuditors();
   }
 
   /**
@@ -257,7 +328,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public Network setNumAuditors(int numAuditors) {
-    config.setNumAuditors(numAuditors);
+    config.setNetworkNumAuditors(numAuditors);
     return this;
   }
 
@@ -274,7 +345,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public Network setAckTimeout(long timeout) {
-    config.setAckTimeout(timeout);
+    config.setNetworkAckTimeout(timeout);
     return this;
   }
 
@@ -286,7 +357,7 @@ public final class Network implements Serializable {
    */
   @Deprecated
   public long getAckTimeout() {
-    return config.getAckTimeout();
+    return config.getNetworkAckTimeout();
   }
 
   /**
@@ -569,7 +640,7 @@ public final class Network implements Serializable {
 
   @Override
   public String toString() {
-    return address;
+    return id();
   }
 
 }

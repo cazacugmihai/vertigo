@@ -47,6 +47,7 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
 @SuppressWarnings("rawtypes")
 public class ComponentContext<T extends net.kuujo.vertigo.component.Component> implements Serializable {
   private static final long FIXED_HEARTBEAT_INTERVAL = 5000;
+  private String name;
   private String address;
   private Class<T> type;
   private String main;
@@ -100,6 +101,26 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
     return this;
   }
 
+  /**
+   * Returns the component identifier.
+   *
+   * @return
+   *   The globally unique component identifier.
+   */
+  public String id() {
+    return String.format("%s-%s", network.id(), name());
+  }
+
+  /**
+   * Gets the component name.
+   *
+   * @return
+   *   The component name.
+   */
+  public String name() {
+    return name;
+  }
+
   @Deprecated
   public String getAddress() {
     return address();
@@ -112,7 +133,7 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    *   The component address.
    */
   public String address() {
-    return address;
+    return address != null ? address : String.format("%s.%s", network.address(), name());
   }
 
   @Deprecated
@@ -326,7 +347,7 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
 
   @Override
   public String toString() {
-    return network.address() + "-" + address;
+    return network + "-" + name();
   }
 
 }
