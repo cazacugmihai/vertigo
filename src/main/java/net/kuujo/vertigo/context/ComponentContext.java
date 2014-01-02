@@ -32,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 
 import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.hooks.ComponentHook;
-import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
@@ -45,7 +44,7 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  * @author Jordan Halterman
  */
 @SuppressWarnings("rawtypes")
-public class ComponentContext<T extends net.kuujo.vertigo.component.Component> implements Serializable {
+public class ComponentContext<T extends net.kuujo.vertigo.component.Component> implements Context {
   private String id;
   private String address;
   private Class<T> type;
@@ -72,8 +71,8 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    */
   @SuppressWarnings("unchecked")
   public static <T extends Component<T>> ComponentContext<T> fromJson(JsonObject context) {
-    Serializer<ComponentContext> serializer = SerializerFactory.getSerializer(ComponentContext.class);
-    ComponentContext<T> component = serializer.deserialize(context.getObject("component"));
+    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    ComponentContext<T> component = serializer.deserialize(context.getObject("component"), ComponentContext.class);
     NetworkContext network = NetworkContext.fromJson(context);
     return component.setNetworkContext(network);
   }
@@ -87,8 +86,8 @@ public class ComponentContext<T extends net.kuujo.vertigo.component.Component> i
    *   A Json representation of the component context.
    */
   public static JsonObject toJson(ComponentContext context) {
-    Serializer<ComponentContext> serializer = SerializerFactory.getSerializer(ComponentContext.class);
-    JsonObject json = NetworkContext.toJson(context.getNetwork());
+    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    JsonObject json = NetworkContext.toJson(context.networkContext());
     json.putObject("component", serializer.serialize(context));
     return json;
   }

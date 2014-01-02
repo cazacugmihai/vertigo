@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.vertx.java.core.json.JsonObject;
 
-import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
 /**
@@ -32,7 +31,7 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  *
  * @author Jordan Halterman
  */
-public final class NetworkContext implements Serializable {
+public final class NetworkContext implements Context {
   private String id;
   private String address;
   private boolean acking;
@@ -54,8 +53,8 @@ public final class NetworkContext implements Serializable {
    *   If the network context is malformed.
    */
   public static NetworkContext fromJson(JsonObject context) {
-    return SerializerFactory.getSerializer(NetworkContext.class)
-        .deserialize(context.getObject("network"));
+    return SerializerFactory.getSerializer(Context.class)
+        .deserialize(context.getObject("network"), NetworkContext.class);
   }
 
   /**

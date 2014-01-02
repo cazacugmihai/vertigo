@@ -55,7 +55,6 @@ public class ListenerTest extends TestVerticle {
     Component<Worker> worker3 = network.addWorker("worker3", TestAckingWorker.class.getName(), 2);
     worker3.addInput("worker1");
     worker3.addInput("worker2");
-    network.addWorker("worker4", TestAckingWorker.class.getName(), 2).addInput("worker3").randomGrouping();
 
     Cluster cluster = new LocalCluster(vertx, container);
     cluster.deploy(network, new Handler<AsyncResult<NetworkContext>>() {

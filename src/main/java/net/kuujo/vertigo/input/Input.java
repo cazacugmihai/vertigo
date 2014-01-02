@@ -65,14 +65,22 @@ public final class Input implements Serializable {
   }
 
   public Input(String address) {
-    this(address, DEFAULT_STREAM);
+    this(address, DEFAULT_STREAM, new RoundGrouping());
   }
 
   public Input(String address, String stream) {
+    this(address, stream, new RoundGrouping());
+  }
+
+  public Input(String address, Grouping grouping) {
+    this(address, DEFAULT_STREAM, grouping);
+  }
+
+  public Input(String address, String stream, Grouping grouping) {
     this.address = address;
     this.stream = stream;
     id = UUID.randomUUID().toString();
-    groupBy(new RoundGrouping());
+    groupBy(grouping);
   }
 
   /**
@@ -147,7 +155,7 @@ public final class Input implements Serializable {
    */
   public Input groupBy(String grouping) {
     try {
-      this.grouping = SerializerFactory.getSerializer(Grouping.class).deserialize(new JsonObject().putString("type", grouping));
+      this.grouping = SerializerFactory.getSerializer(Grouping.class).deserialize(new JsonObject().putString("type", grouping), Grouping.class);
     }
     catch (Exception e) {
       throw new IllegalArgumentException("Invalid input grouping type " + grouping);
@@ -209,6 +217,11 @@ public final class Input implements Serializable {
    */
   public Grouping getGrouping() {
     return grouping;
+  }
+
+  @Override
+  public String toString() {
+    return id();
   }
 
 }

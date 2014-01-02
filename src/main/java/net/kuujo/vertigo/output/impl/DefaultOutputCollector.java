@@ -23,6 +23,7 @@ import java.util.Random;
 
 import net.kuujo.vertigo.acker.Acker;
 import net.kuujo.vertigo.acker.DefaultAcker;
+import net.kuujo.vertigo.context.Context;
 import net.kuujo.vertigo.context.InputContext;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.hooks.OutputHook;
@@ -76,17 +77,8 @@ public class DefaultOutputCollector implements OutputCollector {
     this(vertx, container, vertx.eventBus(), context);
   }
 
-  @SuppressWarnings("deprecation")
   public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context) {
-    this.vertx = vertx;
-    this.logger = LoggerFactory.getLogger(OutputCollector.class.getCanonicalName() + "-" + context);
-    this.eventBus = eventBus;
-    this.context = context;
-    acker = new DefaultAcker(context.id(), eventBus);
-    messageBuilder = new JsonMessageBuilder(context.id(), String.format("%s-", context.id()));
-    ackingEnabled = context.componentContext().networkContext().isAckingEnabled();
-    auditors = context.componentContext().networkContext().auditors();
-    componentAddress = context.componentContext().address();
+    this(vertx, container, eventBus, context, new DefaultAcker(context.id(), eventBus));
   }
 
   public DefaultOutputCollector(Vertx vertx, Container container, InstanceContext<?> context, Acker acker) {
@@ -129,8 +121,8 @@ public class DefaultOutputCollector implements OutputCollector {
       return;
     }
 
-    Serializer<InputContext> serializer = SerializerFactory.getSerializer(InputContext.class);
-    InputContext input = serializer.deserialize(info);
+    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    InputContext input = serializer.deserialize(info, InputContext.class);
     Output output = new Output(input.id(), input.stream(), input.count(), input.grouping().createSelector());
 
     final Channel channel = findChannel(output);

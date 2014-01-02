@@ -13,28 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.kuujo.vertigo.serializer;
+package net.kuujo.vertigo.context;
+
+import net.kuujo.vertigo.serializer.Serializable;
 
 /**
- * Static helper methods for serialization.<p>
- *
- * This class is deprecated. Users should use {@link SerializerFactory} to
- * access serializer instances.
+ * A base interface for all contexts. This interface is used solely as
+ * an identifier for serialization purposes.
  *
  * @author Jordan Halterman
  */
-@Deprecated
-public abstract class Serializers {
-  private static final String DEFAULT_SERIALIZER = "default";
-
-  @Deprecated
-  public static Serializer getDefault() {
-    return SerializerFactory.getSerializer(DEFAULT_SERIALIZER);
-  }
-
-  @Deprecated
-  public static Serializer getSerializer(String name) {
-    return SerializerFactory.getSerializer(name);
-  }
-
+public interface Context extends Serializable {
 }

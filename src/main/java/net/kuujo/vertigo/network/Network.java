@@ -95,7 +95,7 @@ public final class Network implements Serializable {
    */
   public static Network fromJson(JsonObject json) {
     try {
-      Network network = SerializerFactory.getSerializer(Network.class).deserialize(adaptJson(json));
+      Network network = SerializerFactory.getSerializer(Network.class).deserialize(adaptJson(json), Network.class);
       for (Component<?> component : network.getComponents()) {
         component.setNetwork(network);
       }

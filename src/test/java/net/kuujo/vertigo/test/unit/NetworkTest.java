@@ -292,7 +292,7 @@ public class NetworkTest {
     network.getNetworkConfig().setComponentDefaultConfig(new JsonObject().putString("foo", "bar"));
     network.getNetworkConfig().setComponentDefaultNumInstances(2);
 
-    Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
+    Serializer serializer = SerializerFactory.getSerializer(Network.class);
     JsonObject json = serializer.serialize(network);
     assertEquals("test", json.getString(Network.NETWORK_ADDRESS));
     assertEquals(0, json.getObject(Network.NETWORK_COMPONENTS).size());
@@ -306,7 +306,7 @@ public class NetworkTest {
     assertEquals("bar", componentConfig.getObject(Config.COMPONENT_DEFAULT_CONFIG).getString("foo"));
     assertTrue(componentConfig.getInteger(Config.COMPONENT_DEFAULT_NUM_INSTANCES) == 2);
 
-    Network result = serializer.deserialize(json);
+    Network result = serializer.deserialize(json, Network.class);
     assertEquals("test", result.getAddress());
     assertEquals(0, result.getComponents().size());
     assertNotNull(result.getNetworkConfig());
@@ -333,7 +333,7 @@ public class NetworkTest {
     worker.addInput("test.feeder", "nondefault").allGrouping();
     worker.addHook(new TestHook());
 
-    Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
+    Serializer serializer = SerializerFactory.getSerializer(Network.class);
     JsonObject json = serializer.serialize(network);
     assertEquals("test", json.getString(Network.NETWORK_ADDRESS));
     JsonObject config = json.getObject(Network.NETWORK_CONFIG);

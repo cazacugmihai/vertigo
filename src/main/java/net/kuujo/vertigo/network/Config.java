@@ -20,7 +20,7 @@ import java.util.Map;
 import org.vertx.java.core.json.JsonObject;
 
 import net.kuujo.vertigo.serializer.Serializable;
-import net.kuujo.vertigo.serializer.Serializer;
+import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
 /**
@@ -116,10 +116,16 @@ public class Config implements Serializable {
    *   A Json representation of the configuration.
    * @return
    *   A configuration instance constructed from Json.
+   * @throws MalformedNetworkException
+   *   If the configuration is malformed.
    */
   public static Config fromJson(JsonObject json) {
-    Serializer<Config> serializer = SerializerFactory.getSerializer(Config.class);
-    return serializer.deserialize(json);
+    try {
+      return SerializerFactory.getSerializer(Network.class).deserialize(json, Config.class);
+    }
+    catch (SerializationException e) {
+      throw new MalformedNetworkException(e);
+    }
   }
 
   /**

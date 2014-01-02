@@ -18,6 +18,7 @@ package net.kuujo.vertigo.context.impl;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
+import net.kuujo.vertigo.context.Context;
 import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.network.Component;
 import net.kuujo.vertigo.network.Config;
@@ -50,7 +51,7 @@ public final class ContextBuilder {
   @SuppressWarnings("deprecation")
   public static NetworkContext buildContext(Network network) throws MalformedNetworkException {
     try {
-      Serializer<Network> serializer = SerializerFactory.getSerializer(Network.class);
+      Serializer serializer = SerializerFactory.getSerializer(Context.class);
       JsonObject serialized = serializer.serialize(network);
       serialized.putString("id", formatNetworkId(network));
 
@@ -76,7 +77,7 @@ public final class ContextBuilder {
         }
         jsonComponent.putArray("instances", instances);
       }
-      return SerializerFactory.getSerializer(NetworkContext.class).deserialize(serialized);
+      return serializer.deserialize(serialized, NetworkContext.class);
     }
     catch (SerializationException e) {
       throw new MalformedNetworkException(e);

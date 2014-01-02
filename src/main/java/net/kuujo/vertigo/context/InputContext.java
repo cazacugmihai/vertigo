@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.input.grouping.Grouping;
-import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
@@ -30,7 +29,7 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  *
  * @author Jordan Halterman
  */
-public final class InputContext implements Serializable {
+public final class InputContext implements Context {
   private @JsonIgnore ComponentContext<?> component;
   private String id;
   private String stream;
@@ -51,8 +50,8 @@ public final class InputContext implements Serializable {
    *   If the JSON context is malformed.
    */
   public static <T extends Component<T>> InputContext fromJson(JsonObject context) {
-    Serializer<InputContext> serializer = SerializerFactory.getSerializer(InputContext.class);
-    InputContext instance = serializer.deserialize(context.getObject("instance"));
+    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    InputContext instance = serializer.deserialize(context.getObject("instance"), InputContext.class);
     ComponentContext<T> component = ComponentContext.fromJson(context);
     return instance.setComponentContext(component);
   }
@@ -66,7 +65,7 @@ public final class InputContext implements Serializable {
    *   A Json representation of the input context.
    */
   public static JsonObject toJson(InputContext context) {
-    Serializer<InputContext> serializer = SerializerFactory.getSerializer(InputContext.class);
+    Serializer serializer = SerializerFactory.getSerializer(Context.class);
     JsonObject json = ComponentContext.toJson(context.componentContext());
     return json.putObject("instance", serializer.serialize(context));
   }
@@ -134,6 +133,11 @@ public final class InputContext implements Serializable {
    */
   public ComponentContext<?> componentContext() {
     return component;
+  }
+
+  @Override
+  public String toString() {
+    return id();
   }
 
 }
