@@ -17,12 +17,13 @@ package net.kuujo.vertigo;
 
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.Container;
+import org.vertx.java.platform.Verticle;
 
+import net.kuujo.vertigo.cluster.Cluster;
 import net.kuujo.vertigo.cluster.LocalCluster;
 import net.kuujo.vertigo.cluster.RemoteCluster;
-import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.network.Network;
@@ -37,57 +38,19 @@ import net.kuujo.vertigo.network.Network;
  * component, this API can be used to create and deploy Vertigo networks.
  *
  * @author Jordan Halterman
- *
- * @param <T> The current component instance type.
  */
-public interface Vertigo<T extends Component<T>> {
+public final class Vertigo {
+  private final Vertx vertx;
+  private final Container container;
 
-  /**
-   * Indicates whether the current Vertigo instance is a component instance.
-   * If this is a component instance then the component will be available via
-   * the {@link #component()} method.
-   *
-   * @return
-   *   Whether the current instance is a component.
-   */
-  boolean isComponent();
+  public Vertigo(Verticle verticle) {
+    this(verticle.getVertx(), verticle.getContainer());
+  }
 
-  /**
-   * Gets the current component instance.
-   *
-   * The component instance is automatically constructed by Vertigo. This ensures
-   * type and connection safety in Vertigo component instances. Each Vert.x
-   * verticle may only represent a single Vertigo component instance, and this
-   * is that instance.
-   *
-   * @return
-   *   The current component instance. If the current Vertigo instance is not
-   *   a component then this value will be null.
-   */
-  T component();
-
-  /**
-   * Gets the component configuration. This configuration is also available
-   * via the Vert.x container.
-   *
-   * @return
-   *   The component configuration. If the current Vertigo instance is not a
-   *   component then this value will be null.
-   */
-  JsonObject config();
-
-  /**
-   * Gets the current component instance context.
-   *
-   * The instance context contains information about the current component instance,
-   * the defined component configuration, and the overall network structure,
-   * including event bus addresses, connections, and more.
-   *
-   * @return
-   *   The current component instance context.If the current Vertigo instance is
-   *   not a component then this value will be null.
-   */
-  InstanceContext<T> context();
+  public Vertigo(Vertx vertx, Container container) {
+    this.vertx = vertx;
+    this.container = container;
+  }
 
   /**
    * Creates a new network.
@@ -97,7 +60,9 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   A new network instance.
    */
-  public Network createNetwork(String address);
+  public Network createNetwork(String address) {
+    return new Network(address);
+  }
 
   /**
    * Deploys a network within the current Vert.x instance.<p>
@@ -111,7 +76,11 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> deployLocalNetwork(Network network);
+  public Vertigo deployLocalNetwork(Network network) {
+    Cluster cluster = new LocalCluster(vertx, container);
+    cluster.deployNetwork(network);
+    return this;
+  }
 
   /**
    * Deploys a network within the current Vert.x instance.<p>
@@ -129,7 +98,11 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> deployLocalNetwork(Network network, Handler<AsyncResult<NetworkContext>> doneHandler);
+  public Vertigo deployLocalNetwork(Network network, Handler<AsyncResult<NetworkContext>> doneHandler) {
+    Cluster cluster = new LocalCluster(vertx, container);
+    cluster.deployNetwork(network, doneHandler);
+    return this;
+  }
 
   /**
    * Shuts down a local network.
@@ -139,7 +112,11 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> shutdownLocalNetwork(NetworkContext context);
+  public Vertigo shutdownLocalNetwork(NetworkContext context) {
+    Cluster cluster = new LocalCluster(vertx, container);
+    cluster.shutdownNetwork(context);
+    return this;
+  }
 
   /**
    * Shuts down a local network.
@@ -151,7 +128,11 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> shutdownLocalNetwork(NetworkContext context, Handler<AsyncResult<Void>> doneHandler);
+  public Vertigo shutdownLocalNetwork(NetworkContext context, Handler<AsyncResult<Void>> doneHandler) {
+    Cluster cluster = new LocalCluster(vertx, container);
+    cluster.shutdownNetwork(context, doneHandler);
+    return this;
+  }
 
   /**
    * Deploys a network via the Vert.x event bus.
@@ -171,7 +152,11 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> deployRemoteNetwork(String address, Network network);
+  public Vertigo deployRemoteNetwork(String address, Network network) {
+    Cluster cluster = new RemoteCluster(vertx, container, address);
+    cluster.deployNetwork(network);
+    return this;
+  }
 
   /**
    * Deploys a network via the Vert.x event bus.
@@ -195,7 +180,11 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> deployRemoteNetwork(String address, Network network, Handler<AsyncResult<NetworkContext>> doneHandler);
+  public Vertigo deployRemoteNetwork(String address, Network network, Handler<AsyncResult<NetworkContext>> doneHandler) {
+    Cluster cluster = new RemoteCluster(vertx, container, address);
+    cluster.deployNetwork(network, doneHandler);
+    return this;
+  }
 
   /**
    * Shuts down a network via the Vert.x event bus.
@@ -211,7 +200,11 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> shutdownRemoteNetwork(String address, NetworkContext context);
+  public Vertigo shutdownRemoteNetwork(String address, NetworkContext context) {
+    Cluster cluster = new RemoteCluster(vertx, container, address);
+    cluster.shutdownNetwork(context);
+    return this;
+  }
 
   /**
    * Shuts down a network via the Vert.x event bus.
@@ -229,6 +222,10 @@ public interface Vertigo<T extends Component<T>> {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo<T> shutdownRemoteNetwork(String address, NetworkContext context, Handler<AsyncResult<Void>> doneHandler);
+  public Vertigo shutdownRemoteNetwork(String address, NetworkContext context, Handler<AsyncResult<Void>> doneHandler) {
+    Cluster cluster = new RemoteCluster(vertx, container, address);
+    cluster.shutdownNetwork(context, doneHandler);
+    return this;
+  }
 
 }
