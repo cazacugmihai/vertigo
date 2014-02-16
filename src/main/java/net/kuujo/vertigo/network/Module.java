@@ -22,8 +22,7 @@ import static net.kuujo.vertigo.util.Component.isModuleName;
  *
  * @author Jordan Halterman
  */
-@SuppressWarnings("rawtypes")
-public class Module<T extends net.kuujo.vertigo.component.Component> extends ComponentType<Module<T>, T> {
+public class Module extends Component<Module> {
 
   /**
    * <code>module</code> is a string indicating the module name. This field is
@@ -36,11 +35,11 @@ public class Module<T extends net.kuujo.vertigo.component.Component> extends Com
   public Module() {
   }
 
-  public Module(Class<T> type, String address) {
+  public Module(Type type, String address) {
     super(type, address);
   }
 
-  public Module(Class<T> type, String address, String moduleName) {
+  public Module(Type type, String address, String moduleName) {
     this(type, address);
     setModule(moduleName);
   }
@@ -65,7 +64,7 @@ public class Module<T extends net.kuujo.vertigo.component.Component> extends Com
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<T> setModule(String moduleName) {
+  public Module setModule(String moduleName) {
     if (!isModuleName(moduleName)) {
       throw new IllegalArgumentException(moduleName + " is not a valid module name.");
     }

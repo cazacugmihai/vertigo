@@ -34,7 +34,6 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
 
 /**
  * A default listener implementation.
@@ -78,71 +77,7 @@ public class DefaultListener implements Listener {
     this.eventBus = vertx.eventBus();
   }
 
-  @Deprecated
-  public DefaultListener(String address, Vertx vertx, EventBus eventBus) {
-    this.address = UUID.randomUUID().toString();
-    this.statusAddress = UUID.randomUUID().toString();
-    this.context = inputToContext(new Input(address));
-    this.vertx = vertx;
-    this.eventBus = eventBus;
-  }
-
-  @Deprecated
-  public DefaultListener(String address, Vertx vertx, Logger logger) {
-    this.address = UUID.randomUUID().toString();
-    this.statusAddress = UUID.randomUUID().toString();
-    this.context = inputToContext(new net.kuujo.vertigo.network.Input(address));
-    this.vertx = vertx;
-    this.eventBus = vertx.eventBus();
-  }
-
-  @Deprecated
-  public DefaultListener(String address, Vertx vertx, EventBus eventBus, Logger logger) {
-    this.address = UUID.randomUUID().toString();
-    this.statusAddress = UUID.randomUUID().toString();
-    this.context = inputToContext(new net.kuujo.vertigo.network.Input(address));
-    this.vertx = vertx;
-    this.eventBus = eventBus;
-  }
-
-  @Deprecated
-  public DefaultListener(net.kuujo.vertigo.input.Input input, Vertx vertx) {
-    this.address = UUID.randomUUID().toString();
-    this.statusAddress = UUID.randomUUID().toString();
-    this.context = inputToContext(input);
-    this.vertx = vertx;
-    this.eventBus = vertx.eventBus();
-  }
-
-  @Deprecated
-  public DefaultListener(net.kuujo.vertigo.input.Input input, Vertx vertx, Logger logger) {
-    this.address = UUID.randomUUID().toString();
-    this.statusAddress = UUID.randomUUID().toString();
-    this.context = inputToContext(input);
-    this.vertx = vertx;
-    this.eventBus = vertx.eventBus();
-  }
-
-  @Deprecated
-  public DefaultListener(net.kuujo.vertigo.input.Input input, Vertx vertx, EventBus eventBus) {
-    this.address = UUID.randomUUID().toString();
-    this.statusAddress = UUID.randomUUID().toString();
-    this.context = inputToContext(input);
-    this.vertx = vertx;
-    this.eventBus = eventBus;
-  }
-
-  @Deprecated
-  public DefaultListener(net.kuujo.vertigo.input.Input input, Vertx vertx, EventBus eventBus, Logger logger) {
-    this.address = UUID.randomUUID().toString();
-    this.statusAddress = UUID.randomUUID().toString();
-    this.context = inputToContext(input);
-    this.vertx = vertx;
-    this.eventBus = eventBus;
-  }
-
-  @SuppressWarnings("deprecation")
-  private InputContext inputToContext(net.kuujo.vertigo.input.Input input) {
+  private InputContext inputToContext(Input input) {
     Serializer serializer = SerializerFactory.getSerializer(Context.class);
     return serializer.deserialize(serializer.serialize(input), InputContext.class);
   }

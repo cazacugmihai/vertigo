@@ -22,8 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Jordan Halterman
  */
-@SuppressWarnings("rawtypes")
-public class Verticle<T extends net.kuujo.vertigo.component.Component> extends ComponentType<Verticle<T>, T> {
+public class Verticle extends Component<Verticle> {
 
   /**
    * <code>main</code> is a string indicating the verticle main. This field is
@@ -52,11 +51,11 @@ public class Verticle<T extends net.kuujo.vertigo.component.Component> extends C
   public Verticle() {
   }
 
-  public Verticle(Class<T> type, String address) {
+  public Verticle(Type type, String address) {
     super(type, address);
   }
 
-  public Verticle(Class<T> type, String address, String main) {
+  public Verticle(Type type, String address, String main) {
     this(type, address);
     setMain(main);
   }
@@ -79,7 +78,7 @@ public class Verticle<T extends net.kuujo.vertigo.component.Component> extends C
    * @return
    *   The verticle configuration.
    */
-  public Verticle<T> setMain(String main) {
+  public Verticle setMain(String main) {
     this.main = main;
     return this;
   }
@@ -102,7 +101,7 @@ public class Verticle<T extends net.kuujo.vertigo.component.Component> extends C
    * @return
    *   The verticle configuration.
    */
-  public Verticle<T> setWorker(boolean isWorker) {
+  public Verticle setWorker(boolean isWorker) {
     worker = isWorker;
     return this;
   }
@@ -126,7 +125,7 @@ public class Verticle<T extends net.kuujo.vertigo.component.Component> extends C
    * @return
    *   The verticle configuration.
    */
-  public Verticle<T> setMultiThreaded(boolean isMultiThreaded) {
+  public Verticle setMultiThreaded(boolean isMultiThreaded) {
     multiThreaded = isMultiThreaded;
     return this;
   }

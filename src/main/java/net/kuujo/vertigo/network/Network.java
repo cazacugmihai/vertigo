@@ -24,9 +24,6 @@ import java.util.UUID;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
-import net.kuujo.vertigo.feeder.Feeder;
-import net.kuujo.vertigo.rpc.Executor;
-import net.kuujo.vertigo.worker.Worker;
 import static net.kuujo.vertigo.util.Component.isModuleName;
 
 import org.vertx.java.core.json.JsonObject;
@@ -288,11 +285,6 @@ public final class Network implements Serializable {
     return this;
   }
 
-  @Deprecated
-  public Network setAckTimeout(long timeout) {
-    return setMessageTimeout(timeout);
-  }
-
   /**
    * Gets the network message timeout.
    *
@@ -301,11 +293,6 @@ public final class Network implements Serializable {
    */
   public long getMessageTimeout() {
     return timeout;
-  }
-
-  @Deprecated
-  public long getAckTimeout() {
-    return getMessageTimeout();
   }
 
   /**
@@ -348,8 +335,7 @@ public final class Network implements Serializable {
    * @return
    *   The added component configuration.
    */
-  @SuppressWarnings("rawtypes")
-  public <T extends Component> T addComponent(T component) {
+  public <T extends Component<T>> T addComponent(T component) {
     components.put(component.getAddress(), component);
     return component;
   }
@@ -362,8 +348,7 @@ public final class Network implements Serializable {
    * @return
    *   The added module component configuration.
    */
-  @SuppressWarnings("rawtypes")
-  public <T extends net.kuujo.vertigo.component.Component> Module<T> addModule(Module<T> module) {
+  public Module addModule(Module module) {
     components.put(module.getAddress(), module);
     return module;
   }
@@ -376,8 +361,7 @@ public final class Network implements Serializable {
    * @return
    *   The added verticle component configuration.
    */
-  @SuppressWarnings("rawtypes")
-  public <T extends net.kuujo.vertigo.component.Component> Verticle<T> addVerticle(Verticle<T> verticle) {
+  public Verticle addVerticle(Verticle verticle) {
     components.put(verticle.getAddress(), verticle);
     return verticle;
   }
@@ -394,12 +378,13 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder component configuration.
    */
-  public Component<Feeder> addFeeder(String address, String moduleOrMain) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addFeeder(String address, String moduleOrMain) {
     if (isModuleName(moduleOrMain)) {
-      return addFeederModule(address, moduleOrMain);
+      return (T) addFeederModule(address, moduleOrMain);
     }
     else {
-      return addFeederVerticle(address, moduleOrMain);
+      return (T) addFeederVerticle(address, moduleOrMain);
     }
   }
 
@@ -418,12 +403,13 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder component configuration.
    */
-  public Component<Feeder> addFeeder(String address, String moduleOrMain, JsonObject config) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addFeeder(String address, String moduleOrMain, JsonObject config) {
     if (isModuleName(moduleOrMain)) {
-      return addFeederModule(address, moduleOrMain, config);
+      return (T) addFeederModule(address, moduleOrMain, config);
     }
     else {
-      return addFeederVerticle(address, moduleOrMain, config);
+      return (T) addFeederVerticle(address, moduleOrMain, config);
     }
   }
 
@@ -443,12 +429,13 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder component configuration.
    */
-  public Component<Feeder> addFeeder(String address, String moduleOrMain, int numInstances) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addFeeder(String address, String moduleOrMain, int numInstances) {
     if (isModuleName(moduleOrMain)) {
-      return addFeederModule(address, moduleOrMain, numInstances);
+      return (T) addFeederModule(address, moduleOrMain, numInstances);
     }
     else {
-      return addFeederVerticle(address, moduleOrMain, numInstances);
+      return (T) addFeederVerticle(address, moduleOrMain, numInstances);
     }
   }
 
@@ -471,12 +458,13 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder component configuration.
    */
-  public Component<Feeder> addFeeder(String address, String moduleOrMain, JsonObject config, int numInstances) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addFeeder(String address, String moduleOrMain, JsonObject config, int numInstances) {
     if (isModuleName(moduleOrMain)) {
-      return addFeederModule(address, moduleOrMain, config, numInstances);
+      return (T) addFeederModule(address, moduleOrMain, config, numInstances);
     }
     else {
-      return addFeederVerticle(address, moduleOrMain, config, numInstances);
+      return (T) addFeederVerticle(address, moduleOrMain, config, numInstances);
     }
   }
 
@@ -493,8 +481,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Feeder> addFeederModule(String address, String moduleName) {
-    return addModule(new Module<Feeder>(Feeder.class, address, moduleName));
+  public Module addFeederModule(String address, String moduleName) {
+    return addModule(new Module(Component.Type.FEEDER, address, moduleName));
   }
 
   /**
@@ -513,8 +501,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Feeder> addFeederModule(String address, String moduleName, JsonObject config) {
-    return addModule(new Module<Feeder>(Feeder.class, address, moduleName).setConfig(config));
+  public Module addFeederModule(String address, String moduleName, JsonObject config) {
+    return addModule(new Module(Component.Type.FEEDER, address, moduleName).setConfig(config));
   }
 
   /**
@@ -534,8 +522,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Feeder> addFeederModule(String address, String moduleName, int numInstances) {
-    return addModule(new Module<Feeder>(Feeder.class, address, moduleName).setNumInstances(numInstances));
+  public Module addFeederModule(String address, String moduleName, int numInstances) {
+    return addModule(new Module(Component.Type.FEEDER, address, moduleName).setNumInstances(numInstances));
   }
 
   /**
@@ -558,8 +546,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Feeder> addFeederModule(String address, String moduleName, JsonObject config, int numInstances) {
-    return addModule(new Module<Feeder>(Feeder.class, address, moduleName).setConfig(config).setNumInstances(numInstances));
+  public Module addFeederModule(String address, String moduleName, JsonObject config, int numInstances) {
+    return addModule(new Module(Component.Type.FEEDER, address, moduleName).setConfig(config).setNumInstances(numInstances));
   }
 
   /**
@@ -573,8 +561,8 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder verticle configuration.
    */
-  public Verticle<Feeder> addFeederVerticle(String address, String main) {
-    return addVerticle(new Verticle<Feeder>(Feeder.class, address, main));
+  public Verticle addFeederVerticle(String address, String main) {
+    return addVerticle(new Verticle(Component.Type.FEEDER, address, main));
   }
 
   /**
@@ -591,8 +579,8 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder verticle configuration.
    */
-  public Verticle<Feeder> addFeederVerticle(String address, String main, JsonObject config) {
-    return addVerticle(new Verticle<Feeder>(Feeder.class, address, main).setConfig(config));
+  public Verticle addFeederVerticle(String address, String main, JsonObject config) {
+    return addVerticle(new Verticle(Component.Type.FEEDER, address, main).setConfig(config));
   }
 
   /**
@@ -610,8 +598,8 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder verticle configuration.
    */
-  public Verticle<Feeder> addFeederVerticle(String address, String main, int numInstances) {
-    return addVerticle(new Verticle<Feeder>(Feeder.class, address, main).setNumInstances(numInstances));
+  public Verticle addFeederVerticle(String address, String main, int numInstances) {
+    return addVerticle(new Verticle(Component.Type.FEEDER, address, main).setNumInstances(numInstances));
   }
 
   /**
@@ -632,262 +620,8 @@ public final class Network implements Serializable {
    * @return
    *   The new feeder verticle configuration.
    */
-  public Verticle<Feeder> addFeederVerticle(String address, String main, JsonObject config, int numInstances) {
-    return addVerticle(new Verticle<Feeder>(Feeder.class, address, main).setConfig(config).setNumInstances(numInstances));
-  }
-
-  /**
-   * Adds an executor component to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleOrMain
-   *   The executor component main or module name. Vertigo will automatically detect
-   *   whether the executor is a module or a verticle based on module naming conventions.
-   * @return
-   *   The new executor component configuration.
-   */
-  public Component<Executor> addExecutor(String address, String moduleOrMain) {
-    if (isModuleName(moduleOrMain)) {
-      return addExecutorModule(address, moduleOrMain);
-    }
-    else {
-      return addExecutorVerticle(address, moduleOrMain);
-    }
-  }
-
-  /**
-   * Adds an executor component to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleOrMain
-   *   The executor component main or module name. Vertigo will automatically detect
-   *   whether the executor is a module or a verticle based on module naming conventions.
-   * @param config
-   *   The executor component configuration. This configuration will be made available
-   *   as the verticle configuration within the component implementation.
-   * @return
-   *   The new executor component configuration.
-   */
-  public Component<Executor> addExecutor(String address, String moduleOrMain, JsonObject config) {
-    if (isModuleName(moduleOrMain)) {
-      return addExecutorModule(address, moduleOrMain, config);
-    }
-    else {
-      return addExecutorVerticle(address, moduleOrMain, config);
-    }
-  }
-
-  /**
-   * Adds an executor component to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleOrMain
-   *   The executor component main or module name. Vertigo will automatically detect
-   *   whether the executor is a module or a verticle based on module naming conventions.
-   * @param numInstances
-   *   The number of executor instances. If multiple instances are defined, groupings
-   *   will be used to determine how messages are distributed between multiple
-   *   component instances.
-   * @return
-   *   The new executor component configuration.
-   */
-  public Component<Executor> addExecutor(String address, String moduleOrMain, int numInstances) {
-    if (isModuleName(moduleOrMain)) {
-      return addExecutorModule(address, moduleOrMain, numInstances);
-    }
-    else {
-      return addExecutorVerticle(address, moduleOrMain, numInstances);
-    }
-  }
-
-  /**
-   * Adds an executor component to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleOrMain
-   *   The executor component main or module name. Vertigo will automatically detect
-   *   whether the executor is a module or a verticle based on module naming conventions.
-   * @param config
-   *   The executor component configuration. This configuration will be made available
-   *   as the verticle configuration within the component implementation.
-   * @param numInstances
-   *   The number of executor instances. If multiple instances are defined, groupings
-   *   will be used to determine how messages are distributed between multiple
-   *   component instances.
-   * @return
-   *   The new executor component configuration.
-   */
-  public Component<Executor> addExecutor(String address, String moduleOrMain, JsonObject config, int numInstances) {
-    if (isModuleName(moduleOrMain)) {
-      return addExecutorModule(address, moduleOrMain, config, numInstances);
-    }
-    else {
-      return addExecutorVerticle(address, moduleOrMain, config, numInstances);
-    }
-  }
-
-  /**
-   * Adds an executor module to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleName
-   *   The executor module name.
-   * @return
-   *   The new executor module configuration.
-   * @throws IllegalArgumentException
-   *   If the module name is not a valid module identifier.
-   */
-  public Module<Executor> addExecutorModule(String address, String moduleName) {
-    return addModule(new Module<Executor>(Executor.class, address, moduleName));
-  }
-
-  /**
-   * Adds an executor module to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleName
-   *   The executor module name.
-   * @param config
-   *   The executor module configuration. This configuration will be made available
-   *   as the verticle configuration within deployed module instances.
-   * @return
-   *   The new executor module configuration.
-   * @throws IllegalArgumentException
-   *   If the module name is not a valid module identifier.
-   */
-  public Module<Executor> addExecutorModule(String address, String moduleName, JsonObject config) {
-    return addModule(new Module<Executor>(Executor.class, address, moduleName).setConfig(config));
-  }
-
-  /**
-   * Adds an executor module to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleName
-   *   The executor module name.
-   * @param numInstances
-   *   The number of module instances. If multiple instances are defined, groupings
-   *   will be used to determine how messages are distributed between multiple
-   *   component instances.
-   * @return
-   *   The new executor module configuration.
-   * @throws IllegalArgumentException
-   *   If the module name is not a valid module identifier.
-   */
-  public Module<Executor> addExecutorModule(String address, String moduleName, int numInstances) {
-    return addModule(new Module<Executor>(Executor.class, address, moduleName).setNumInstances(numInstances));
-  }
-
-  /**
-   * Adds an executor module to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param moduleName
-   *   The executor module name.
-   * @param config
-   *   The executor module configuration. This configuration will be made available
-   *   as the verticle configuration within deployed module instances.
-   * @param numInstances
-   *   The number of module instances. If multiple instances are defined, groupings
-   *   will be used to determine how messages are distributed between multiple
-   *   component instances.
-   * @return
-   *   The new executor module configuration.
-   * @throws IllegalArgumentException
-   *   If the module name is not a valid module identifier.
-   */
-  public Module<Executor> addExecutorModule(String address, String moduleName, JsonObject config, int numInstances) {
-    return addModule(new Module<Executor>(Executor.class, address, moduleName).setConfig(config).setNumInstances(numInstances));
-  }
-
-  /**
-   * Adds an executor verticle to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param main
-   *   The executor verticle main.
-   * @return
-   *   The new executor verticle configuration.
-   */
-  public Verticle<Executor> addExecutorVerticle(String address, String main) {
-    return addVerticle(new Verticle<Executor>(Executor.class, address, main));
-  }
-
-  /**
-   * Adds an executor verticle to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param main
-   *   The executor verticle main.
-   * @param config
-   *   The executor verticle configuration. This configuration will be made available
-   *   as the verticle configuration within deployed module instances.
-   * @return
-   *   The new executor verticle configuration.
-   */
-  public Verticle<Executor> addExecutorVerticle(String address, String main, JsonObject config) {
-    return addVerticle(new Verticle<Executor>(Executor.class, address, main).setConfig(config));
-  }
-
-  /**
-   * Adds an executor verticle to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param main
-   *   The executor verticle main.
-   * @param numInstances
-   *   The number of verticle instances. If multiple instances are defined, groupings
-   *   will be used to determine how messages are distributed between multiple
-   *   component instances.
-   * @return
-   *   The new executor verticle configuration.
-   */
-  public Verticle<Executor> addExecutorVerticle(String address, String main, int numInstances) {
-    return addVerticle(new Verticle<Executor>(Executor.class, address, main).setNumInstances(numInstances));
-  }
-
-  /**
-   * Adds an executor verticle to the network.
-   *
-   * @param address
-   *   The component address. This should be a globally unique event bus address
-   *   and can be any string.
-   * @param main
-   *   The executor verticle main.
-   * @param config
-   *   The executor verticle configuration. This configuration will be made available
-   *   as the verticle configuration within deployed module instances.
-   * @param numInstances
-   *   The number of verticle instances. If multiple instances are defined, groupings
-   *   will be used to determine how messages are distributed between multiple
-   *   component instances.
-   * @return
-   *   The new executor verticle configuration.
-   */
-  public Verticle<Executor> addExecutorVerticle(String address, String main, JsonObject config, int numInstances) {
-    return addVerticle(new Verticle<Executor>(Executor.class, address, main).setConfig(config).setNumInstances(numInstances));
+  public Verticle addFeederVerticle(String address, String main, JsonObject config, int numInstances) {
+    return addVerticle(new Verticle(Component.Type.FEEDER, address, main).setConfig(config).setNumInstances(numInstances));
   }
 
   /**
@@ -902,12 +636,13 @@ public final class Network implements Serializable {
    * @return
    *   The new worker component configuration.
    */
-  public Component<Worker> addWorker(String address, String moduleOrMain) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addWorker(String address, String moduleOrMain) {
     if (isModuleName(moduleOrMain)) {
-      return addWorkerModule(address, moduleOrMain);
+      return (T) addWorkerModule(address, moduleOrMain);
     }
     else {
-      return addWorkerVerticle(address, moduleOrMain);
+      return (T) addWorkerVerticle(address, moduleOrMain);
     }
   }
 
@@ -926,12 +661,13 @@ public final class Network implements Serializable {
    * @return
    *   The new worker component configuration.
    */
-  public Component<Worker> addWorker(String address, String moduleOrMain, JsonObject config) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addWorker(String address, String moduleOrMain, JsonObject config) {
     if (isModuleName(moduleOrMain)) {
-      return addWorkerModule(address, moduleOrMain, config);
+      return (T) addWorkerModule(address, moduleOrMain, config);
     }
     else {
-      return addWorkerVerticle(address, moduleOrMain, config);
+      return (T) addWorkerVerticle(address, moduleOrMain, config);
     }
   }
 
@@ -951,12 +687,13 @@ public final class Network implements Serializable {
    * @return
    *   The new worker component configuration.
    */
-  public Component<Worker> addWorker(String address, String moduleOrMain, int numInstances) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addWorker(String address, String moduleOrMain, int numInstances) {
     if (isModuleName(moduleOrMain)) {
-      return addWorkerModule(address, moduleOrMain, numInstances);
+      return (T) addWorkerModule(address, moduleOrMain, numInstances);
     }
     else {
-      return addWorkerVerticle(address, moduleOrMain, numInstances);
+      return (T) addWorkerVerticle(address, moduleOrMain, numInstances);
     }
   }
 
@@ -979,12 +716,13 @@ public final class Network implements Serializable {
    * @return
    *   The new worker component configuration.
    */
-  public Component<Worker> addWorker(String address, String moduleOrMain, JsonObject config, int numInstances) {
+  @SuppressWarnings("unchecked")
+  public <T extends Component<T>> T addWorker(String address, String moduleOrMain, JsonObject config, int numInstances) {
     if (isModuleName(moduleOrMain)) {
-      return addWorkerModule(address, moduleOrMain, config, numInstances);
+      return (T) addWorkerModule(address, moduleOrMain, config, numInstances);
     }
     else {
-      return addWorkerVerticle(address, moduleOrMain, config, numInstances);
+      return (T) addWorkerVerticle(address, moduleOrMain, config, numInstances);
     }
   }
 
@@ -1001,8 +739,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Worker> addWorkerModule(String address, String moduleName) {
-    return addModule(new Module<Worker>(Worker.class, address, moduleName));
+  public Module addWorkerModule(String address, String moduleName) {
+    return addModule(new Module(Component.Type.WORKER, address, moduleName));
   }
 
   /**
@@ -1021,8 +759,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Worker> addWorkerModule(String address, String moduleName, JsonObject config) {
-    return addModule(new Module<Worker>(Worker.class, address, moduleName).setConfig(config));
+  public Module addWorkerModule(String address, String moduleName, JsonObject config) {
+    return addModule(new Module(Component.Type.WORKER, address, moduleName).setConfig(config));
   }
 
   /**
@@ -1042,8 +780,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Worker> addWorkerModule(String address, String moduleName, int numInstances) {
-    return addModule(new Module<Worker>(Worker.class, address, moduleName).setNumInstances(numInstances));
+  public Module addWorkerModule(String address, String moduleName, int numInstances) {
+    return addModule(new Module(Component.Type.WORKER, address, moduleName).setNumInstances(numInstances));
   }
 
   /**
@@ -1066,8 +804,8 @@ public final class Network implements Serializable {
    * @throws IllegalArgumentException
    *   If the module name is not a valid module identifier.
    */
-  public Module<Worker> addWorkerModule(String address, String moduleName, JsonObject config, int numInstances) {
-    return addModule(new Module<Worker>(Worker.class, address, moduleName).setConfig(config).setNumInstances(numInstances));
+  public Module addWorkerModule(String address, String moduleName, JsonObject config, int numInstances) {
+    return addModule(new Module(Component.Type.WORKER, address, moduleName).setConfig(config).setNumInstances(numInstances));
   }
 
   /**
@@ -1081,8 +819,8 @@ public final class Network implements Serializable {
    * @return
    *   The new worker verticle configuration.
    */
-  public Verticle<Worker> addWorkerVerticle(String address, String main) {
-    return addVerticle(new Verticle<Worker>(Worker.class, address, main));
+  public Verticle addWorkerVerticle(String address, String main) {
+    return addVerticle(new Verticle(Component.Type.WORKER, address, main));
   }
 
   /**
@@ -1099,8 +837,8 @@ public final class Network implements Serializable {
    * @return
    *   The new worker verticle configuration.
    */
-  public Verticle<Worker> addWorkerVerticle(String address, String main, JsonObject config) {
-    return addVerticle(new Verticle<Worker>(Worker.class, address, main).setConfig(config));
+  public Verticle addWorkerVerticle(String address, String main, JsonObject config) {
+    return addVerticle(new Verticle(Component.Type.WORKER, address, main).setConfig(config));
   }
 
   /**
@@ -1118,8 +856,8 @@ public final class Network implements Serializable {
    * @return
    *   The new worker verticle configuration.
    */
-  public Verticle<Worker> addWorkerVerticle(String address, String main, int numInstances) {
-    return addVerticle(new Verticle<Worker>(Worker.class, address, main).setNumInstances(numInstances));
+  public Verticle addWorkerVerticle(String address, String main, int numInstances) {
+    return addVerticle(new Verticle(Component.Type.WORKER, address, main).setNumInstances(numInstances));
   }
 
   /**
@@ -1140,8 +878,8 @@ public final class Network implements Serializable {
    * @return
    *   The new worker verticle configuration.
    */
-  public Verticle<Worker> addWorkerVerticle(String address, String main, JsonObject config, int numInstances) {
-    return addVerticle(new Verticle<Worker>(Worker.class, address, main).setConfig(config).setNumInstances(numInstances));
+  public Verticle addWorkerVerticle(String address, String main, JsonObject config, int numInstances) {
+    return addVerticle(new Verticle(Component.Type.WORKER, address, main).setConfig(config).setNumInstances(numInstances));
   }
 
   @Override

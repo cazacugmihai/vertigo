@@ -32,10 +32,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import net.kuujo.vertigo.hooks.ComponentHook;
 import net.kuujo.vertigo.input.grouping.Grouping;
 import net.kuujo.vertigo.serializer.Serializable;
-import net.kuujo.vertigo.serializer.SerializationException;
-import net.kuujo.vertigo.serializer.SerializerFactory;
-import static net.kuujo.vertigo.util.Component.serializeType;
-import static net.kuujo.vertigo.util.Component.deserializeType;
 
 /**
  * A network component definition.<p>
@@ -55,8 +51,7 @@ import static net.kuujo.vertigo.util.Component.deserializeType;
   @JsonSubTypes.Type(value=Module.class, name=Component.COMPONENT_DEPLOYMENT_MODULE),
   @JsonSubTypes.Type(value=Verticle.class, name=Component.COMPONENT_DEPLOYMENT_VERTICLE)
 })
-@SuppressWarnings("rawtypes")
-public abstract class Component<T extends net.kuujo.vertigo.component.Component> implements Serializable {
+public abstract class Component<T extends Component<T>> implements Serializable {
 
   /**
    * <code>address</code> is a string indicating the globally unique component
@@ -139,11 +134,72 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    */
   public static final String COMPONENT_INPUTS = "inputs";
 
+  /**
+   * Component type.
+   *
+   * @author Jordan Halterman
+   */
+  public static enum Type {
+
+    /**
+     * A feeder component.
+     */
+    FEEDER("feeder"),
+
+    /**
+     * A worker component.
+     */
+    WORKER("worker");
+
+    private final String name;
+
+    private Type(String name) {
+      this.name = name;
+    }
+
+    /**
+     * Returns the component type name.
+     *
+     * @return
+     *   The component type name.
+     */
+    public String getName() {
+      return name;
+    }
+
+    @Override
+    public String toString() {
+      return name;
+    }
+
+    /**
+     * Parses a component type name.
+     *
+     * @param name
+     *   The component type name.
+     * @return
+     *   A component type.
+     * @throws IllegalArgumentException
+     *   If the compoennt type name is invalid.
+     */
+    public static Type parse(String name) {
+      switch (name) {
+        case "feeder":
+          return FEEDER;
+        case "worker":
+          return WORKER;
+        default:
+          throw new IllegalArgumentException("Invalid component type " + name);
+      }
+    }
+
+  }
+
   private static final int DEFAULT_NUM_INSTANCES = 1;
   private static final long DEFAULT_HEARTBEAT_INTERVAL = 5000;
 
   private String address;
-  private Class<T> type;
+  private Type type;
   private Map<String, Object> config;
   private int instances = DEFAULT_NUM_INSTANCES;
   private Set<String> targets = new HashSet<>();
@@ -155,35 +211,15 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
     address = UUID.randomUUID().toString();
   }
 
-  public Component(Class<T> type, String address) {
+  public Component(Type type, String address) {
     this.type = type;
     this.address = address;
   }
 
-  /**
-   * Creates a component configuration from JSON.
-   *
-   * @param json
-   *   A JSON representation of the component configuration.
-   * @return
-   *   A constructed component configuration.
-   * @throws MalformedNetworkException
-   *   If the component definition is malformed.
-   */
-  @Deprecated
   @SuppressWarnings("unchecked")
-  public static <T extends net.kuujo.vertigo.component.Component<T>> Component<T> fromJson(JsonObject json) throws MalformedNetworkException {
-    try {
-      return SerializerFactory.getSerializer(Network.class).deserialize(json, Component.class);
-    }
-    catch (SerializationException e) {
-      throw new MalformedNetworkException(e);
-    }
-  }
-
-  Component<T> setAddress(String address) {
+  T setAddress(String address) {
     this.address = address;
-    return this;
+    return (T) this;
   }
 
   /**
@@ -206,12 +242,6 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
     return address;
   }
 
-  @Deprecated
-  public Component<T> setType(Class<T> type) {
-    this.type = type;
-    return this;
-  }
-
   /**
    * Gets the component type.<p>
    *
@@ -223,19 +253,18 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    * @return
    *   The component type.
    */
-  public Class<T> getType() {
+  public Type getType() {
     return type;
   }
 
   @JsonGetter("type")
   private String getSerializedType() {
-    return serializeType(type);
+    return type.getName();
   }
 
   @JsonSetter("type")
-  @SuppressWarnings("unchecked")
   private void setSerializedType(String type) {
-    this.type = (Class<T>) deserializeType(type);
+    this.type = Type.parse(type);
   }
 
   /**
@@ -256,40 +285,6 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    */
   public boolean isVerticle() {
     return false;
-  }
-
-  @Deprecated
-  @SuppressWarnings("unchecked")
-  public Component<T> setModule(String moduleName) {
-    if (isModule()) {
-      return ((Module) this).setModule(moduleName);
-    }
-    return this;
-  }
-
-  @Deprecated
-  public String getModule() {
-    if (isModule()) {
-      return ((Module) this).getModule();
-    }
-    return null;
-  }
-
-  @Deprecated
-  @SuppressWarnings("unchecked")
-  public Component<T> setMain(String main) {
-    if (isVerticle()) {
-      return ((Verticle) this).setMain(main);
-    }
-    return this;
-  }
-
-  @Deprecated
-  public String getMain() {
-    if (isVerticle()) {
-      return ((Verticle) this).getMain();
-    }
-    return null;
   }
 
   /**
@@ -313,9 +308,10 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    * @return
    *   The component configuration.
    */
-  public Component<T> setConfig(JsonObject config) {
+  @SuppressWarnings("unchecked")
+  public T setConfig(JsonObject config) {
     this.config = config.toMap();
-    return this;
+    return (T) this;
   }
 
   /**
@@ -328,11 +324,6 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
     return instances;
   }
 
-  @Deprecated
-  public int getInstances() {
-    return getNumInstances();
-  }
-
   /**
    * Sets the number of component instances to deploy within the network.
    *
@@ -341,17 +332,13 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    * @return
    *   The component configuration.
    */
-  public Component<T> setNumInstances(int numInstances) {
+  @SuppressWarnings("unchecked")
+  public T setNumInstances(int numInstances) {
     instances = numInstances;
     for (Input input : inputs) {
       input.setCount(instances);
     }
-    return this;
-  }
-
-  @Deprecated
-  public Component<T> setInstances(int instances) {
-    return setNumInstances(instances);
+    return (T) this;
   }
 
   /**
@@ -362,9 +349,10 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    * @return
    *   The component configuration.
    */
-  public Component<T> addDeploymentTarget(String node) {
+  @SuppressWarnings("unchecked")
+  public T addDeploymentTarget(String node) {
     targets.add(node);
-    return this;
+    return (T) this;
   }
 
   /**
@@ -375,12 +363,13 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    * @return
    *   The component configuration.
    */
-  public Component<T> setDeploymentTargets(String... nodes) {
+  @SuppressWarnings("unchecked")
+  public T setDeploymentTargets(String... nodes) {
     this.targets = new HashSet<>();
     for (String node : nodes) {
       targets.add(node);
     }
-    return this;
+    return (T) this;
   }
 
   /**
@@ -414,9 +403,10 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    * @return
    *   The component configuration.
    */
-  public Component<T> setHeartbeatInterval(long interval) {
+  @SuppressWarnings("unchecked")
+  public T setHeartbeatInterval(long interval) {
     heartbeat = interval;
-    return this;
+    return (T) this;
   }
 
   /**
@@ -437,9 +427,10 @@ public abstract class Component<T extends net.kuujo.vertigo.component.Component>
    *   The component configuration.
    * @see ComponentHook
    */
-  public Component<T> addHook(ComponentHook hook) {
+  @SuppressWarnings("unchecked")
+  public T addHook(ComponentHook hook) {
     hooks.add(hook);
-    return this;
+    return (T) this;
   }
 
   /**
