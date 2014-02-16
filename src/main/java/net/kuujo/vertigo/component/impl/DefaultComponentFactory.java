@@ -15,13 +15,18 @@
  */
 package net.kuujo.vertigo.component.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.kuujo.vertigo.annotations.Factory;
 import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.component.ComponentFactory;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.feeder.Feeder;
-import net.kuujo.vertigo.feeder.impl.BasicFeeder;
 import net.kuujo.vertigo.worker.Worker;
-import net.kuujo.vertigo.worker.impl.BasicWorker;
 
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.Container;
@@ -56,34 +61,61 @@ public class DefaultComponentFactory implements ComponentFactory {
   }
 
   @Override
-  @SuppressWarnings({"unchecked"})
-  public <T extends Component<T>> T createComponent(InstanceContext context) {
-    net.kuujo.vertigo.network.Component.Type type = context.componentContext().type();
-    if (type.equals(net.kuujo.vertigo.network.Component.Type.FEEDER)) {
-      return (T) createFeeder(context);
+  @SuppressWarnings("unchecked")
+  public <T extends Component<?>> T createComponent(Class<T> type, InstanceContext context) {
+    // Validate a feeder.
+    if (Feeder.class.isAssignableFrom(type)) {
+      if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.FEEDER)) {
+        throw new IllegalArgumentException(type.getCanonicalName() + " is not a valid feeder component.");
+      }
     }
-    else if (type.equals(net.kuujo.vertigo.network.Component.Type.WORKER)) {
-      return (T) createWorker(context);
-    }
-    else {
-      throw new IllegalArgumentException("Invalid component type.");
-    }
-  }
 
-  @Override
-  public Feeder createFeeder(InstanceContext context) {
-    if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.FEEDER)) {
-      throw new IllegalArgumentException("Not a valid feeder context.");
+    // Validate a worker.
+    if (Worker.class.isAssignableFrom(type)) {
+      if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.WORKER)) {
+        throw new IllegalArgumentException(type.getCanonicalName() + " is not a valid worker component.");
+      }
     }
-    return new BasicFeeder(vertx, container, context);
-  }
 
-  @Override
-  public Worker createWorker(InstanceContext context) {
-    if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.WORKER)) {
-      throw new IllegalArgumentException("Not a valid worker context.");
+    // Search the class for a factory method.
+    for (Method method : type.getDeclaredMethods()) {
+      if (method.isAnnotationPresent(Factory.class)) {
+        // The method must be public static.
+        if (!method.isAccessible() || !Modifier.isStatic(method.getModifiers())) {
+          throw new IllegalArgumentException("Factory method " + method.getName() + " in " + type.getCanonicalName() + " must be public state.");
+        }
+        // The method return type must be a Class<T> instance.
+        if (!method.getReturnType().equals(type)) {
+          throw new IllegalArgumentException("Factory method " + method.getName() + " in " + type.getCanonicalName() + " must return a " + type.getCanonicalName() + " instance.");
+        }
+
+        // Set up the factory arguments.
+        Class<?>[] params = method.getParameterTypes();
+        List<Object> args = new ArrayList<>();
+        for (int i = 0; i < params.length; i++) {
+          args.set(i, null);
+          if (Vertx.class.isAssignableFrom(params[i])) {
+            args.set(i, vertx);
+          }
+          else if (Container.class.isAssignableFrom(params[i])) {
+            args.set(i, container);
+          }
+          else if (InstanceContext.class.isAssignableFrom(params[i])) {
+            args.set(i, context);
+          }
+        }
+
+        // Invoke the factory method.
+        try {
+          return (T) method.invoke(null, args.toArray());
+        }
+        catch (IllegalAccessException | InvocationTargetException e) {
+          continue; // Just skip it. An exception will be thrown later.
+        }
+      }
     }
-    return new BasicWorker(vertx, container, context);
+
+    throw new IllegalArgumentException(type.getCanonicalName() + " does not contain a valid factory method.");
   }
 
 }
