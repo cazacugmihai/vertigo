@@ -58,7 +58,7 @@ public interface ComponentFactory {
    * @return
    *   A new component instance.
    */
-  <T extends Component<T>> Component<T> createComponent(InstanceContext<T> context);
+  <T extends Component<T>> T createComponent(InstanceContext context);
 
   /**
    * Creates a feeder.
@@ -68,7 +68,7 @@ public interface ComponentFactory {
    * @return
    *   A new feeder instance.
    */
-  Feeder createFeeder(InstanceContext<Feeder> context);
+  Feeder createFeeder(InstanceContext context);
 
   /**
    * Creates an executor.
@@ -78,7 +78,7 @@ public interface ComponentFactory {
    * @return
    *   A new executor instance.
    */
-  Executor createExecutor(InstanceContext<Executor> context);
+  Executor createExecutor(InstanceContext context);
 
   /**
    * Creates a worker.
@@ -88,6 +88,6 @@ public interface ComponentFactory {
    * @return
    *   A new worker instance.
    */
-  Worker createWorker(InstanceContext<Worker> context);
+  Worker createWorker(InstanceContext context);
 
 }

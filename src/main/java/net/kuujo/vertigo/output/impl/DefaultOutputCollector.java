@@ -57,7 +57,7 @@ import org.vertx.java.platform.Container;
 public class DefaultOutputCollector implements OutputCollector {
   private final Vertx vertx;
   private final EventBus eventBus;
-  private final InstanceContext<?> context;
+  private final InstanceContext context;
   private final Logger logger;
   private final Acker acker;
   private final boolean ackingEnabled;
@@ -73,11 +73,11 @@ public class DefaultOutputCollector implements OutputCollector {
   private Map<String, Long> connectionTimers = new HashMap<>();
   private static final long LISTEN_INTERVAL = 15000;
 
-  public DefaultOutputCollector(Vertx vertx, Container container, InstanceContext<?> context) {
+  public DefaultOutputCollector(Vertx vertx, Container container, InstanceContext context) {
     this(vertx, container, vertx.eventBus(), context);
   }
 
-  public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context) {
+  public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext context) {
     this.vertx = vertx;
     this.eventBus = eventBus;
     this.context = context;
@@ -89,11 +89,11 @@ public class DefaultOutputCollector implements OutputCollector {
     componentAddress = context.componentContext().address();
   }
 
-  public DefaultOutputCollector(Vertx vertx, Container container, InstanceContext<?> context, Acker acker) {
+  public DefaultOutputCollector(Vertx vertx, Container container, InstanceContext context, Acker acker) {
     this(vertx, container, vertx.eventBus(), context, acker);
   }
 
-  public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext<?> context, Acker acker) {
+  public DefaultOutputCollector(Vertx vertx, Container container, EventBus eventBus, InstanceContext context, Acker acker) {
     this.vertx = vertx;
     this.eventBus = eventBus;
     this.context = context;

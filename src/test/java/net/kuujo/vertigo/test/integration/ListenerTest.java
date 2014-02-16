@@ -20,12 +20,11 @@ import net.kuujo.vertigo.cluster.LocalCluster;
 import net.kuujo.vertigo.input.Listener;
 import net.kuujo.vertigo.input.impl.DefaultListener;
 import net.kuujo.vertigo.message.JsonMessage;
-import net.kuujo.vertigo.network.Component;
 import net.kuujo.vertigo.network.Network;
+import net.kuujo.vertigo.network.Verticle;
 import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.testtools.TestAckingWorker;
 import net.kuujo.vertigo.testtools.TestPeriodicFeeder;
-import net.kuujo.vertigo.worker.Worker;
 
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;
@@ -52,7 +51,7 @@ public class ListenerTest extends TestVerticle {
     network.addFeederVerticle("feeder", TestPeriodicFeeder.class.getName(), new JsonObject().putArray("fields", new JsonArray().add("body")));
     network.addWorkerVerticle("worker1", TestAckingWorker.class.getName(), 2).addInput("feeder");
     network.addWorkerVerticle("worker2", TestAckingWorker.class.getName(), 2).addInput("feeder");
-    Component<Worker> worker3 = network.addWorker("worker3", TestAckingWorker.class.getName(), 2);
+    Verticle worker3 = network.addWorker("worker3", TestAckingWorker.class.getName(), 2);
     worker3.addInput("worker1");
     worker3.addInput("worker2");
     network.addWorkerVerticle("worker4", TestAckingWorker.class.getName(), 2).addInput("worker3").randomGrouping();

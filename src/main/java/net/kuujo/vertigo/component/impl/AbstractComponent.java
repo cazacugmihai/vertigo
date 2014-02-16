@@ -59,7 +59,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
   protected final EventBus eventBus;
   protected final Container container;
   protected final Logger logger;
-  protected final InstanceContext<T> context;
+  protected final InstanceContext context;
   protected final Acker acker;
   protected final String instanceId;
   protected final String address;
@@ -133,11 +133,11 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     }
   };
 
-  protected AbstractComponent(Vertx vertx, Container container, InstanceContext<T> context) {
+  protected AbstractComponent(Vertx vertx, Container container, InstanceContext context) {
     this.vertx = vertx;
     this.eventBus = vertx.eventBus();
     this.container = container;
-    this.logger = LoggerFactory.getLogger(String.format("%s-%s", context.componentContext().type().getCanonicalName(), context.address()));
+    this.logger = LoggerFactory.getLogger(String.format("%s-%s", getClass().getSimpleName().toLowerCase(), context.address()));
     this.context = context;
     this.acker = new DefaultAcker(context.address(), eventBus);
     this.instanceId = context.address();
@@ -192,12 +192,12 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
   }
 
   @Override
-  public InstanceContext<T> context() {
+  public InstanceContext context() {
     return context;
   }
 
   @Override
-  public InstanceContext<T> getContext() {
+  public InstanceContext getContext() {
     return context();
   }
 
@@ -306,7 +306,7 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     // that the network has started.
     final Set<String> instances = new HashSet<>();
     for (ComponentContext<?> component : context.componentContext().networkContext().componentContexts()) {
-      for (InstanceContext<?> instance : component.instanceContexts()) {
+      for (InstanceContext instance : component.instanceContexts()) {
         instances.add(instance.id());
       }
     }

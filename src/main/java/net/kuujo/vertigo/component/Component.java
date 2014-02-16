@@ -103,14 +103,14 @@ public interface Component<T extends Component<T>> {
    * @return
    *   The instance context.
    */
-  InstanceContext<T> context();
+  InstanceContext context();
 
   /**
    * Returns the component instance context. This method is deprecated.
    * Use the {@link #context()} method instead.
    */
   @Deprecated
-  InstanceContext<T> getContext();
+  InstanceContext getContext();
 
   /**
    * Returns the instance logger.

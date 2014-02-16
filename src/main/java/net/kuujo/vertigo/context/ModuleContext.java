@@ -24,8 +24,7 @@ import net.kuujo.vertigo.network.Component;
  *
  * @param <T> The component type
  */
-@SuppressWarnings("rawtypes")
-public class ModuleContext<T extends net.kuujo.vertigo.component.Component> extends ComponentContext<T> {
+public class ModuleContext extends ComponentContext<ModuleContext> {
   private String module;
 
   @Override

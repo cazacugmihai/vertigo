@@ -57,7 +57,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
   protected Logger logger;
   protected Events events;
   protected Map<String, String> deploymentMap = new HashMap<>();
-  protected Map<String, InstanceContext<?>> contextMap = new HashMap<>();
+  protected Map<String, InstanceContext> contextMap = new HashMap<>();
   protected Map<String, HeartbeatMonitor> heartbeats = new HashMap<>();
   protected Set<String> instances = new HashSet<>();
   protected Map<String, Message<JsonObject>> ready = new HashMap<>();
@@ -353,7 +353,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
         public void handle(AsyncResult<Void> result) {
           deploymentMap.remove(id);
           if (contextMap.containsKey(id)) {
-            final InstanceContext<?> context = contextMap.get(id);
+            final InstanceContext context = contextMap.get(id);
 
             JsonObject config;
             try {
@@ -454,7 +454,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
       if (logger.isDebugEnabled()) {
         logger.debug(String.format("%s is ready", id));
       }
-      InstanceContext<?> context = contextMap.get(id);
+      InstanceContext context = contextMap.get(id);
       events.trigger(Events.Component.Start.class, context.componentContext().address(), context);
       if (ready.size() == instances.size()) {
         if (logger.isInfoEnabled()) {
@@ -657,14 +657,14 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
     /**
      * A network component instance deployer.
      */
-    private class RecursiveInstanceDeployer extends RecursiveContextDeployer<InstanceContext<?>> {
+    private class RecursiveInstanceDeployer extends RecursiveContextDeployer<InstanceContext> {
 
-      public RecursiveInstanceDeployer(Collection<InstanceContext<?>> contexts) {
+      public RecursiveInstanceDeployer(Collection<InstanceContext> contexts) {
         super(contexts);
       }
 
       @Override
-      protected void doDeploy(final InstanceContext<?> context, Handler<AsyncResult<String>> resultHandler) {
+      protected void doDeploy(final InstanceContext context, Handler<AsyncResult<String>> resultHandler) {
         if (logger.isDebugEnabled()) {
           logger.debug(String.format("Deploying instance %s", context.address()));
         }
@@ -733,7 +733,7 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
       }
 
       @Override
-      protected void doUndeploy(final InstanceContext<?> context, Handler<AsyncResult<Void>> resultHandler) {
+      protected void doUndeploy(final InstanceContext context, Handler<AsyncResult<Void>> resultHandler) {
         if (logger.isDebugEnabled()) {
           logger.debug(String.format("Undeploying instance %s", context.address()));
         }

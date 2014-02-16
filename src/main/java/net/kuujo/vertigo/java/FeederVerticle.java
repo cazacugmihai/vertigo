@@ -49,7 +49,7 @@ public abstract class FeederVerticle extends ComponentVerticle<Feeder> {
   protected Feeder feeder;
 
   @Override
-  protected Feeder createComponent(InstanceContext<Feeder> context) {
+  protected Feeder createComponent(InstanceContext context) {
     ComponentFactory componentFactory = new DefaultComponentFactory(vertx, container);
     return componentFactory.createFeeder(context);
   }

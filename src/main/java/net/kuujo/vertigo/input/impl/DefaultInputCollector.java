@@ -49,21 +49,21 @@ import org.vertx.java.platform.Container;
 public class DefaultInputCollector implements InputCollector {
   private final Vertx vertx;
   private final Logger logger;
-  private final InstanceContext<?> context;
+  private final InstanceContext context;
   private final List<InputHook> hooks = new ArrayList<InputHook>();
   private final Acker acker;
   private JsonValidator validator;
   private Handler<JsonMessage> messageHandler;
   private List<Listener> listeners;
 
-  public DefaultInputCollector(Vertx vertx, Container container, InstanceContext<?> context) {
+  public DefaultInputCollector(Vertx vertx, Container container, InstanceContext context) {
     this.vertx = vertx;
     this.logger = LoggerFactory.getLogger(String.format("%s-%s", InputCollector.class.getCanonicalName(), context.address()));
     this.context = context;
     this.acker = new DefaultAcker(context.address(), vertx.eventBus());
   }
 
-  public DefaultInputCollector(Vertx vertx, Container container, InstanceContext<?> context, Acker acker) {
+  public DefaultInputCollector(Vertx vertx, Container container, InstanceContext context, Acker acker) {
     this.vertx = vertx;
     this.logger = LoggerFactory.getLogger(String.format("%s-%s", InputCollector.class.getCanonicalName(), context.address()));
     this.context = context;

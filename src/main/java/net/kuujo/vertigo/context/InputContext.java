@@ -137,9 +137,8 @@ public class InputContext implements Context {
    * @return
    *   The parent component context.
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public <T extends ComponentContext> T componentContext() {
-    return (T) component;
+  public ComponentContext<?> componentContext() {
+    return component;
   }
 
   @Override

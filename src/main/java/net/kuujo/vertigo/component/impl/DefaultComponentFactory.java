@@ -21,7 +21,6 @@ import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.feeder.Feeder;
 import net.kuujo.vertigo.feeder.impl.BasicFeeder;
 import net.kuujo.vertigo.rpc.Executor;
-import net.kuujo.vertigo.rpc.impl.BasicExecutor;
 import net.kuujo.vertigo.worker.Worker;
 import net.kuujo.vertigo.worker.impl.BasicWorker;
 
@@ -59,16 +58,13 @@ public class DefaultComponentFactory implements ComponentFactory {
 
   @Override
   @SuppressWarnings({"unchecked"})
-  public <T extends Component<T>> Component<T> createComponent(InstanceContext<T> context) {
-    Class<T> type = context.componentContext().type();
-    if (Feeder.class.isAssignableFrom(type)) {
-      return (Component<T>) createFeeder((InstanceContext<Feeder>) context);
+  public <T extends Component<T>> T createComponent(InstanceContext context) {
+    net.kuujo.vertigo.network.Component.Type type = context.componentContext().type();
+    if (type.equals(net.kuujo.vertigo.network.Component.Type.FEEDER)) {
+      return (T) createFeeder(context);
     }
-    else if (Executor.class.isAssignableFrom(type)) {
-      return (Component<T>) createExecutor((InstanceContext<Executor>) context);
-    }
-    else if (Worker.class.isAssignableFrom(type)) {
-      return (Component<T>) createWorker((InstanceContext<Worker>) context);
+    else if (type.equals(net.kuujo.vertigo.network.Component.Type.WORKER)) {
+      return (T) createWorker(context);
     }
     else {
       throw new IllegalArgumentException("Invalid component type.");
@@ -76,17 +72,23 @@ public class DefaultComponentFactory implements ComponentFactory {
   }
 
   @Override
-  public Feeder createFeeder(InstanceContext<Feeder> context) {
+  public Feeder createFeeder(InstanceContext context) {
+    if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.FEEDER)) {
+      throw new IllegalArgumentException("Not a valid feeder context.");
+    }
     return new BasicFeeder(vertx, container, context);
   }
 
   @Override
-  public Executor createExecutor(InstanceContext<Executor> context) {
-    return new BasicExecutor(vertx, container, context);
+  public Executor createExecutor(InstanceContext context) {
+    throw new IllegalArgumentException("Not a valid executor context.");
   }
 
   @Override
-  public Worker createWorker(InstanceContext<Worker> context) {
+  public Worker createWorker(InstanceContext context) {
+    if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.WORKER)) {
+      throw new IllegalArgumentException("Not a valid worker context.");
+    }
     return new BasicWorker(vertx, container, context);
   }
 

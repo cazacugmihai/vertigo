@@ -78,11 +78,6 @@ public final class NetworkContext implements Context {
     return address;
   }
 
-  @Deprecated
-  public String getAddress() {
-    return address();
-  }
-
   /**
    * Returns the number of network auditors.
    *
@@ -101,11 +96,6 @@ public final class NetworkContext implements Context {
    */
   public List<String> auditors() {
     return auditors;
-  }
-
-  @Deprecated
-  public List<String> getAuditors() {
-    return auditors();
   }
 
   /**
@@ -138,11 +128,6 @@ public final class NetworkContext implements Context {
     return timeout;
   }
 
-  @Deprecated
-  public long getAckTimeout() {
-    return messageTimeout();
-  }
-
   /**
    * Returns a list of network component contexts.
    *
@@ -157,11 +142,6 @@ public final class NetworkContext implements Context {
     return components;
   }
 
-  @Deprecated
-  public List<ComponentContext<?>> getComponents() {
-    return componentContexts();
-  }
-
   /**
    * Returns a component context by address.
    *
@@ -172,18 +152,12 @@ public final class NetworkContext implements Context {
    * @throws IllegalArgumentException
    *   If a component does not exist at the given address.
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public <T extends ComponentContext> T componentContext(String address) {
+  @SuppressWarnings("unchecked")
+  public <T extends ComponentContext<T>> T componentContext(String address) {
     if (components.containsKey(address)) {
       return (T) components.get(address).setNetworkContext(this);
     }
     throw new IllegalArgumentException(address + " is not a valid component in " + address());
-  }
-
-  @Deprecated
-  @SuppressWarnings("rawtypes")
-  public <T extends net.kuujo.vertigo.component.Component> ComponentContext<T> getComponent(String address) {
-    return componentContext(address);
   }
 
   @Override

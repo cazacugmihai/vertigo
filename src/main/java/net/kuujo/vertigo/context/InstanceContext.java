@@ -15,7 +15,6 @@
  */
 package net.kuujo.vertigo.context;
 
-import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
@@ -30,11 +29,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author Jordan Halterman
  */
-@SuppressWarnings("rawtypes")
-public final class InstanceContext<T extends Component> implements Serializable {
+public final class InstanceContext implements Serializable {
   private String id;
   private int number;
-  private @JsonIgnore ComponentContext<T> component;
+  private @JsonIgnore ComponentContext<?> component;
 
   private InstanceContext() {
   }
@@ -49,11 +47,10 @@ public final class InstanceContext<T extends Component> implements Serializable 
    * @throws MalformedContextException
    *   If the JSON context is malformed.
    */
-  @SuppressWarnings("unchecked")
-  public static <T extends Component<T>> InstanceContext<T> fromJson(JsonObject context) {
+  public static InstanceContext fromJson(JsonObject context) {
     Serializer serializer = SerializerFactory.getSerializer(Context.class);
-    InstanceContext<T> instance = serializer.deserialize(context.getObject("instance"), InstanceContext.class);
-    ComponentContext<T> component = ComponentContext.fromJson(context);
+    InstanceContext instance = serializer.deserialize(context.getObject("instance"), InstanceContext.class);
+    ComponentContext<?> component = ComponentContext.fromJson(context);
     return instance.setComponentContext(component);
   }
 
@@ -65,16 +62,17 @@ public final class InstanceContext<T extends Component> implements Serializable 
    * @return
    *   A Json representation of the instance context.
    */
-  public static JsonObject toJson(InstanceContext<?> context) {
+  public static JsonObject toJson(InstanceContext context) {
     Serializer serializer = SerializerFactory.getSerializer(Context.class);
-    JsonObject json = ComponentContext.toJson(context.componentContext());
+    JsonObject json = ComponentContext.toJson(context.componentContext().isModule() ?
+        context.<ModuleContext>componentContext() : context.<VerticleContext>componentContext());
     return json.putObject("instance", serializer.serialize(context));
   }
 
   /**
    * Sets the instance parent.
    */
-  InstanceContext<T> setComponentContext(ComponentContext<T> component) {
+  InstanceContext setComponentContext(ComponentContext<?> component) {
     this.component = component;
     return this;
   }
@@ -115,14 +113,9 @@ public final class InstanceContext<T extends Component> implements Serializable 
    * @return
    *   The parent component context.
    */
-  @SuppressWarnings({"unchecked", "hiding"})
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public <T extends ComponentContext> T componentContext() {
     return (T) component;
-  }
-
-  @Deprecated
-  public ComponentContext<T> getComponent() {
-    return componentContext();
   }
 
   @Override

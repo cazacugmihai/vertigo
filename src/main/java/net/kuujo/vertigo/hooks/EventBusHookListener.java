@@ -56,7 +56,7 @@ public class EventBusHookListener {
    * @return
    *   The called listener instance.
    */
-  public EventBusHookListener startHandler(final Handler<InstanceContext<?>> startHandler) {
+  public EventBusHookListener startHandler(final Handler<InstanceContext> startHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.start", componentAddress), new Handler<Message<JsonObject>>() {
       @Override
       public void handle(Message<JsonObject> message) {
@@ -224,7 +224,7 @@ public class EventBusHookListener {
    * @return
    *   The called listener instance.
    */
-  public EventBusHookListener stopHandler(final Handler<InstanceContext<?>> stopHandler) {
+  public EventBusHookListener stopHandler(final Handler<InstanceContext> stopHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.stop", componentAddress), new Handler<Message<JsonObject>>() {
       @Override
       public void handle(Message<JsonObject> message) {

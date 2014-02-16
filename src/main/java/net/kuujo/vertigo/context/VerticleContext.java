@@ -26,8 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @param <T> The component type
  */
-@SuppressWarnings("rawtypes")
-public class VerticleContext<T extends net.kuujo.vertigo.component.Component> extends ComponentContext<T> {
+public class VerticleContext extends ComponentContext<VerticleContext> {
   private String main;
   private boolean worker;
   @JsonProperty("multi-threaded")
