@@ -49,9 +49,9 @@ public @interface FeederOptions {
   int autoRetryAttempts() default -1;
 
   /**
-   * Indicates the interval at which the feed handler will be called. Defaults
+   * Indicates the period at which the feed handler will be called. Defaults
    * to 10 milliseconds
    */
-  long feedInterval() default 10;
+  long feedDelay() default 10;
 
 }
