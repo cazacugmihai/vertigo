@@ -20,7 +20,6 @@ import net.kuujo.vertigo.component.ComponentFactory;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.feeder.Feeder;
 import net.kuujo.vertigo.feeder.impl.BasicFeeder;
-import net.kuujo.vertigo.rpc.Executor;
 import net.kuujo.vertigo.worker.Worker;
 import net.kuujo.vertigo.worker.impl.BasicWorker;
 
@@ -77,11 +76,6 @@ public class DefaultComponentFactory implements ComponentFactory {
       throw new IllegalArgumentException("Not a valid feeder context.");
     }
     return new BasicFeeder(vertx, container, context);
-  }
-
-  @Override
-  public Executor createExecutor(InstanceContext context) {
-    throw new IllegalArgumentException("Not a valid executor context.");
   }
 
   @Override
