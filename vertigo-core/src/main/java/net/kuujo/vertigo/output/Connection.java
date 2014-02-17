@@ -20,30 +20,27 @@ import net.kuujo.vertigo.message.MessageId;
 
 /**
  * A single point-to-point connection.
- *
- * A connection represents a globally unique event bus address on which a single
- * component instance resides. This is the facility for sending messages to
- * specific component instances using selectors.
- *
+ * 
+ * A connection represents a globally unique event bus address on which a single component
+ * instance resides. This is the facility for sending messages to specific component
+ * instances using selectors.
+ * 
  * @author Jordan Halterman
  */
 public interface Connection {
 
   /**
    * Gets the remote connection address.
-   *
-   * @return
-   *   The remote connection address.
+   * 
+   * @return The remote connection address.
    */
   String getAddress();
 
   /**
    * Writes a message to the connection.
-   *
-   * @param message
-   *   The message to write to the connection.
-   * @return
-   *   The written message identifier.
+   * 
+   * @param message The message to write to the connection.
+   * @return The written message identifier.
    */
   MessageId write(JsonMessage message);
 

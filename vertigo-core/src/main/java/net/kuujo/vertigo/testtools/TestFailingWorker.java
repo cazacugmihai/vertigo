@@ -21,7 +21,7 @@ import net.kuujo.vertigo.worker.Worker;
 
 /**
  * A test worker that fails all messages.
- *
+ * 
  * @author Jordan Halterman
  */
 public class TestFailingWorker extends BasicWorker {

@@ -21,36 +21,32 @@ import net.kuujo.vertigo.network.Network;
 
 /**
  * An input hook.
- *
- * This hook type may be added to any {@link InputCollector} instance
- * either directly via the {@link InputCollector} interface or via a
- * {@link Network} definition.
- *
+ * 
+ * This hook type may be added to any {@link InputCollector} instance either directly via
+ * the {@link InputCollector} interface or via a {@link Network} definition.
+ * 
  * @author Jordan Halterman
  */
 public interface InputHook extends Hook<InputCollector> {
 
   /**
    * Called when the component receives an input message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleReceive(MessageId messageId);
 
   /**
    * Called when the component acks a received message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleAck(MessageId messageId);
 
   /**
    * Called when the component fails a received message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleFail(MessageId messageId);
 

@@ -17,14 +17,13 @@ package net.kuujo.vertigo.output;
 
 /**
  * A pseudo-connection implementation.
- *
- * The pseudo connection is used in place of missing connections to ensure that
- * methods such as consistent hashing work properly even in the absense of some
- * connections. When a message is written to the pseudo connection, it behaves
- * as if it created/forked the message without actually sending the message data
- * to any address. This has the ultimate effect of timing out messages sent to
- * connections that are currently invalid.
- *
+ * 
+ * The pseudo connection is used in place of missing connections to ensure that methods
+ * such as consistent hashing work properly even in the absense of some connections. When
+ * a message is written to the pseudo connection, it behaves as if it created/forked the
+ * message without actually sending the message data to any address. This has the ultimate
+ * effect of timing out messages sent to connections that are currently invalid.
+ * 
  * @author Jordan Halterman
  */
 public interface PseudoConnection extends Connection {

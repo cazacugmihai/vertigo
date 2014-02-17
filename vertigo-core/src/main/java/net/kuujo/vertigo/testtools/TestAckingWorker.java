@@ -21,7 +21,7 @@ import net.kuujo.vertigo.worker.Worker;
 
 /**
  * A test worker that acks and emits all messages as children.
- *
+ * 
  * @author Jordan Halterman
  */
 public class TestAckingWorker extends BasicWorker {

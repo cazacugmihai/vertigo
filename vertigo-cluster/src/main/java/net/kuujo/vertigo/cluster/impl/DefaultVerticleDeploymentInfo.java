@@ -23,7 +23,7 @@ import net.kuujo.vertigo.cluster.VerticleDeploymentInfo;
 
 /**
  * Default verticle deployment info implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultVerticleDeploymentInfo extends AbstractDeploymentInfo implements VerticleDeploymentInfo {

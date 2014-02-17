@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 package net.kuujo.vertigo.testtools;
+
 import net.kuujo.vertigo.java.BasicWorker;
 import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.worker.Worker;
 
 /**
  * A test worker that times out messages.
- *
+ * 
  * @author Jordan Halterman
  */
 public class TestTimingOutWorker extends BasicWorker {

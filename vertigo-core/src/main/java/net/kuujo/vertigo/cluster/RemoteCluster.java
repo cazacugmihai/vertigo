@@ -28,17 +28,17 @@ import net.kuujo.vertigo.context.impl.ContextBuilder;
 import net.kuujo.vertigo.network.Network;
 
 /**
- * A remote cluster implementation.<p>
- *
+ * A remote cluster implementation.
+ * <p>
+ * 
  * The remote cluster supports deploying networks across a cluster of Vert.x instances
- * using an event bus based deployment mechanism. Rather than deploying modules
- * and verticles using the Vert.x container, Via sends messages to supervisors
- * on different Vert.x instances in a cluster, with each supervisor deploying
- * and monitoring modules and verticles within its own instance. This results in
- * a much more reliable network deployment as Via can reassign deployments to
- * new nodes when an existing node dies. See the Via documentation for deployment
- * message structures.
- *
+ * using an event bus based deployment mechanism. Rather than deploying modules and
+ * verticles using the Vert.x container, Via sends messages to supervisors on different
+ * Vert.x instances in a cluster, with each supervisor deploying and monitoring modules
+ * and verticles within its own instance. This results in a much more reliable network
+ * deployment as Via can reassign deployments to new nodes when an existing node dies. See
+ * the Via documentation for deployment message structures.
+ * 
  * @author Jordan Halterman
  */
 public class RemoteCluster extends AbstractCluster {

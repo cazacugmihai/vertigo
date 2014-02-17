@@ -29,44 +29,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Deployment instance info.
- *
+ * 
  * @author Jordan Halterman
  */
-@JsonTypeInfo(
-  use=JsonTypeInfo.Id.CLASS,
-  include=JsonTypeInfo.As.PROPERTY,
-  property="class",
-  defaultImpl=DefaultInstanceInfo.class
-)
-@JsonAutoDetect(
-    creatorVisibility=JsonAutoDetect.Visibility.NONE,
-    fieldVisibility=JsonAutoDetect.Visibility.ANY,
-    getterVisibility=JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility=JsonAutoDetect.Visibility.NONE,
-    setterVisibility=JsonAutoDetect.Visibility.NONE
-  )
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class", defaultImpl = DefaultInstanceInfo.class)
+@JsonAutoDetect(creatorVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public interface InstanceInfo {
 
   /**
    * Returns the instance ID.
-   *
-   * @return
-   *   The unique instance ID.
+   * 
+   * @return The unique instance ID.
    */
   String id();
 
   /**
    * Returns the parent deployment info.
-   *
-   * @return
-   *   The parent deployment info.
+   * 
+   * @return The parent deployment info.
    */
   DeploymentInfo deployment();
 
   /**
    * An instance info builder.
-   *
+   * 
    * @author Jordan Halterman
    */
   public static class Builder {
@@ -83,9 +70,8 @@ public interface InstanceInfo {
 
     /**
      * Returns a new instance info builder.
-     *
-     * @return
-     *   A new builder instance.
+     * 
+     * @return A new builder instance.
      */
     public static Builder newBuilder() {
       return new Builder();
@@ -93,11 +79,9 @@ public interface InstanceInfo {
 
     /**
      * Returns a new instance info builder.
-     *
-     * @param info
-     *   Json info with which to start the build.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Json info with which to start the build.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(JsonObject info) {
       return new Builder(info);
@@ -105,11 +89,9 @@ public interface InstanceInfo {
 
     /**
      * Returns a new instance info builder.
-     *
-     * @param info
-     *   Existing instance info with which to initialize the builder.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Existing instance info with which to initialize the builder.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(InstanceInfo info) {
       try {
@@ -122,11 +104,9 @@ public interface InstanceInfo {
 
     /**
      * Sets the instance ID.
-     *
-     * @param id
-     *   The instance ID.
-     * @return
-     *   The builder instance.
+     * 
+     * @param id The instance ID.
+     * @return The builder instance.
      */
     public Builder setId(String id) {
       info.putString("id", id);
@@ -135,11 +115,9 @@ public interface InstanceInfo {
 
     /**
      * Sets the instance's parent deployment.
-     *
-     * @param info
-     *   The parent deployment info.
-     * @return
-     *   The builder instance.
+     * 
+     * @param info The parent deployment info.
+     * @return The builder instance.
      */
     public Builder setDeployment(DeploymentInfo info) {
       try {
@@ -153,9 +131,8 @@ public interface InstanceInfo {
 
     /**
      * Builds the instance info.
-     *
-     * @return
-     *   An instance info instance.
+     * 
+     * @return An instance info instance.
      */
     public InstanceInfo build() {
       try {

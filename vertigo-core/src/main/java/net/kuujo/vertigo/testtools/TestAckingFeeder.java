@@ -27,7 +27,7 @@ import static org.vertx.testtools.VertxAssert.testComplete;
 
 /**
  * A test feeder that tests that a message was successfully acked.
- *
+ * 
  * @author Jordan Halterman
  */
 public class TestAckingFeeder extends BasicFeeder {

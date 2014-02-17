@@ -26,10 +26,10 @@ import org.vertx.java.core.json.JsonObject;
 
 /**
  * An event bus hook listener.
- *
- * This class assists in listening for messages arriving on the event bus
- * via the {@link EventBusHook}.
- *
+ * 
+ * This class assists in listening for messages arriving on the event bus via the
+ * {@link EventBusHook}.
+ * 
  * @author Jordan Halterman
  */
 public class EventBusHookListener {
@@ -50,11 +50,9 @@ public class EventBusHookListener {
 
   /**
    * Sets a start handler.
-   *
-   * @param startHandler
-   *   A start handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param startHandler A start handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener startHandler(final Handler<InstanceContext> startHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.start", componentAddress), new Handler<Message<JsonObject>>() {
@@ -71,11 +69,9 @@ public class EventBusHookListener {
 
   /**
    * Sets a receive handler.
-   *
-   * @param receiveHandler
-   *   A receive handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param receiveHandler A receive handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener receiveHandler(final Handler<MessageId> receiveHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.receive", componentAddress), new Handler<Message<JsonObject>>() {
@@ -92,11 +88,9 @@ public class EventBusHookListener {
 
   /**
    * Sets a ack handler.
-   *
-   * @param ackHandler
-   *   A ack handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param ackHandler A ack handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener ackHandler(final Handler<MessageId> ackHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.ack", componentAddress), new Handler<Message<JsonObject>>() {
@@ -113,11 +107,9 @@ public class EventBusHookListener {
 
   /**
    * Sets a fail handler.
-   *
-   * @param failHandler
-   *   A fail handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param failHandler A fail handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener failHandler(final Handler<MessageId> failHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.fail", componentAddress), new Handler<Message<JsonObject>>() {
@@ -134,11 +126,9 @@ public class EventBusHookListener {
 
   /**
    * Sets an emit handler.
-   *
-   * @param emitHandler
-   *   An emit handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param emitHandler An emit handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener emitHandler(final Handler<MessageId> emitHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.emit", componentAddress), new Handler<Message<JsonObject>>() {
@@ -155,11 +145,9 @@ public class EventBusHookListener {
 
   /**
    * Sets an acked handler.
-   *
-   * @param ackedHandler
-   *   An acked handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param ackedHandler An acked handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener ackedHandler(final Handler<MessageId> ackedHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.acked", componentAddress), new Handler<Message<JsonObject>>() {
@@ -176,11 +164,9 @@ public class EventBusHookListener {
 
   /**
    * Sets a failed handler.
-   *
-   * @param failedHandler
-   *   A failed handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param failedHandler A failed handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener failedHandler(final Handler<MessageId> failedHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.failed", componentAddress), new Handler<Message<JsonObject>>() {
@@ -197,11 +183,9 @@ public class EventBusHookListener {
 
   /**
    * Sets a timeout handler.
-   *
-   * @param timeoutHandler
-   *   A timeout handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param timeoutHandler A timeout handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener timeoutHandler(final Handler<MessageId> timeoutHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.timeout", componentAddress), new Handler<Message<JsonObject>>() {
@@ -218,11 +202,9 @@ public class EventBusHookListener {
 
   /**
    * Sets a stop handler.
-   *
-   * @param stopHandler
-   *   A stop handler.
-   * @return
-   *   The called listener instance.
+   * 
+   * @param stopHandler A stop handler.
+   * @return The called listener instance.
    */
   public EventBusHookListener stopHandler(final Handler<InstanceContext> stopHandler) {
     eventBus.registerHandler(String.format("vertigo.hooks.%s.stop", componentAddress), new Handler<Message<JsonObject>>() {

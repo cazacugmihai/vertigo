@@ -32,44 +32,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Node info.
- *
+ * 
  * @author Jordan Halterman
  */
-@JsonTypeInfo(
-  use=JsonTypeInfo.Id.CLASS,
-  include=JsonTypeInfo.As.PROPERTY,
-  property="class",
-  defaultImpl=DefaultNodeInfo.class
-)
-@JsonAutoDetect(
-    creatorVisibility=JsonAutoDetect.Visibility.NONE,
-    fieldVisibility=JsonAutoDetect.Visibility.ANY,
-    getterVisibility=JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility=JsonAutoDetect.Visibility.NONE,
-    setterVisibility=JsonAutoDetect.Visibility.NONE
-  )
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class", defaultImpl = DefaultNodeInfo.class)
+@JsonAutoDetect(creatorVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public interface NodeInfo {
 
   /**
    * Returns the node address.
-   *
-   * @return
-   *   The node address.
+   * 
+   * @return The node address.
    */
   String address();
 
   /**
    * Returns a collection of deployments assigned to the node.
-   *
-   * @return
-   *   A collection of deployments assigned to the node.
+   * 
+   * @return A collection of deployments assigned to the node.
    */
   Collection<AssignmentInfo> assignments();
 
   /**
    * Node info builder.
-   *
+   * 
    * @author Jordan Halterman
    */
   public static class Builder {
@@ -86,9 +73,8 @@ public interface NodeInfo {
 
     /**
      * Returns a new node info builder.
-     *
-     * @return
-     *   A new builder instance.
+     * 
+     * @return A new builder instance.
      */
     public static Builder newBuilder() {
       return new Builder();
@@ -96,11 +82,9 @@ public interface NodeInfo {
 
     /**
      * Returns a new node info builder.
-     *
-     * @param info
-     *   Json info with which to start the build.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Json info with which to start the build.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(JsonObject info) {
       return new Builder(info);
@@ -108,11 +92,9 @@ public interface NodeInfo {
 
     /**
      * Returns a new node info builder.
-     *
-     * @param info
-     *   Existing node info with which to initialize the builder.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Existing node info with which to initialize the builder.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(NodeInfo info) {
       try {
@@ -125,11 +107,9 @@ public interface NodeInfo {
 
     /**
      * Sets the node address.
-     *
-     * @param address
-     *   The node address.
-     * @return
-     *   The builder instance.
+     * 
+     * @param address The node address.
+     * @return The builder instance.
      */
     public Builder setAddress(String address) {
       info.putString("address", address);
@@ -138,11 +118,9 @@ public interface NodeInfo {
 
     /**
      * Sets the node's assignments.
-     *
-     * @param assignments
-     *   A collection of assignment info.
-     * @return
-     *   The builder instance.
+     * 
+     * @param assignments A collection of assignment info.
+     * @return The builder instance.
      */
     public Builder setAssignments(Collection<AssignmentInfo> assignments) {
       for (AssignmentInfo info : assignments) {
@@ -153,11 +131,9 @@ public interface NodeInfo {
 
     /**
      * Adds an assignment to the node.
-     *
-     * @param info
-     *   The assignment info.
-     * @return
-     *   The builder instance.
+     * 
+     * @param info The assignment info.
+     * @return The builder instance.
      */
     public Builder addAssignment(AssignmentInfo info) {
       if (!this.info.containsField("assignments")) {
@@ -175,11 +151,9 @@ public interface NodeInfo {
 
     /**
      * Removes an assignment from the node.
-     *
-     * @param info
-     *   The assignment info.
-     * @return
-     *   The builder instance.
+     * 
+     * @param info The assignment info.
+     * @return The builder instance.
      */
     public Builder removeAssignment(AssignmentInfo info) {
       if (!this.info.containsField("assignments")) {
@@ -203,9 +177,8 @@ public interface NodeInfo {
 
     /**
      * Builds the node info.
-     *
-     * @return
-     *   A new node info instance.
+     * 
+     * @return A new node info instance.
      */
     public NodeInfo build() {
       try {

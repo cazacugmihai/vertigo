@@ -23,25 +23,26 @@ import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.feeder.Feeder;
 
 /**
- * A feeder verticle implementation.<p>
- *
+ * A feeder verticle implementation.
+ * <p>
+ * 
  * This is a basic verticle that makes a Vertigo feeder available via the
- * {@link #start(Feeder)} method. Users can either operate on the {@link Feeder}
- * by overriding that method or my overriding the {@link #nextMessage(Feeder)}
- * method.<p>
- *
+ * {@link #start(Feeder)} method. Users can either operate on the {@link Feeder} by
+ * overriding that method or my overriding the {@link #nextMessage(Feeder)} method.
+ * <p>
+ * 
  * <pre>
  * public class MyFeederVerticle extends FeederVerticle {
  *   protected void start(Feeder feeder) {
- *     feeder.emit(new JsonObject().putString("foo", "bar"), new Handler<AsyncResult<MessageId>>() {
- *       public void handle(AsyncResult<MessageId> result) {
+ *     feeder.emit(new JsonObject().putString(&quot;foo&quot;, &quot;bar&quot;), new Handler&lt;AsyncResult&lt;MessageId&gt;&gt;() {
+ *       public void handle(AsyncResult&lt;MessageId&gt; result) {
  *         ...
  *       }
  *     });
  *   }
  * }
  * </pre>
- *
+ * 
  * @author Jordan Halterman
  */
 public abstract class BasicFeeder extends ComponentVerticle<Feeder> {
@@ -66,7 +67,7 @@ public abstract class BasicFeeder extends ComponentVerticle<Feeder> {
 
   /**
    * Called when the feeder is requesting the next message.
-   *
+   * 
    * Override this method to perform polling-based feeding. The feeder will automatically
    * call this method any time the feed queue is prepared to accept new messages.
    */

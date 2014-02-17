@@ -22,40 +22,36 @@ import net.kuujo.vertigo.message.MessageId;
 
 /**
  * A network message acker.
- *
+ * 
  * @author Jordan Halterman
  */
 public interface Auditor {
 
   /**
    * Sets the acker Vertx instance.
-   *
-   * @param vertx
-   *   A vertx instance.
+   * 
+   * @param vertx A vertx instance.
    */
   void setVertx(Vertx vertx);
 
   /**
    * Sets the acker container instance.
-   *
-   * @param container
-   *   A container instance.
+   * 
+   * @param container A container instance.
    */
   void setContainer(Container container);
 
   /**
    * Sets the auditor's parent acker instance.
-   *
-   * @param auditorVerticle
-   *   The parent acker.
+   * 
+   * @param auditorVerticle The parent acker.
    */
   void setAcker(AuditorVerticle auditorVerticle);
 
   /**
    * Sets the message timeout.
-   *
-   * @param timeout
-   *   The message timeout.
+   * 
+   * @param timeout The message timeout.
    */
   void setTimeout(long timeout);
 
@@ -66,33 +62,29 @@ public interface Auditor {
 
   /**
    * Creates a new message tree.
-   *
-   * @param messageId
-   *   The root message ID.
+   * 
+   * @param messageId The root message ID.
    */
   void create(MessageId messageId);
 
   /**
    * Forks a message.
-   *
-   * @param messageId
-   *   The forked message ID.
+   * 
+   * @param messageId The forked message ID.
    */
   void fork(MessageId messageId);
 
   /**
    * Acks a message.
-   *
-   * @param messageId
-   *   The acked message ID.
+   * 
+   * @param messageId The acked message ID.
    */
   void ack(MessageId messageId);
 
   /**
    * Fails a message.
-   *
-   * @param messageId
-   *   The failed message ID.
+   * 
+   * @param messageId The failed message ID.
    */
   void fail(MessageId messageId);
 

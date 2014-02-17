@@ -22,57 +22,50 @@ import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.network.Network;
 
 /**
- * The cluster is the primary interface for deploying Vertigo networks. Clusters
- * handle deploying network coordinators which handle deployment and monitoring
- * of network component instances.
- *
+ * The cluster is the primary interface for deploying Vertigo networks. Clusters handle
+ * deploying network coordinators which handle deployment and monitoring of network
+ * component instances.
+ * 
  * @author Jordan Halterman
  */
 public interface Cluster {
 
   /**
    * Returns the cluster address.
-   *
-   * @return
-   *   The cluster address.
+   * 
+   * @return The cluster address.
    */
   String address();
 
   /**
    * Deploys a network to the cluster.
-   *
-   * @param network
-   *   The network configuration.
+   * 
+   * @param network The network configuration.
    */
   void deployNetwork(Network network);
 
   /**
    * Deploys a network to the cluster.
-   *
-   * @param network
-   *   The network configuration.
-   * @param doneHandler
-   *   A handler to be called once the deployment is complete. This handler will
-   *   be passed the deployed network context containing information about the
-   *   deployed components.
+   * 
+   * @param network The network configuration.
+   * @param doneHandler A handler to be called once the deployment is complete. This
+   *          handler will be passed the deployed network context containing information
+   *          about the deployed components.
    */
   void deployNetwork(Network network, Handler<AsyncResult<NetworkContext>> doneHandler);
 
   /**
    * Shuts down a network in the cluster.
-   *
-   * @param context
-   *   The context of the network to shutdown.
+   * 
+   * @param context The context of the network to shutdown.
    */
   void shutdownNetwork(NetworkContext context);
 
   /**
    * Shuts down a network in the cluster.
-   *
-   * @param context
-   *   The context of the network to shutdown.
-   * @param doneHandler
-   *   A handler to be called once the shutdown is complete.
+   * 
+   * @param context The context of the network to shutdown.
+   * @param doneHandler A handler to be called once the shutdown is complete.
    */
   void shutdownNetwork(NetworkContext context, Handler<AsyncResult<Void>> doneHandler);
 

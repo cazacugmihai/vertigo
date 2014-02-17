@@ -50,7 +50,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A Vertigo node.
- *
+ * 
  * @author Jordan Halterman
  */
 public class VertigoNode extends BusModBase implements StateMachine {
@@ -175,11 +175,10 @@ public class VertigoNode extends BusModBase implements StateMachine {
   private final Handler<Long> broadcastTimer = new Handler<Long>() {
     @Override
     public void handle(Long timerID) {
-      eb.publish(clusterAddress, new JsonObject()
-          .putString("action", "broadcast")
-          .putString("address", nodeAddress)
-          .putString("id", internalAddress)
-          .putString("replica", replica.address()));
+      eb.publish(
+          clusterAddress,
+          new JsonObject().putString("action", "broadcast").putString("address", nodeAddress).putString("id", internalAddress)
+              .putString("replica", replica.address()));
     }
   };
 
@@ -202,12 +201,12 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A state machine command for adding a node to the cluster.
-   *
+   * 
    * @param address The node address.
    * @param id The node ID.
    * @param replica The node's replica address.
    */
-  @Command(type=Command.Type.WRITE)
+  @Command(type = Command.Type.WRITE)
   public void addNode(@Argument("address") String address, @Argument("id") String id, @Argument("replica") String replica) {
     NodeReference node;
     if (!nodes.containsKey(address)) {
@@ -232,7 +231,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A state machine command for updating a node's deployments and info.
-   *
+   * 
    * @param address The node address.
    * @param id The node ID.
    * @param replica The node's replica address.
@@ -240,12 +239,9 @@ public class VertigoNode extends BusModBase implements StateMachine {
    * @param info The node's info.
    * @return Indicates whether the node was successfully updated.
    */
-  @Command(type=Command.Type.WRITE)
-  public boolean updateNode(
-      @Argument("address") String address,
-      @Argument("id") String id,
-      @Argument("replica") String replica,
-      @Argument(value="info", required=false) NodeInfo info) {
+  @Command(type = Command.Type.WRITE)
+  public boolean updateNode(@Argument("address") String address, @Argument("id") String id, @Argument("replica") String replica,
+      @Argument(value = "info", required = false) NodeInfo info) {
     if (!nodes.containsKey(address)) {
       return false;
     }
@@ -261,11 +257,11 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A state machine command for removing a node from the cluster.
-   *
+   * 
    * @param address The node address.
    * @return Indicates whether the node was removed.
    */
-  @Command(type=Command.Type.WRITE)
+  @Command(type = Command.Type.WRITE)
   public boolean removeNode(@Argument("address") String address) {
     if (nodes.containsKey(address)) {
       nodes.remove(address);
@@ -322,13 +318,13 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple set command.
-   *
+   * 
    * @param key The key to set.
    * @param value The value to set.
    * @param expire An optional key expiration.
    */
-  @Command(type=Command.Type.WRITE)
-  public void set(@Argument("key") String key, @Argument("value") Object value, @Argument(value="expire", required=false) long expire) {
+  @Command(type = Command.Type.WRITE)
+  public void set(@Argument("key") String key, @Argument("value") Object value, @Argument(value = "expire", required = false) long expire) {
     data.put(key, new Value(value, expire));
     if (replica.isLeader()) {
       triggerEvent("set", key, value);
@@ -337,13 +333,13 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple get command.
-   *
+   * 
    * @param key The key to get.
    * @param defaultValue An optional default value.
    * @return The key value or the default if none was found.
    */
-  @Command(type=Command.Type.READ)
-  public Object get(@Argument("key") String key, @Argument(value="default", required=false) Object defaultValue) {
+  @Command(type = Command.Type.READ)
+  public Object get(@Argument("key") String key, @Argument(value = "default", required = false) Object defaultValue) {
     Value value = data.get(key);
     if (value != null) {
       if (value.expire > 0 && value.expire < System.currentTimeMillis()) {
@@ -361,11 +357,11 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple delete command.
-   *
+   * 
    * @param key The key to delete.
    * @return Indicates whether the key was deleted.
    */
-  @Command(type=Command.Type.WRITE)
+  @Command(type = Command.Type.WRITE)
   public boolean delete(@Argument("key") String key) {
     if (data.containsKey(key)) {
       Value value = data.remove(key);
@@ -380,10 +376,10 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple keys command.
-   *
+   * 
    * @return A list of keys.
    */
-  @Command(type=Command.Type.READ)
+  @Command(type = Command.Type.READ)
   public List<String> keys() {
     List<String> keys = new ArrayList<>();
     Iterator<Map.Entry<String, Value>> iterator = data.entrySet().iterator();
@@ -403,23 +399,23 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple exists command.
-   *
+   * 
    * @param key The key to check.
    * @return Indicates whether the key exists.
    */
-  @Command(type=Command.Type.READ)
+  @Command(type = Command.Type.READ)
   public boolean exists(@Argument("key") String key) {
     return data.containsKey(key);
   }
 
   /**
    * A simple key timeout command.
-   *
+   * 
    * @param key The key to timeout.
    * @param timeout The key timeout.
    */
-  @Command(type=Command.Type.WRITE)
-  public void timeout(final @Argument("key") String key, @Argument(value="timeout", required=false) Long timeout) {
+  @Command(type = Command.Type.WRITE)
+  public void timeout(final @Argument("key") String key, @Argument(value = "timeout", required = false) Long timeout) {
     if (data.containsKey(key)) {
       Value oldValue = data.get(key);
       if (oldValue.timer > 0) {
@@ -459,11 +455,11 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple timeout cancel command.
-   *
+   * 
    * @param key The key to cancel.
    * @return Indicates whether the key was cancelled.
    */
-  @Command(type=Command.Type.WRITE)
+  @Command(type = Command.Type.WRITE)
   public boolean cancel(@Argument("key") String key) {
     if (data.containsKey(key) && data.get(key).timer > 0) {
       Value value = data.remove(key);
@@ -476,13 +472,14 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple key watch command.
-   *
+   * 
    * @param key The key to watch.
    * @param address The address at which to watch.
    * @return Indicates whether the address began watching the key.
    */
-  @Command(type=Command.Type.WRITE)
-  public boolean watch(@Argument("key") String key, @Argument("address") String address, @Argument(value="event", required=false) String event) {
+  @Command(type = Command.Type.WRITE)
+  public boolean watch(@Argument("key") String key, @Argument("address") String address,
+      @Argument(value = "event", required = false) String event) {
     Set<Watcher> watch;
     if (!watchers.containsKey(key)) {
       watch = new HashSet<>();
@@ -496,13 +493,14 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * A simple key unwatch command.
-   *
+   * 
    * @param key The key to unwatch.
    * @param address The address at which to unwatch.
    * @return Indicates whether the address stopped watching the key.
    */
-  @Command(type=Command.Type.WRITE)
-  public boolean unwatch(@Argument("key") String key, @Argument("address") String address, @Argument(value="event", required=false) String event) {
+  @Command(type = Command.Type.WRITE)
+  public boolean unwatch(@Argument("key") String key, @Argument("address") String address,
+      @Argument(value = "event", required = false) String event) {
     if (!watchers.containsKey(key)) {
       return false;
     }
@@ -631,11 +629,11 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   /**
    * Handles cluster broadcasting.
-   *
-   * If the current node is the cluster leader, the cluster membership
-   * configuration may be updated by the leader. In that case, the underlying
-   * replication system will log the configuration change and replicate the
-   * new configuration to the rest of the cluster.
+   * 
+   * If the current node is the cluster leader, the cluster membership configuration may
+   * be updated by the leader. In that case, the underlying replication system will log
+   * the configuration change and replicate the new configuration to the rest of the
+   * cluster.
    */
   private void doClusterBroadcast(final Message<JsonObject> message) {
     if (this.replica.isLeader()) {
@@ -849,46 +847,45 @@ public class VertigoNode extends BusModBase implements StateMachine {
   }
 
   /**
-   * Called when the cluster receives a deploy message.
-   * The cluster leader is the only node that actually handles deployments,
-   * so the message is simply forwarded on to the leader.
+   * Called when the cluster receives a deploy message. The cluster leader is the only
+   * node that actually handles deployments, so the message is simply forwarded on to the
+   * leader.
    */
   private void doClusterDeploy(final Message<JsonObject> message) {
     forwardToLeader(message);
   }
 
   /**
-   * Called when the cluster receives an undeploy message.
-   * The cluster leader is the only node that actually handles deployments,
-   * so the message is simply forwarded on to the leader.
+   * Called when the cluster receives an undeploy message. The cluster leader is the only
+   * node that actually handles deployments, so the message is simply forwarded on to the
+   * leader.
    */
   private void doClusterUndeploy(final Message<JsonObject> message) {
     forwardToLeader(message);
   }
 
   /**
-   * Called when the node receives a deploy message.
-   * The cluster leader is the only node that actually handles deployments,
-   * so the message is simply forwarded on to the leader.
+   * Called when the node receives a deploy message. The cluster leader is the only node
+   * that actually handles deployments, so the message is simply forwarded on to the
+   * leader.
    */
   private void doNodeDeploy(final Message<JsonObject> message) {
     forwardToLeader(message.body().putString("target", nodeAddress), message);
   }
 
   /**
-   * Called when the node receives an undeploy message.
-   * The cluster leader is the only node that actually handles deployments,
-   * so the message is simply forwarded on to the leader.
+   * Called when the node receives an undeploy message. The cluster leader is the only
+   * node that actually handles deployments, so the message is simply forwarded on to the
+   * leader.
    */
   private void doNodeUndeploy(final Message<JsonObject> message) {
     forwardToLeader(message.body().putString("target", nodeAddress), message);
   }
 
   /**
-   * Called when the node receives an internal deploy message.
-   * Internal deploy messages should only ever be sent to the cluster
-   * leader. Thus, if this node is not the leader then simply return
-   * an error.
+   * Called when the node receives an internal deploy message. Internal deploy messages
+   * should only ever be sent to the cluster leader. Thus, if this node is not the leader
+   * then simply return an error.
    */
   private void doInternalDeploy(final Message<JsonObject> message) {
     if (!replica.isLeader()) {
@@ -933,7 +930,8 @@ public class VertigoNode extends BusModBase implements StateMachine {
   /**
    * Deploys instances separately across the cluster.
    */
-  private void doDeployInstances(final int instance, final List<InstanceInfo> instances, final DeploymentInfo deploymentInfo, final Handler<AsyncResult<Void>> doneHandler) {
+  private void doDeployInstances(final int instance, final List<InstanceInfo> instances, final DeploymentInfo deploymentInfo,
+      final Handler<AsyncResult<Void>> doneHandler) {
     // If a deployment target was specified then attempt to assign
     // the deployment to that target. If the target doesn't exist
     // then fail the deployment.
@@ -959,16 +957,19 @@ public class VertigoNode extends BusModBase implements StateMachine {
   /**
    * Deploys instances recursively from a set of nodes.
    */
-  private void doDeployInstances(final Map<String, NodeReference> nodes, final int instance, final List<InstanceInfo> instances, final DeploymentInfo deploymentInfo, final Handler<AsyncResult<Void>> doneHandler) {
+  private void doDeployInstances(final Map<String, NodeReference> nodes, final int instance, final List<InstanceInfo> instances,
+      final DeploymentInfo deploymentInfo, final Handler<AsyncResult<Void>> doneHandler) {
     if (instance < instances.size()) {
       final NodeReference node = pickNode(nodes);
       if (node == null) {
-        new DefaultFutureResult<Void>().setHandler(doneHandler).setFailure(new DeploymentException("Failed to assign deployment to any node."));
+        new DefaultFutureResult<Void>().setHandler(doneHandler).setFailure(
+            new DeploymentException("Failed to assign deployment to any node."));
       }
       else {
         final AssignmentInfo assignment = AssignmentInfo.Builder.newBuilder().setInstance(instances.get(instance)).build();
         try {
-          eb.sendWithTimeout(node.id, new JsonObject(mapper.writeValueAsString(assignment)).putString("action", "assign"), 15000, new Handler<AsyncResult<Message<JsonObject>>>() {
+          eb.sendWithTimeout(node.id, new JsonObject(mapper.writeValueAsString(assignment)).putString("action", "assign"), 15000,
+              new Handler<AsyncResult<Message<JsonObject>>>() {
                 @Override
                 public void handle(AsyncResult<Message<JsonObject>> result) {
                   if (result.failed()) {
@@ -984,7 +985,8 @@ public class VertigoNode extends BusModBase implements StateMachine {
                       doDeployInstances(nodes, instance, instances, deploymentInfo, doneHandler);
                     }
                     else {
-                      new DefaultFutureResult<Void>().setHandler(doneHandler).setFailure(new DeploymentException(result.result().body().getString("message")));
+                      new DefaultFutureResult<Void>().setHandler(doneHandler).setFailure(
+                          new DeploymentException(result.result().body().getString("message")));
                     }
                   }
                   else {
@@ -997,7 +999,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
                             new DefaultFutureResult<Void>().setHandler(doneHandler).setFailure(result.cause());
                           }
                           else {
-                            doDeployInstances(instance+1, instances, deploymentInfo, doneHandler);
+                            doDeployInstances(instance + 1, instances, deploymentInfo, doneHandler);
                           }
                         }
                       });
@@ -1007,7 +1009,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
                     }
                   }
                 }
-          });
+              });
         }
         catch (JsonProcessingException e) {
           new DefaultFutureResult<Void>(e).setHandler(doneHandler);
@@ -1051,21 +1053,22 @@ public class VertigoNode extends BusModBase implements StateMachine {
     else if (info.instance().deployment().type().equals(DeploymentInfo.Type.VERTICLE)) {
       VerticleDeploymentInfo deployment = (VerticleDeploymentInfo) info.instance().deployment();
       if (deployment.isWorker()) {
-        container.deployWorkerVerticle(deployment.main(), deployment.config(), deployment.instances(), deployment.isMultiThreaded(), new Handler<AsyncResult<String>>() {
-          @Override
-          public void handle(AsyncResult<String> result) {
-            if (result.failed()) {
-              sendError(message, result.cause().getMessage());
-            }
-            else {
-              assignments.put(id, new AssignmentInfoInternal(result.result(), AssignmentInfoInternal.VERTICLE));
-              sendOK(message, new JsonObject().putString("id", id));
-            }
-          }
-        });
+        container.deployWorkerVerticle(deployment.main(), deployment.config(), deployment.instances(), deployment.isMultiThreaded(),
+            new Handler<AsyncResult<String>>() {
+              @Override
+              public void handle(AsyncResult<String> result) {
+                if (result.failed()) {
+                  sendError(message, result.cause().getMessage());
+                }
+                else {
+                  assignments.put(id, new AssignmentInfoInternal(result.result(), AssignmentInfoInternal.VERTICLE));
+                  sendOK(message, new JsonObject().putString("id", id));
+                }
+              }
+            });
       }
       else {
-        
+
       }
     }
     else {
@@ -1136,7 +1139,8 @@ public class VertigoNode extends BusModBase implements StateMachine {
   /**
    * Undeploys instances from a set of nodes.
    */
-  private void doUndeployInstances(final String parentID, final Map<String, NodeReference> nodes, final Handler<AsyncResult<Void>> doneHandler) {
+  private void doUndeployInstances(final String parentID, final Map<String, NodeReference> nodes,
+      final Handler<AsyncResult<Void>> doneHandler) {
     final List<NodeReference> nodeList = new ArrayList<>();
     final List<AssignmentInfo> assignmentList = new ArrayList<>();
     for (NodeReference node : nodes.values()) {
@@ -1160,42 +1164,44 @@ public class VertigoNode extends BusModBase implements StateMachine {
   /**
    * Recursively undeploys instances from a list of instances to be undeployed.
    */
-  private void doUndeployInstances(final int current, final List<NodeReference> nodeList, final List<AssignmentInfo> assignmentList, final Throwable t, final Handler<AsyncResult<Void>> doneHandler) {
+  private void doUndeployInstances(final int current, final List<NodeReference> nodeList, final List<AssignmentInfo> assignmentList,
+      final Throwable t, final Handler<AsyncResult<Void>> doneHandler) {
     if (current < nodeList.size()) {
       final NodeReference node = nodeList.get(current);
       final AssignmentInfo assignment = assignmentList.get(current);
-      eb.sendWithTimeout(node.id, new JsonObject().putString("action", "unassign")
-          .putString("id", assignment.instance().id()), 15000, new Handler<AsyncResult<Message<JsonObject>>>() {
+      eb.sendWithTimeout(node.id, new JsonObject().putString("action", "unassign").putString("id", assignment.instance().id()), 15000,
+          new Handler<AsyncResult<Message<JsonObject>>>() {
             @Override
             public void handle(final AsyncResult<Message<JsonObject>> result) {
               NodeInfo nodeInfo = NodeInfo.Builder.newBuilder(node.info).removeAssignment(assignment).build();
               try {
-                replica.submitCommand("updateNode", new JsonObject().putString("id", node.id)
-                    .putString("address", node.address).putString("replica", node.replica)
-                    .putString("action", "unassign").putObject("info", new JsonObject(mapper.writeValueAsString(nodeInfo))),
+                replica.submitCommand("updateNode",
+                    new JsonObject().putString("id", node.id).putString("address", node.address).putString("replica", node.replica)
+                        .putString("action", "unassign").putObject("info", new JsonObject(mapper.writeValueAsString(nodeInfo))),
                     new Handler<AsyncResult<Boolean>>() {
                       @Override
                       public void handle(AsyncResult<Boolean> commandResult) {
                         if (result.failed()) {
-                          doUndeployInstances(current+1, nodeList, assignmentList, t != null ? t : result.cause(), doneHandler);
+                          doUndeployInstances(current + 1, nodeList, assignmentList, t != null ? t : result.cause(), doneHandler);
                         }
                         else if (result.result().body().getString("status").equals("error")) {
-                          doUndeployInstances(current+1, nodeList, assignmentList, t != null ? t : new DeploymentException(result.result().body().getString("message")), doneHandler);
+                          doUndeployInstances(current + 1, nodeList, assignmentList, t != null ? t : new DeploymentException(result
+                              .result().body().getString("message")), doneHandler);
                         }
                         else if (commandResult.failed()) {
-                          doUndeployInstances(current+1, nodeList, assignmentList, t != null ? t : commandResult.cause(), doneHandler);
+                          doUndeployInstances(current + 1, nodeList, assignmentList, t != null ? t : commandResult.cause(), doneHandler);
                         }
                         else {
-                          doUndeployInstances(current+1, nodeList, assignmentList, t, doneHandler);
+                          doUndeployInstances(current + 1, nodeList, assignmentList, t, doneHandler);
                         }
                       }
-                });
+                    });
               }
               catch (JsonProcessingException e) {
-                doUndeployInstances(current+1, nodeList, assignmentList, t != null ? t : e, doneHandler);
+                doUndeployInstances(current + 1, nodeList, assignmentList, t != null ? t : e, doneHandler);
               }
             }
-      });
+          });
     }
     else if (t != null) {
       new DefaultFutureResult<Void>(t).setHandler(doneHandler);
@@ -1248,8 +1254,8 @@ public class VertigoNode extends BusModBase implements StateMachine {
   }
 
   /**
-   * Selects a node from a list of nodes based on the node with the least
-   * current assignments.
+   * Selects a node from a list of nodes based on the node with the least current
+   * assignments.
    */
   private NodeReference pickNode(final Map<String, NodeReference> nodes) {
     String address = null;
@@ -1286,15 +1292,17 @@ public class VertigoNode extends BusModBase implements StateMachine {
   /**
    * Reassigns deployments from a failed node.
    */
-  private void reassignNodeDeployments(final Iterator<AssignmentInfo> iterator, final Throwable t, final Handler<AsyncResult<Void>> doneHandler) {
+  private void reassignNodeDeployments(final Iterator<AssignmentInfo> iterator, final Throwable t,
+      final Handler<AsyncResult<Void>> doneHandler) {
     if (iterator.hasNext()) {
       AssignmentInfo assignmentInfo = iterator.next();
-      doDeployInstances(1, Arrays.asList(new InstanceInfo[]{assignmentInfo.instance()}), assignmentInfo.instance().deployment(), new Handler<AsyncResult<Void>>() {
-        @Override
-        public void handle(AsyncResult<Void> result) {
-          reassignNodeDeployments(iterator, result.failed() ? (t != null ? t : result.cause()) : t, doneHandler);
-        }
-      });
+      doDeployInstances(1, Arrays.asList(new InstanceInfo[] { assignmentInfo.instance() }), assignmentInfo.instance().deployment(),
+          new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> result) {
+              reassignNodeDeployments(iterator, result.failed() ? (t != null ? t : result.cause()) : t, doneHandler);
+            }
+          });
     }
     else {
       new DefaultFutureResult<Void>((Void) null).setHandler(doneHandler);

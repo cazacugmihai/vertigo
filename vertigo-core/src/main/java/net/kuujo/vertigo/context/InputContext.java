@@ -26,7 +26,7 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
 
 /**
  * Component input context.
- *
+ * 
  * @author Jordan Halterman
  */
 public class InputContext implements Context {
@@ -36,20 +36,18 @@ public class InputContext implements Context {
   private int count = 1;
   private String address;
   private Grouping grouping;
-  private @JsonIgnore ComponentContext<?> component;
+  private @JsonIgnore
+  ComponentContext<?> component;
 
   private InputContext() {
   }
 
   /**
    * Creates a new input context from JSON.
-   *
-   * @param context
-   *   A JSON representation of the input context.
-   * @return
-   *   A new input context instance.
-   * @throws MalformedContextException
-   *   If the JSON context is malformed.
+   * 
+   * @param context A JSON representation of the input context.
+   * @return A new input context instance.
+   * @throws MalformedContextException If the JSON context is malformed.
    */
   public static InputContext fromJson(JsonObject context) {
     Serializer serializer = SerializerFactory.getSerializer(InputContext.class);
@@ -60,11 +58,9 @@ public class InputContext implements Context {
 
   /**
    * Serializes an input context to JSON.
-   *
-   * @param context
-   *   The input context to serialize.
-   * @return
-   *   A Json representation of the input context.
+   * 
+   * @param context The input context to serialize.
+   * @return A Json representation of the input context.
    */
   public static JsonObject toJson(InputContext context) {
     Serializer serializer = SerializerFactory.getSerializer(InputContext.class);
@@ -82,9 +78,8 @@ public class InputContext implements Context {
 
   /**
    * Returns the input ID.
-   *
-   * @return
-   *   The unique input identifier.
+   * 
+   * @return The unique input identifier.
    */
   public String id() {
     return id;
@@ -92,9 +87,8 @@ public class InputContext implements Context {
 
   /**
    * Returns the address to which the input subscribes.
-   *
-   * @return
-   *   The input address.
+   * 
+   * @return The input address.
    */
   public String address() {
     return address;
@@ -102,9 +96,8 @@ public class InputContext implements Context {
 
   /**
    * Returns the stream to which the input subscribes.
-   *
-   * @return
-   *   The input stream.
+   * 
+   * @return The input stream.
    */
   public String stream() {
     return stream;
@@ -112,9 +105,8 @@ public class InputContext implements Context {
 
   /**
    * Returns the grouping used to partition input between multiple component instances.
-   *
-   * @return
-   *   The input grouping.
+   * 
+   * @return The input grouping.
    */
   public Grouping grouping() {
     return grouping;
@@ -122,9 +114,8 @@ public class InputContext implements Context {
 
   /**
    * Returns the total number of input partitions.
-   *
-   * @return
-   *   The input count.
+   * 
+   * @return The input count.
    */
   @JsonGetter("count")
   public int count() {
@@ -133,9 +124,8 @@ public class InputContext implements Context {
 
   /**
    * Returns the parent component context.
-   *
-   * @return
-   *   The parent component context.
+   * 
+   * @return The parent component context.
    */
   public ComponentContext<?> componentContext() {
     return component;

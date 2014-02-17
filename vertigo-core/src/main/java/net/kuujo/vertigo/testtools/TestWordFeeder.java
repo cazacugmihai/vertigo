@@ -25,7 +25,7 @@ import net.kuujo.vertigo.java.BasicFeeder;
 
 /**
  * A feeder that feeder "random" test words to a network.
- *
+ * 
  * @author Jordan Halterman
  */
 public class TestWordFeeder extends BasicFeeder {

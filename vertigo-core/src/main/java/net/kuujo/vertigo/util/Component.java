@@ -19,21 +19,19 @@ import org.vertx.java.platform.impl.ModuleIdentifier;
 
 /**
  * Component helper methods.
- *
+ * 
  * @author Jordan Halterman
  */
 public final class Component {
 
   /**
    * Indicates whether the given name is a module name.
-   *
+   * 
    * This validation is performed by using the core Vert.x module name validation
    * contained in the {@link ModuleIdentifier} class.
-   *
-   * @param moduleName
-   *   The name to check.
-   * @return
-   *   Indicates whether the name is a module name.
+   * 
+   * @param moduleName The name to check.
+   * @return Indicates whether the name is a module name.
    */
   public static boolean isModuleName(String moduleName) {
     try {
@@ -47,14 +45,12 @@ public final class Component {
 
   /**
    * Indicates whether the given name is a verticle main.
-   *
+   * 
    * This validation is performed by using the core Vert.x module name validation
    * contained in the {@link ModuleIdentifier} class.
-   *
-   * @param verticleMain
-   *   The name to check.
-   * @return
-   *   Indicates whether the name is a verticle main.
+   * 
+   * @param verticleMain The name to check.
+   * @return Indicates whether the name is a verticle main.
    */
   public static boolean isVerticleMain(String verticleMain) {
     return !isModuleName(verticleMain);

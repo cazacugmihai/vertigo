@@ -19,9 +19,9 @@ import net.kuujo.vertigo.network.Component;
 
 /**
  * Module component context.
- *
+ * 
  * @author Jordan Halterman
- *
+ * 
  * @param <T> The component type
  */
 public class ModuleContext extends ComponentContext<ModuleContext> {
@@ -39,9 +39,8 @@ public class ModuleContext extends ComponentContext<ModuleContext> {
 
   /**
    * Returns the module name.
-   *
-   * @return
-   *   The module name.
+   * 
+   * @return The module name.
    */
   public String module() {
     return module;

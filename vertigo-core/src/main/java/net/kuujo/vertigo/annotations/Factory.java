@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * Denotes a component factory method.
- *
+ * 
  * @author Jordan Halterman
  */
 @Target(ElementType.METHOD)

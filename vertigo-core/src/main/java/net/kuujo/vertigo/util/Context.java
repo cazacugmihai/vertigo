@@ -21,18 +21,16 @@ import net.kuujo.vertigo.context.InstanceContext;
 
 /**
  * Context utilities.
- *
+ * 
  * @author Jordan Halterman
  */
 public final class Context {
 
   /**
    * Parses an instance context from a configuration object.
-   *
-   * @param config
-   *   The Json configuration object.
-   * @return
-   *   An instance context.
+   * 
+   * @param config The Json configuration object.
+   * @return An instance context.
    */
   public static InstanceContext parseContext(JsonObject config) {
     if (config != null && !config.getFieldNames().isEmpty()) {

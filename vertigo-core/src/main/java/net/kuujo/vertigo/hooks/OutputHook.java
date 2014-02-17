@@ -21,44 +21,39 @@ import net.kuujo.vertigo.network.Network;
 
 /**
  * An output hook.
- *
- * This hook type may be added to any {@link OutputCollector} instance
- * either directly via the {@link OutputCollector} interface or via a
- * {@link Network} definition.
- *
+ * 
+ * This hook type may be added to any {@link OutputCollector} instance either directly via
+ * the {@link OutputCollector} interface or via a {@link Network} definition.
+ * 
  * @author Jordan Halterman
  */
 public interface OutputHook extends Hook<OutputCollector> {
 
   /**
    * Called when the output emits a message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleEmit(MessageId messageId);
 
   /**
    * Called when the output receives an ack for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleAcked(MessageId messageId);
 
   /**
    * Called when the output receives a failure for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleFailed(MessageId messageId);
 
   /**
    * Called when the output receives a timeout for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleTimeout(MessageId messageId);
 

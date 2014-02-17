@@ -31,11 +31,12 @@ import net.kuujo.vertigo.context.impl.ContextBuilder;
 import net.kuujo.vertigo.network.Network;
 
 /**
- * A local cluster implementation.<p>
- *
- * The local cluster deploys Vertigo components (modules and verticles) within
- * the local Vert.x instance via the Vert.x {@link Container}.
- *
+ * A local cluster implementation.
+ * <p>
+ * 
+ * The local cluster deploys Vertigo components (modules and verticles) within the local
+ * Vert.x instance via the Vert.x {@link Container}.
+ * 
  * @author Jordan Halterman
  */
 public class LocalCluster extends AbstractCluster {
@@ -57,8 +58,9 @@ public class LocalCluster extends AbstractCluster {
   @Override
   public void deployNetwork(final Network network, final Handler<AsyncResult<NetworkContext>> doneHandler) {
     final NetworkContext context = ContextBuilder.buildContext(network);
-    container.deployVerticle(VertigoNode.class.getName(), new JsonObject().putString("cluster", address)
-        .putString("address", UUID.randomUUID().toString()), new Handler<AsyncResult<String>>() {
+    container.deployVerticle(VertigoNode.class.getName(),
+        new JsonObject().putString("cluster", address).putString("address", UUID.randomUUID().toString()),
+        new Handler<AsyncResult<String>>() {
           @Override
           public void handle(AsyncResult<String> result) {
             if (result.failed()) {
@@ -79,7 +81,7 @@ public class LocalCluster extends AbstractCluster {
               });
             }
           }
-    });
+        });
   }
 
   @Override

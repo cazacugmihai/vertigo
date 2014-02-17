@@ -24,24 +24,26 @@ import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.worker.Worker;
 
 /**
- * A Java worker verticle.<p>
- *
+ * A Java worker verticle.
+ * <p>
+ * 
  * To implement a worker using this class, override the
- * {@link #handleMessage(JsonMessage, Worker)} method. Each time
- * the worker receives a message, this method will be called.<p>
- *
+ * {@link #handleMessage(JsonMessage, Worker)} method. Each time the worker receives a
+ * message, this method will be called.
+ * <p>
+ * 
  * <pre>
  * public class MyWorker extends WorkerVerticle {
  *   protected void handleMessage(JsonMessage message, Worker worker) {
- *     int num1 = message.body().getInteger("num1");
- *     int num2 = message.body().getInteger("num2");
+ *     int num1 = message.body().getInteger(&quot;num1&quot;);
+ *     int num2 = message.body().getInteger(&quot;num2&quot;);
  *     int total = num1 + num2;
- *     worker.emit(new JsonObject().putNumber("total", total), message);
+ *     worker.emit(new JsonObject().putNumber(&quot;total&quot;, total), message);
  *     worker.ack(message);
  *   }
  * }
  * </pre>
- *
+ * 
  * @author Jordan Halterman
  */
 public abstract class BasicWorker extends ComponentVerticle<Worker> {
@@ -66,9 +68,8 @@ public abstract class BasicWorker extends ComponentVerticle<Worker> {
 
   /**
    * Called when a new message is received by the worker.
-   *
-   * @param message
-   *   The message that was received.
+   * 
+   * @param message The message that was received.
    */
   protected abstract void handleMessage(JsonMessage message, Worker worker);
 

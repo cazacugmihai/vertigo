@@ -7,7 +7,7 @@ import net.kuujo.vertigo.cluster.NodeInfo;
 
 /**
  * Default node info implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultNodeInfo implements NodeInfo {

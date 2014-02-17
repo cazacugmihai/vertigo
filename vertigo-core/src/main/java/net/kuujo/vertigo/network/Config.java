@@ -19,7 +19,7 @@ import net.kuujo.vertigo.serializer.Serializable;
 
 /**
  * A base network configuration type.
- *
+ * 
  * @author Jordan Halterman
  */
 public interface Config extends Serializable {

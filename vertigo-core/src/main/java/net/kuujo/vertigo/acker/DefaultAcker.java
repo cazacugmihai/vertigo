@@ -16,7 +16,7 @@ import org.vertx.java.core.json.JsonObject;
 
 /**
  * A remote acker.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultAcker implements Acker {
@@ -110,12 +110,13 @@ public class DefaultAcker implements Acker {
   public Acker create(MessageId messageId) {
     List<MessageId> messageIds = children.remove(messageId.correlationId());
     if (messageIds != null && !messageIds.isEmpty()) {
-      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "create")
-          .putObject("id", messageId.toJson()).putArray("children", messageIdsToArray(messageIds)));
+      eventBus.send(
+          messageId.auditor(),
+          new JsonObject().putString("action", "create").putObject("id", messageId.toJson())
+              .putArray("children", messageIdsToArray(messageIds)));
     }
     else {
-      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "create")
-          .putObject("id", messageId.toJson()));
+      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "create").putObject("id", messageId.toJson()));
     }
     return this;
   }
@@ -136,12 +137,13 @@ public class DefaultAcker implements Acker {
   public Acker ack(MessageId messageId) {
     List<MessageId> messageIds = children.remove(messageId.correlationId());
     if (messageIds != null) {
-      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "ack")
-          .putObject("id", messageId.toJson()).putArray("children", messageIdsToArray(messageIds)));
+      eventBus.send(
+          messageId.auditor(),
+          new JsonObject().putString("action", "ack").putObject("id", messageId.toJson())
+              .putArray("children", messageIdsToArray(messageIds)));
     }
     else {
-      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "ack")
-          .putObject("id", messageId.toJson()));
+      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "ack").putObject("id", messageId.toJson()));
     }
     return this;
   }
@@ -149,8 +151,7 @@ public class DefaultAcker implements Acker {
   @Override
   public Acker fail(MessageId messageId) {
     children.remove(messageId.correlationId());
-    eventBus.send(messageId.auditor(), new JsonObject().putString("action", "fail")
-        .putObject("id", messageId.toJson()));
+    eventBus.send(messageId.auditor(), new JsonObject().putString("action", "fail").putObject("id", messageId.toJson()));
     return this;
   }
 

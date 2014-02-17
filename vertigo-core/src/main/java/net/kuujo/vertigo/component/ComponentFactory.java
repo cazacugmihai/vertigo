@@ -22,38 +22,32 @@ import net.kuujo.vertigo.context.InstanceContext;
 
 /**
  * A component instance factory.
- *
+ * 
  * @author Jordan Halterman
  */
 public interface ComponentFactory {
 
   /**
    * Sets the factory Vertx instance.
-   *
-   * @param vertx
-   *   A Vertx instance.
-   * @return
-   *   The called factory instance.
+   * 
+   * @param vertx A Vertx instance.
+   * @return The called factory instance.
    */
   ComponentFactory setVertx(Vertx vertx);
 
   /**
    * Sets the factory Container instance.
-   *
-   * @param container
-   *   A Vert.x container.
-   * @return
-   *   The called factory instance.
+   * 
+   * @param container A Vert.x container.
+   * @return The called factory instance.
    */
   ComponentFactory setContainer(Container container);
 
   /**
    * Creates a component.
-   *
-   * @param context
-   *   The component context.
-   * @return
-   *   A new component instance.
+   * 
+   * @param context The component context.
+   * @return A new component instance.
    */
   <T extends Component<?>> T createComponent(Class<T> type, InstanceContext context);
 

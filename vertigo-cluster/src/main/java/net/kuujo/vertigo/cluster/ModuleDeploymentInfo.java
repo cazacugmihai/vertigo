@@ -21,17 +21,16 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 /**
  * Module deployment info.
- *
+ * 
  * @author Jordan Halterman
  */
-@JsonSubTypes({@JsonSubTypes.Type(value=DefaultModuleDeploymentInfo.class, name="module")})
+@JsonSubTypes({ @JsonSubTypes.Type(value = DefaultModuleDeploymentInfo.class, name = "module") })
 public interface ModuleDeploymentInfo extends DeploymentInfo {
 
   /**
    * Returns the module name.
-   *
-   * @return
-   *   The module name.
+   * 
+   * @return The module name.
    */
   String module();
 

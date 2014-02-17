@@ -19,7 +19,7 @@ import net.kuujo.vertigo.serializer.Serializable;
 
 /**
  * Base context.
- *
+ * 
  * @author Jordan Halterman
  */
 public interface Context extends Serializable {

@@ -17,10 +17,9 @@ package net.kuujo.vertigo.network;
 
 import net.kuujo.vertigo.VertigoException;
 
-
 /**
  * A malformed definition exception.
- *
+ * 
  * @author Jordan Halterman
  */
 @SuppressWarnings("serial")

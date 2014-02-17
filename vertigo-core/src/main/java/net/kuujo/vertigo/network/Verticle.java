@@ -19,27 +19,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A verticle component.
- *
+ * 
  * @author Jordan Halterman
  */
 public class Verticle extends Component<Verticle> {
 
   /**
-   * <code>main</code> is a string indicating the verticle main. This field is
-   * required for all verticle components.
+   * <code>main</code> is a string indicating the verticle main. This field is required
+   * for all verticle components.
    */
   public static final String VERTICLE_MAIN = "main";
 
   /**
-   * <code>worker</code> is a boolean indicating whether this verticle should be
-   * deployed as a worker verticle. Defaults to <code>false</code>
+   * <code>worker</code> is a boolean indicating whether this verticle should be deployed
+   * as a worker verticle. Defaults to <code>false</code>
    */
   public static final String VERTICLE_IS_WORKER = "worker";
 
   /**
-   * <code>multi-threaded</code> is a boolean indicating whether a worker verticle
-   * is multi-threaded. This option only applies to verticles where <code>worker</code>
-   * is <code>true</code>. Defaults to <code>false</code>
+   * <code>multi-threaded</code> is a boolean indicating whether a worker verticle is
+   * multi-threaded. This option only applies to verticles where <code>worker</code> is
+   * <code>true</code>. Defaults to <code>false</code>
    */
   public static final String VERTICLE_IS_MULTI_THREADED = "multi-threaded";
 
@@ -72,11 +72,9 @@ public class Verticle extends Component<Verticle> {
 
   /**
    * Sets the verticle main.
-   *
-   * @param main
-   *   The verticle main.
-   * @return
-   *   The verticle configuration.
+   * 
+   * @param main The verticle main.
+   * @return The verticle configuration.
    */
   public Verticle setMain(String main) {
     this.main = main;
@@ -85,9 +83,8 @@ public class Verticle extends Component<Verticle> {
 
   /**
    * Gets the verticle main.
-   *
-   * @return
-   *   The verticle main.
+   * 
+   * @return The verticle main.
    */
   public String getMain() {
     return main;
@@ -95,11 +92,9 @@ public class Verticle extends Component<Verticle> {
 
   /**
    * Sets the verticle worker option.
-   *
-   * @param isWorker
-   *   Indicates whether the verticle should be deployed as a worker.
-   * @return
-   *   The verticle configuration.
+   * 
+   * @param isWorker Indicates whether the verticle should be deployed as a worker.
+   * @return The verticle configuration.
    */
   public Verticle setWorker(boolean isWorker) {
     worker = isWorker;
@@ -108,9 +103,8 @@ public class Verticle extends Component<Verticle> {
 
   /**
    * Returns a boolean indicating whether the verticle is a worker.
-   *
-   * @return
-   *   Indicates whether the verticle is a worker.
+   * 
+   * @return Indicates whether the verticle is a worker.
    */
   public boolean isWorker() {
     return worker;
@@ -119,11 +113,9 @@ public class Verticle extends Component<Verticle> {
   /**
    * Sets the verticle multi-threaded option. This option only applies to worker
    * verticles.
-   *
-   * @param isMultiThreaded
-   *   Indicates whether the worker verticle is multi-threaded.
-   * @return
-   *   The verticle configuration.
+   * 
+   * @param isMultiThreaded Indicates whether the worker verticle is multi-threaded.
+   * @return The verticle configuration.
    */
   public Verticle setMultiThreaded(boolean isMultiThreaded) {
     multiThreaded = isMultiThreaded;
@@ -132,10 +124,9 @@ public class Verticle extends Component<Verticle> {
 
   /**
    * Returns a boolean indicating whether the verticle is a worker and is multi-threaded.
-   *
-   * @return
-   *   Indicates whether the verticle is a worker and is multi-threaded. If the
-   *   verticle is not a worker verticle then <code>false</code> will be returned.
+   * 
+   * @return Indicates whether the verticle is a worker and is multi-threaded. If the
+   *         verticle is not a worker verticle then <code>false</code> will be returned.
    */
   public boolean isMultiThreaded() {
     return worker && multiThreaded;

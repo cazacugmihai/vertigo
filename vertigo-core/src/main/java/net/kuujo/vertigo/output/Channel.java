@@ -22,82 +22,70 @@ import net.kuujo.vertigo.message.MessageId;
 
 /**
  * A uni-directional communication channel.
- *
- * A channel represents a set of connections represented by a single output.
- * When a message is emitted from a component, the message is published to all
- * component channels. Within each channel, the channel selects the appropriate
- * {@link Connection} to which to publish the message and validates that the
- * target component is interested in receiving the message.
- *
+ * 
+ * A channel represents a set of connections represented by a single output. When a
+ * message is emitted from a component, the message is published to all component
+ * channels. Within each channel, the channel selects the appropriate {@link Connection}
+ * to which to publish the message and validates that the target component is interested
+ * in receiving the message.
+ * 
  * @author Jordan Halterman
  */
 public interface Channel {
 
   /**
    * Gets the channel identifier.
-   *
-   * @return
-   *   The unique channel identifier.
+   * 
+   * @return The unique channel identifier.
    */
   String id();
 
   /**
    * Sets the target channel connection count.
-   *
-   * @param connectionCount
-   *   The target channel connection count.
-   * @return
-   *   The called channel instance.
+   * 
+   * @param connectionCount The target channel connection count.
+   * @return The called channel instance.
    */
   Channel setConnectionCount(int connectionCount);
 
   /**
    * Adds a connection to the channel.
-   *
-   * @param connection
-   *   The connection to add.
-   * @return
-   *   The called channel instance.
+   * 
+   * @param connection The connection to add.
+   * @return The called channel instance.
    */
   Channel addConnection(Connection connection);
 
   /**
    * Removes a connection from the channel.
-   *
-   * @param connection
-   *   The connection to remove.
-   * @return
-   *   The called channel instance.
+   * 
+   * @param connection The connection to remove.
+   * @return The called channel instance.
    */
   Channel removeConnection(Connection connection);
 
   /**
    * Returns a boolean indicating whether the channel contains a connection by address.
-   *
-   * @param address
-   *   The connection address.
-   * @return
-   *   A boolean indicating whether the channel contains a connection at that address.
+   * 
+   * @param address The connection address.
+   * @return A boolean indicating whether the channel contains a connection at that
+   *         address.
    */
   boolean containsConnection(String address);
 
   /**
    * Returns a connection by address.
-   *
-   * @param address
-   *   The connection address.
-   * @return
-   *   A connection instance or null if the connection doesn't exist.
+   * 
+   * @param address The connection address.
+   * @return A connection instance or null if the connection doesn't exist.
    */
   Connection getConnection(String address);
 
   /**
    * Publishes a message to the channel.
-   *
-   * @param message
-   *   The message to publish to the channel.
-   * @return
-   *   A list of written message identifiers.
+   * 
+   * @param message The message to publish to the channel.
+   * @return A list of written message identifiers.
    */
   List<MessageId> publish(JsonMessage message);
 

@@ -28,7 +28,7 @@ import org.vertx.java.core.json.JsonObject;
 
 /**
  * Observes component message trees and manages ack/fail.
- *
+ * 
  * @author Jordan Halterman
  */
 public final class AuditorVerticle extends BusModBase {
@@ -148,35 +148,29 @@ public final class AuditorVerticle extends BusModBase {
 
   /**
    * Completes processing of a message.
-   *
-   * @param messageId
-   *   The root message ID.
+   * 
+   * @param messageId The root message ID.
    */
   public void complete(MessageId messageId) {
-    eb.send(messageId.owner(), new JsonObject().putString("action", "ack")
-        .putObject("id", messageId.toJson()));
+    eb.send(messageId.owner(), new JsonObject().putString("action", "ack").putObject("id", messageId.toJson()));
   }
 
   /**
    * Fails processing of a message.
-   *
-   * @param messageId
-   *   The root message ID.
+   * 
+   * @param messageId The root message ID.
    */
   public void fail(MessageId messageId) {
-    eb.send(messageId.owner(), new JsonObject().putString("action", "fail")
-        .putObject("id", messageId.toJson()));
+    eb.send(messageId.owner(), new JsonObject().putString("action", "fail").putObject("id", messageId.toJson()));
   }
 
   /**
    * Times out processing of a message.
-   *
-   * @param messageId
-   *   The root message ID.
+   * 
+   * @param messageId The root message ID.
    */
   public void timeout(MessageId messageId) {
-    eb.send(messageId.owner(), new JsonObject().putString("action", "timeout")
-        .putObject("id", messageId.toJson()));
+    eb.send(messageId.owner(), new JsonObject().putString("action", "timeout").putObject("id", messageId.toJson()));
   }
 
   @Override

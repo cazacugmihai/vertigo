@@ -19,7 +19,7 @@ import org.vertx.java.core.VertxException;
 
 /**
  * A base cluster exception.
- *
+ * 
  * @author Jordan Halterman
  */
 @SuppressWarnings("serial")
@@ -38,4 +38,3 @@ public class ClusterException extends VertxException {
   }
 
 }
-

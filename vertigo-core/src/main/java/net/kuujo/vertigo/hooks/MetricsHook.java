@@ -25,19 +25,22 @@ import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.message.MessageId;
 
 /**
- * This hook integrates directly with the mod-metrics module by
- * Tim Yates. To add the hook to a component, simply instantiate
- * the hook with the event bus address of the mod-metrics module.<p>
- *
+ * This hook integrates directly with the mod-metrics module by Tim Yates. To add the hook
+ * to a component, simply instantiate the hook with the event bus address of the
+ * mod-metrics module.
+ * <p>
+ * 
  * <pre>
- * network.addWorker("foo.bar", FooBar.class.getName()).addHook(new MetricsHook("com.bloidonia.metrics"));
+ * network.addWorker(&quot;foo.bar&quot;, FooBar.class.getName()).addHook(new MetricsHook(&quot;com.bloidonia.metrics&quot;));
  * </pre>
- *
+ * 
  * @author Jordan Halterman
  */
 public class MetricsHook implements ComponentHook {
-  @JsonIgnore private InstanceContext context;
-  @JsonIgnore private EventBus eventBus;
+  @JsonIgnore
+  private InstanceContext context;
+  @JsonIgnore
+  private EventBus eventBus;
   private String address;
 
   public MetricsHook() {
@@ -55,56 +58,42 @@ public class MetricsHook implements ComponentHook {
 
   @Override
   public void handleReceive(MessageId messageId) {
-    eventBus.send(address, new JsonObject()
-      .putString("action", "mark")
-      .putString("name", String.format("%s.receive", address)));
+    eventBus.send(address, new JsonObject().putString("action", "mark").putString("name", String.format("%s.receive", address)));
   }
 
   @Override
   public void handleAck(MessageId messageId) {
-    eventBus.send(address, new JsonObject()
-      .putString("action", "mark")
-      .putString("name", String.format("%s.ack", address)));
+    eventBus.send(address, new JsonObject().putString("action", "mark").putString("name", String.format("%s.ack", address)));
   }
 
   @Override
   public void handleFail(MessageId messageId) {
-    eventBus.send(address, new JsonObject()
-      .putString("action", "mark")
-      .putString("name", String.format("%s.fail", address)));
+    eventBus.send(address, new JsonObject().putString("action", "mark").putString("name", String.format("%s.fail", address)));
   }
 
   @Override
   public void handleEmit(MessageId messageId) {
-    eventBus.send(address, new JsonObject()
-      .putString("action", "mark")
-      .putString("name", String.format("%s.emit", address)));
+    eventBus.send(address, new JsonObject().putString("action", "mark").putString("name", String.format("%s.emit", address)));
   }
 
   @Override
   public void handleAcked(MessageId messageId) {
-    eventBus.send(address, new JsonObject()
-      .putString("action", "mark")
-      .putString("name", String.format("%s.acked", address)));
+    eventBus.send(address, new JsonObject().putString("action", "mark").putString("name", String.format("%s.acked", address)));
   }
 
   @Override
   public void handleFailed(MessageId messageId) {
-    eventBus.send(address, new JsonObject()
-      .putString("action", "mark")
-      .putString("name", String.format("%s.failed", address)));
+    eventBus.send(address, new JsonObject().putString("action", "mark").putString("name", String.format("%s.failed", address)));
   }
 
   @Override
   public void handleTimeout(MessageId messageId) {
-    eventBus.send(address, new JsonObject()
-      .putString("action", "mark")
-      .putString("name", String.format("%s.timeout", address)));
+    eventBus.send(address, new JsonObject().putString("action", "mark").putString("name", String.format("%s.timeout", address)));
   }
 
   @Override
   public void handleStop(Component<?> component) {
-    
+
   }
 
 }

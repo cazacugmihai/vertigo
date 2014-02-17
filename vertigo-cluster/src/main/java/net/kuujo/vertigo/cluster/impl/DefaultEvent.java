@@ -22,7 +22,7 @@ import net.kuujo.vertigo.cluster.Event;
 
 /**
  * A default event implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultEvent implements Event {

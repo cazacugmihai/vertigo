@@ -30,12 +30,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A deployable (verticle/module) hook.
- *
+ * 
  * @author Jordan Halterman
  */
 abstract class DeployableHook implements ComponentHook {
   protected String address;
-  protected @JsonIgnore EventBus eventBus;
+  protected @JsonIgnore
+  EventBus eventBus;
 
   /**
    * Deploys the deployable.

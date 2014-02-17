@@ -30,20 +30,21 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * A module hook.
- *
- * The module hook can be used to deploy a module along side each component
- * instance to which the hook hooks. The deployed hook module will receive
- * notifications via the event bus. Hook module implementations should
- * extend the abstract {@link HookVerticle} class.
- *
+ * 
+ * The module hook can be used to deploy a module along side each component instance to
+ * which the hook hooks. The deployed hook module will receive notifications via the event
+ * bus. Hook module implementations should extend the abstract {@link HookVerticle} class.
+ * 
  * @author Jordan Halterman
  */
 public class ModuleHook extends DeployableHook {
   private String module;
   private JsonObject config;
   private int instances = 1;
-  @JsonIgnore private String deploymentId;
-  @JsonIgnore private String address = UUID.randomUUID().toString();
+  @JsonIgnore
+  private String deploymentId;
+  @JsonIgnore
+  private String address = UUID.randomUUID().toString();
 
   public ModuleHook() {
   }
@@ -81,19 +82,19 @@ public class ModuleHook extends DeployableHook {
   @Override
   protected void deploy(Container container, Handler<AsyncResult<Void>> doneHandler) {
     final Future<Void> future = new DefaultFutureResult<Void>().setHandler(doneHandler);
-    container.deployModule(module, new JsonObject().putString("address", address)
-        .putObject("config", config), instances, new Handler<AsyncResult<String>>() {
-      @Override
-      public void handle(AsyncResult<String> result) {
-        if (result.succeeded()) {
-          deploymentId = result.result();
-          future.setResult(null);
-        }
-        else {
-          future.setFailure(result.cause());
-        }
-      }
-    });
+    container.deployModule(module, new JsonObject().putString("address", address).putObject("config", config), instances,
+        new Handler<AsyncResult<String>>() {
+          @Override
+          public void handle(AsyncResult<String> result) {
+            if (result.succeeded()) {
+              deploymentId = result.result();
+              future.setResult(null);
+            }
+            else {
+              future.setFailure(result.cause());
+            }
+          }
+        });
   }
 
   @Override
@@ -104,7 +105,10 @@ public class ModuleHook extends DeployableHook {
         @Override
         public void handle(AsyncResult<Void> result) {
           deploymentId = null;
-          if (result.succeeded()) future.setResult(null); else future.setFailure(result.cause());
+          if (result.succeeded())
+            future.setResult(null);
+          else
+            future.setFailure(result.cause());
         }
       });
     }

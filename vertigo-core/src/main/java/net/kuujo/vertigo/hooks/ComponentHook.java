@@ -21,68 +21,60 @@ import net.kuujo.vertigo.network.Network;
 
 /**
  * A component hook.
- *
- * This hook type may be added to any {@link Component} instance either
- * directly via the {@link Component} interface or externally via the
- * {@link Network} definition.
- *
+ * 
+ * This hook type may be added to any {@link Component} instance either directly via the
+ * {@link Component} interface or externally via the {@link Network} definition.
+ * 
  * @author Jordan Halterman
  */
 public interface ComponentHook extends Hook<Component<?>> {
 
   /**
    * Called when the component receives an input message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleReceive(MessageId messageId);
 
   /**
    * Called when the component acks a received message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleAck(MessageId messageId);
 
   /**
    * Called when the component fails a received message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleFail(MessageId messageId);
 
   /**
    * Called when the component emits a message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleEmit(MessageId messageId);
 
   /**
    * Called when the component receives an ack for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleAcked(MessageId messageId);
 
   /**
    * Called when the component receives a failure for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleFailed(MessageId messageId);
 
   /**
    * Called when the component receives a timeout for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   void handleTimeout(MessageId messageId);
 

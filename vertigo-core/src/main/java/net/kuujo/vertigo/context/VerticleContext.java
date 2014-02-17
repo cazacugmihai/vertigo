@@ -21,9 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Verticle component context.
- *
+ * 
  * @author Jordan Halterman
- *
+ * 
  * @param <T> The component type
  */
 public class VerticleContext extends ComponentContext<VerticleContext> {
@@ -44,9 +44,8 @@ public class VerticleContext extends ComponentContext<VerticleContext> {
 
   /**
    * Returns the verticle main.
-   *
-   * @return
-   *   The verticle main.
+   * 
+   * @return The verticle main.
    */
   public String main() {
     return main;
@@ -54,9 +53,8 @@ public class VerticleContext extends ComponentContext<VerticleContext> {
 
   /**
    * Returns a boolean indicating whether the verticle is a worker verticle.
-   *
-   * @return
-   *   Indicates whether the verticle is a worker verticle.
+   * 
+   * @return Indicates whether the verticle is a worker verticle.
    */
   public boolean isWorker() {
     return worker;
@@ -65,9 +63,8 @@ public class VerticleContext extends ComponentContext<VerticleContext> {
   /**
    * Returns a boolean indicating whether the verticle is a worker and is multi-threaded.
    * If the verticle is not a worker then <code>false</code> will be returned.
-   *
-   * @return
-   *   Indicates whether the verticle is a worker and is multi-threaded.
+   * 
+   * @return Indicates whether the verticle is a worker and is multi-threaded.
    */
   public boolean isMultiThreaded() {
     return isWorker() && multiThreaded;

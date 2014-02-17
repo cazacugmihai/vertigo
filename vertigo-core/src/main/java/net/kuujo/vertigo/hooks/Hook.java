@@ -25,35 +25,33 @@ import net.kuujo.vertigo.network.Network;
 
 /**
  * A base hook.
- *
- * Hooks may be used to receive notification of certain events that occur
- * within various Vertigo objects.
- *
- * This hook receives notifications of when a Vertigo object starts or
- * stops, such as an {@link InputCollector}, {@link OutputCollector},
- * or a {@link Component} instance. Hooks can be added either directly
- * on the relevant object or added externally via a {@link Network} definition.
- *
+ * 
+ * Hooks may be used to receive notification of certain events that occur within various
+ * Vertigo objects.
+ * 
+ * This hook receives notifications of when a Vertigo object starts or stops, such as an
+ * {@link InputCollector}, {@link OutputCollector}, or a {@link Component} instance. Hooks
+ * can be added either directly on the relevant object or added externally via a
+ * {@link Network} definition.
+ * 
  * @author Jordan Halterman
- *
+ * 
  * @param <T> The hook subject
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public interface Hook<T> extends Serializable {
 
   /**
    * Called when the hook subject has started.
-   *
-   * @param subject
-   *   The hook subject.
+   * 
+   * @param subject The hook subject.
    */
   void handleStart(T subject);
 
   /**
    * Called when the hook subject has stopped.
-   *
-   * @param subject
-   *   The hook subject.
+   * 
+   * @param subject The hook subject.
    */
   void handleStop(T subject);
 

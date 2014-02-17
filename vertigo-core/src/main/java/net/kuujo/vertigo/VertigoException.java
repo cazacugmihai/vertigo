@@ -18,8 +18,8 @@ package net.kuujo.vertigo;
 import org.vertx.java.core.VertxException;
 
 /**
- * A base Vert.igo exception.
- *
+ * A base Vertigo exception.
+ * 
  * @author Jordan Halterman
  */
 @SuppressWarnings("serial")

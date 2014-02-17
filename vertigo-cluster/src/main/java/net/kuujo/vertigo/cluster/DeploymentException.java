@@ -17,7 +17,7 @@ package net.kuujo.vertigo.cluster;
 
 /**
  * A deployment exception.
- *
+ * 
  * @author Jordan Halterman
  */
 @SuppressWarnings("serial")
@@ -36,4 +36,3 @@ public class DeploymentException extends ClusterException {
   }
 
 }
-

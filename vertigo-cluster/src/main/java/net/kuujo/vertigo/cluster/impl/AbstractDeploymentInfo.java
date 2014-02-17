@@ -24,7 +24,7 @@ import net.kuujo.vertigo.cluster.DeploymentInfo;
 
 /**
  * An abstract deployment info implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public abstract class AbstractDeploymentInfo implements DeploymentInfo {

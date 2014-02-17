@@ -17,7 +17,7 @@ package net.kuujo.vertigo.serializer;
 
 /**
  * A serialization exception.
- *
+ * 
  * @author Jordan Halterman
  */
 @SuppressWarnings("serial")

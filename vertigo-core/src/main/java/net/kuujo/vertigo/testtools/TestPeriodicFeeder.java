@@ -26,7 +26,7 @@ import net.kuujo.vertigo.java.BasicFeeder;
 
 /**
  * A feeder that periodically feeds a network with randomly generated field values.
- *
+ * 
  * @author Jordan Halterman
  */
 public class TestPeriodicFeeder extends BasicFeeder {

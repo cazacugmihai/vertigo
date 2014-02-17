@@ -16,10 +16,11 @@
 package net.kuujo.vertigo.serializer;
 
 /**
- * A deserialization exception.<p>
- *
+ * A deserialization exception.
+ * <p>
+ * 
  * This exception is thrown when an error occurs in deserialization.
- *
+ * 
  * @author Jordan Halterman
  */
 @SuppressWarnings("serial")

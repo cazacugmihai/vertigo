@@ -26,19 +26,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * An event bus publishing hook.
- *
- * This hook publishes events to the event bus. Messages are published using the
- * string format "vertigo.hooks.%s" where the string argument is the full
- * component address. If the method argument is a component, the component
- * context will be provided. If the method argument is a string ID, the ID
- * will be provided.
- *
+ * 
+ * This hook publishes events to the event bus. Messages are published using the string
+ * format "vertigo.hooks.%s" where the string argument is the full component address. If
+ * the method argument is a component, the component context will be provided. If the
+ * method argument is a string ID, the ID will be provided.
+ * 
  * @author Jordan Halterman
  */
 public class EventBusHook implements ComponentHook {
-  @JsonIgnore private InstanceContext context;
-  @JsonIgnore private EventBus eventBus;
-  @JsonIgnore private String address;
+  @JsonIgnore
+  private InstanceContext context;
+  @JsonIgnore
+  private EventBus eventBus;
+  @JsonIgnore
+  private String address;
 
   @Override
   public void handleStart(Component<?> component) {

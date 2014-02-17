@@ -45,7 +45,7 @@ import net.kuujo.vertigo.cluster.NodeInfo;
 
 /**
  * A default cluster manager implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultClusterManager implements ClusterManager {
@@ -92,56 +92,50 @@ public class DefaultClusterManager implements ClusterManager {
 
   @Override
   public ClusterManager set(String key, Object value, long expire, Handler<AsyncResult<Void>> doneHandler) {
-    JsonObject message = new JsonObject()
-      .putString("action", "set")
-      .putString("key", key)
-      .putValue("vaule", value)
-      .putNumber("expire", expire);
+    JsonObject message = new JsonObject().putString("action", "set").putString("key", key).putValue("vaule", value)
+        .putNumber("expire", expire);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncVoidHandler(doneHandler));
     return this;
   }
 
   @Override
   public <T> ClusterManager get(String key, Handler<AsyncResult<T>> resultHandler) {
-    JsonObject message = new JsonObject()
-      .putString("action", "get")
-      .putString("key", key);
+    JsonObject message = new JsonObject().putString("action", "get").putString("key", key);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncValueHandler(resultHandler));
     return this;
   }
 
   @Override
   public ClusterManager exists(String key, Handler<AsyncResult<Boolean>> resultHandler) {
-    JsonObject message = new JsonObject()
-      .putString("action", "exists")
-      .putString("key", key);
+    JsonObject message = new JsonObject().putString("action", "exists").putString("key", key);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncValueHandler(resultHandler));
     return this;
   }
 
   @Override
   public ClusterManager keys(final Handler<AsyncResult<Collection<String>>> resultHandler) {
-    vertx.eventBus().sendWithTimeout(address, new JsonObject().putString("action", "keys"),
-        DEFAULT_TIMEOUT, new Handler<AsyncResult<Message<JsonObject>>>() {
-      @Override
-      public void handle(AsyncResult<Message<JsonObject>> result) {
-        if (result.failed()) {
-          new DefaultFutureResult<Collection<String>>(result.cause()).setHandler(resultHandler);
-        }
-        else {
-          JsonObject body = result.result().body();
-          if (body.getString("status").equals("error")) {
-            new DefaultFutureResult<Collection<String>>(new ClusterException(body.getString("message"))).setHandler(resultHandler);
-          }
-          else {
-            JsonArray jsonKeys = body.getArray("keys");
-            if (jsonKeys != null) {
-              new DefaultFutureResult<Collection<String>>(Arrays.<String>asList((String[]) jsonKeys.toArray())).setHandler(resultHandler);
+    vertx.eventBus().sendWithTimeout(address, new JsonObject().putString("action", "keys"), DEFAULT_TIMEOUT,
+        new Handler<AsyncResult<Message<JsonObject>>>() {
+          @Override
+          public void handle(AsyncResult<Message<JsonObject>> result) {
+            if (result.failed()) {
+              new DefaultFutureResult<Collection<String>>(result.cause()).setHandler(resultHandler);
+            }
+            else {
+              JsonObject body = result.result().body();
+              if (body.getString("status").equals("error")) {
+                new DefaultFutureResult<Collection<String>>(new ClusterException(body.getString("message"))).setHandler(resultHandler);
+              }
+              else {
+                JsonArray jsonKeys = body.getArray("keys");
+                if (jsonKeys != null) {
+                  new DefaultFutureResult<Collection<String>>(Arrays.<String> asList((String[]) jsonKeys.toArray()))
+                      .setHandler(resultHandler);
+                }
+              }
             }
           }
-        }
-      }
-    });
+        });
     return this;
   }
 
@@ -152,10 +146,7 @@ public class DefaultClusterManager implements ClusterManager {
 
   @Override
   public ClusterManager timeout(String key, long timeout, Handler<AsyncResult<Void>> doneHandler) {
-    JsonObject message = new JsonObject()
-      .putString("action", "timeout")
-      .putString("key", key)
-      .putNumber("timeout", timeout);
+    JsonObject message = new JsonObject().putString("action", "timeout").putString("key", key).putNumber("timeout", timeout);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncVoidHandler(doneHandler));
     return this;
   }
@@ -167,9 +158,7 @@ public class DefaultClusterManager implements ClusterManager {
 
   @Override
   public ClusterManager reset(String key, Handler<AsyncResult<Void>> doneHandler) {
-    JsonObject message = new JsonObject()
-      .putString("action", "reset")
-      .putString("key", key);
+    JsonObject message = new JsonObject().putString("action", "reset").putString("key", key);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncVoidHandler(doneHandler));
     return this;
   }
@@ -221,11 +210,8 @@ public class DefaultClusterManager implements ClusterManager {
             watchHandlers.put(key, handlers);
           }
           handlers.put(handler, wrapper);
-          JsonObject message = new JsonObject()
-            .putString("action", "watch")
-            .putString("key", key)
-            .putString("event", event != null ? event.toString() : null)
-            .putString("address", id);
+          JsonObject message = new JsonObject().putString("action", "watch").putString("key", key)
+              .putString("event", event != null ? event.toString() : null).putString("address", id);
           vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, new Handler<AsyncResult<Message<JsonObject>>>() {
             @Override
             public void handle(AsyncResult<Message<JsonObject>> result) {
@@ -269,18 +255,16 @@ public class DefaultClusterManager implements ClusterManager {
   }
 
   @Override
-  public ClusterManager unwatch(final String key, final Type event, final Handler<Event> handler, final Handler<AsyncResult<Void>> doneHandler) {
+  public ClusterManager unwatch(final String key, final Type event, final Handler<Event> handler,
+      final Handler<AsyncResult<Void>> doneHandler) {
     final Map<Handler<Event>, HandlerWrapper> handlers = watchHandlers.get(key);
     if (!handlers.containsKey(handler)) {
       new DefaultFutureResult<Void>((Void) null).setHandler(doneHandler);
       return this;
     }
 
-    JsonObject message = new JsonObject()
-      .putString("action", "unwatch")
-      .putString("key", key)
-      .putString("event", event != null ? event.toString() : null)
-      .putString("address", handlers.get(handler).address);
+    JsonObject message = new JsonObject().putString("action", "unwatch").putString("key", key)
+        .putString("event", event != null ? event.toString() : null).putString("address", handlers.get(handler).address);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, new Handler<AsyncResult<Message<JsonObject>>>() {
       @Override
       public void handle(AsyncResult<Message<JsonObject>> result) {
@@ -465,7 +449,8 @@ public class DefaultClusterManager implements ClusterManager {
   @Override
   public ClusterManager deployModuleTo(String address, String deploymentID, String moduleName, JsonObject config, int instances,
       Handler<AsyncResult<String>> doneHandler) {
-    return doDeploy(new HashSet<String>(Arrays.asList(new String[]{address})), "module", deploymentID, moduleName, config, instances, false, false, doneHandler);
+    return doDeploy(new HashSet<String>(Arrays.asList(new String[] { address })), "module", deploymentID, moduleName, config, instances,
+        false, false, doneHandler);
   }
 
   @Override
@@ -532,7 +517,8 @@ public class DefaultClusterManager implements ClusterManager {
   @Override
   public ClusterManager deployVerticleTo(String address, String deploymentID, String main, JsonObject config, int instances,
       Handler<AsyncResult<String>> doneHandler) {
-    return doDeploy(new HashSet<String>(Arrays.asList(new String[]{address})), "verticle", deploymentID, main, config, instances, false, false, doneHandler);
+    return doDeploy(new HashSet<String>(Arrays.asList(new String[] { address })), "verticle", deploymentID, main, config, instances, false,
+        false, doneHandler);
   }
 
   @Override
@@ -647,7 +633,8 @@ public class DefaultClusterManager implements ClusterManager {
   @Override
   public ClusterManager deployWorkerVerticleTo(String address, String deploymentID, String main, JsonObject config, int instances,
       boolean multiThreaded, Handler<AsyncResult<String>> doneHandler) {
-    return doDeploy(new HashSet<String>(Arrays.asList(new String[]{address})), "verticle", deploymentID, main, config, instances, true, multiThreaded, doneHandler);
+    return doDeploy(new HashSet<String>(Arrays.asList(new String[] { address })), "verticle", deploymentID, main, config, instances, true,
+        multiThreaded, doneHandler);
   }
 
   @Override
@@ -697,17 +684,13 @@ public class DefaultClusterManager implements ClusterManager {
     return doDeploy(nodes, "verticle", deploymentID, main, config, instances, true, multiThreaded, doneHandler);
   }
 
-  private ClusterManager doDeploy(Set<String> targets, String type, String deploymentID, String main, JsonObject config, int instances, boolean worker, boolean multiThreaded, Handler<AsyncResult<String>> doneHandler) {
-    JsonObject message = new JsonObject()
-      .putString("action", "deploy")
-      .putArray("targets", targets != null ? new JsonArray(targets.toArray(new String[targets.size()])) : new JsonArray())
-      .putString("id", deploymentID)
-      .putString("type", type)
-      .putString(type.equals("module") ? "module" : "main", main)
-      .putObject("config", config)
-      .putNumber("instances", instances)
-      .putBoolean("worker", worker)
-      .putBoolean("multi-threaded", multiThreaded);
+  private ClusterManager doDeploy(Set<String> targets, String type, String deploymentID, String main, JsonObject config, int instances,
+      boolean worker, boolean multiThreaded, Handler<AsyncResult<String>> doneHandler) {
+    JsonObject message = new JsonObject().putString("action", "deploy")
+        .putArray("targets", targets != null ? new JsonArray(targets.toArray(new String[targets.size()])) : new JsonArray())
+        .putString("id", deploymentID).putString("type", type).putString(type.equals("module") ? "module" : "main", main)
+        .putObject("config", config).putNumber("instances", instances).putBoolean("worker", worker)
+        .putBoolean("multi-threaded", multiThreaded);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncValueHandler(doneHandler));
     return this;
   }
@@ -719,7 +702,7 @@ public class DefaultClusterManager implements ClusterManager {
 
   @Override
   public ClusterManager undeployModuleFrom(String address, String deploymentID, Handler<AsyncResult<Void>> doneHandler) {
-    return doUndeploy(new HashSet<String>(Arrays.asList(new String[]{address})), "module", deploymentID, doneHandler);
+    return doUndeploy(new HashSet<String>(Arrays.asList(new String[] { address })), "module", deploymentID, doneHandler);
   }
 
   @Override
@@ -734,7 +717,7 @@ public class DefaultClusterManager implements ClusterManager {
 
   @Override
   public ClusterManager undeployVerticleFrom(String address, String deploymentID, Handler<AsyncResult<Void>> doneHandler) {
-    return doUndeploy(new HashSet<String>(Arrays.asList(new String[]{address})), "verticle", deploymentID, doneHandler);
+    return doUndeploy(new HashSet<String>(Arrays.asList(new String[] { address })), "verticle", deploymentID, doneHandler);
   }
 
   @Override
@@ -743,11 +726,8 @@ public class DefaultClusterManager implements ClusterManager {
   }
 
   private ClusterManager doUndeploy(Set<String> targets, String type, String deploymentID, Handler<AsyncResult<Void>> doneHandler) {
-    JsonObject message = new JsonObject()
-      .putString("action", "undeploy")
-      .putString("type", type)
-      .putString("id", deploymentID)
-      .putArray("targets", targets != null ? new JsonArray(targets.toArray(new String[targets.size()])) : new JsonArray());
+    JsonObject message = new JsonObject().putString("action", "undeploy").putString("type", type).putString("id", deploymentID)
+        .putArray("targets", targets != null ? new JsonArray(targets.toArray(new String[targets.size()])) : new JsonArray());
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncVoidHandler(doneHandler));
     return this;
   }

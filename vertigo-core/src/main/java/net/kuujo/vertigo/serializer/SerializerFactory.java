@@ -21,22 +21,24 @@ import java.util.Map;
 import net.kuujo.vertigo.serializer.impl.DefaultSerializerFactory;
 
 /**
- * Json serializer factory.<p>
- *
- * This class is the primary interface to object serialization in Vertigo. Use
- * this class to load type-specific serializers as follows:<p>
- *
+ * Json serializer factory.
+ * <p>
+ * 
+ * This class is the primary interface to object serialization in Vertigo. Use this class
+ * to load type-specific serializers as follows:
+ * <p>
+ * 
  * <pre>
  * JsonObject json = SerializerFactory.getSerializer(MyClass.class).serialize(myClassObj);
  * </pre>
  * <p>
- *
- * In order to serialize an object with the default serializer, classes must
- * implement the {@link Serializable} interface. In most cases, the default serializer
- * will automatically serialize all primitives, collections, and {@link Serializable}
- * properties within the serializable object. For more advanced serialization, look
- * at the Jackson annotations documentation.
- *
+ * 
+ * In order to serialize an object with the default serializer, classes must implement the
+ * {@link Serializable} interface. In most cases, the default serializer will
+ * automatically serialize all primitives, collections, and {@link Serializable}
+ * properties within the serializable object. For more advanced serialization, look at the
+ * Jackson annotations documentation.
+ * 
  * @author Jordan Halterman
  */
 public abstract class SerializerFactory {
@@ -47,9 +49,8 @@ public abstract class SerializerFactory {
 
   /**
    * Gets a singleton serializer factory instance.
-   *
-   * @return
-   *   The current serializer factory instance.
+   * 
+   * @return The current serializer factory instance.
    */
   private static SerializerFactory getInstance() {
     if (instance == null) {
@@ -57,7 +58,8 @@ public abstract class SerializerFactory {
       try {
         className = System.getProperty(SERIALIZER_FACTORY_CLASS_NAME);
       }
-      catch (Exception e) {}
+      catch (Exception e) {
+      }
 
       if (className != null) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -78,11 +80,9 @@ public abstract class SerializerFactory {
 
   /**
    * Gets a serializer instance.
-   *
-   * @param type
-   *   The serializer type.
-   * @return
-   *   A serializer instance.
+   * 
+   * @param type The serializer type.
+   * @return A serializer instance.
    */
   public static Serializer getSerializer(Class<?> type) {
     Class<?> serializable = findSerializableType(type);
@@ -116,8 +116,8 @@ public abstract class SerializerFactory {
 
   /**
    * Recursively iterates over the interface hierarchy to find the base serializable
-   * interface. This is the interface that initially extends the Serializable
-   * interface and it used to group serializers together.
+   * interface. This is the interface that initially extends the Serializable interface
+   * and it used to group serializers together.
    */
   private static Class<?> findSerializableInterface(Class<?> type) {
     Class<?>[] interfaces = type.getInterfaces();
@@ -141,11 +141,9 @@ public abstract class SerializerFactory {
 
   /**
    * Creates a new serializer instance.
-   *
-   * @param type
-   *   The serializer class.
-   * @return
-   *   A new serializer instance.
+   * 
+   * @param type The serializer class.
+   * @return A new serializer instance.
    */
   public abstract Serializer createSerializer(Class<?> clazz);
 

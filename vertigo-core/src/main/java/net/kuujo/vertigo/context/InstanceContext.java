@@ -24,28 +24,26 @@ import org.vertx.java.core.json.JsonObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * A component instance context which contains information regarding
- * a specific component (module or verticle) instance within a network.
- *
+ * A component instance context which contains information regarding a specific component
+ * (module or verticle) instance within a network.
+ * 
  * @author Jordan Halterman
  */
 public final class InstanceContext implements Serializable {
   private String id;
   private int number;
-  private @JsonIgnore ComponentContext<?> component;
+  private @JsonIgnore
+  ComponentContext<?> component;
 
   private InstanceContext() {
   }
 
   /**
    * Creates a new instance context from JSON.
-   *
-   * @param context
-   *   A JSON representation of the instance context.
-   * @return
-   *   A new instance context instance.
-   * @throws MalformedContextException
-   *   If the JSON context is malformed.
+   * 
+   * @param context A JSON representation of the instance context.
+   * @return A new instance context instance.
+   * @throws MalformedContextException If the JSON context is malformed.
    */
   public static InstanceContext fromJson(JsonObject context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
@@ -56,16 +54,14 @@ public final class InstanceContext implements Serializable {
 
   /**
    * Serializes an instance context to JSON.
-   *
-   * @param context
-   *   The instance context to serialize.
-   * @return
-   *   A Json representation of the instance context.
+   * 
+   * @param context The instance context to serialize.
+   * @return A Json representation of the instance context.
    */
   public static JsonObject toJson(InstanceContext context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
-    JsonObject json = ComponentContext.toJson(context.componentContext().isModule() ?
-        context.<ModuleContext>componentContext() : context.<VerticleContext>componentContext());
+    JsonObject json = ComponentContext.toJson(context.componentContext().isModule() ? context.<ModuleContext> componentContext() : context
+        .<VerticleContext> componentContext());
     return json.putObject("instance", serializer.serialize(context));
   }
 
@@ -79,9 +75,8 @@ public final class InstanceContext implements Serializable {
 
   /**
    * Returns the instance ID.
-   *
-   * @return
-   *   The instance ID.
+   * 
+   * @return The instance ID.
    */
   public String id() {
     return id;
@@ -89,9 +84,8 @@ public final class InstanceContext implements Serializable {
 
   /**
    * Returns the instance number.
-   *
-   * @return
-   *   The instance number.
+   * 
+   * @return The instance number.
    */
   public int number() {
     return number;
@@ -99,9 +93,8 @@ public final class InstanceContext implements Serializable {
 
   /**
    * Returns the instance address.
-   *
-   * @return
-   *   The unique instance address.
+   * 
+   * @return The unique instance address.
    */
   public String address() {
     return String.format("%s-%d", componentContext().address(), number());
@@ -109,11 +102,10 @@ public final class InstanceContext implements Serializable {
 
   /**
    * Returns the parent component context.
-   *
-   * @return
-   *   The parent component context.
+   * 
+   * @return The parent component context.
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends ComponentContext> T componentContext() {
     return (T) component;
   }

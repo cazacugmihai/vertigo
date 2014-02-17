@@ -28,7 +28,7 @@ import static org.vertx.testtools.VertxAssert.testComplete;
 
 /**
  * A test feeder that checks that a message was failed.
- *
+ * 
  * @author Jordan Halterman
  */
 public class TestFailingFeeder extends BasicFeeder {

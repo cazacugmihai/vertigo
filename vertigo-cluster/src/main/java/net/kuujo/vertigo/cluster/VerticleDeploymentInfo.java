@@ -21,33 +21,30 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 /**
  * Verticle deployment info.
- *
+ * 
  * @author Jordan Halterman
  */
-@JsonSubTypes({@JsonSubTypes.Type(value=DefaultVerticleDeploymentInfo.class, name="verticle")})
+@JsonSubTypes({ @JsonSubTypes.Type(value = DefaultVerticleDeploymentInfo.class, name = "verticle") })
 public interface VerticleDeploymentInfo extends DeploymentInfo {
 
   /**
    * Returns the verticle main.
-   *
-   * @return
-   *   The verticle main.
+   * 
+   * @return The verticle main.
    */
   String main();
 
   /**
    * Returns a boolean indicating whether the verticle is a worker.
-   *
-   * @return
-   *   Indicates whether the verticle is a worker.
+   * 
+   * @return Indicates whether the verticle is a worker.
    */
   boolean isWorker();
 
   /**
    * Returns a boolean indicating whether the verticle is a worker and is multi-threaded.
-   *
-   * @return
-   *   Indicates whether the verticle is a worker and is multi-threaded.
+   * 
+   * @return Indicates whether the verticle is a worker and is multi-threaded.
    */
   boolean isMultiThreaded();
 

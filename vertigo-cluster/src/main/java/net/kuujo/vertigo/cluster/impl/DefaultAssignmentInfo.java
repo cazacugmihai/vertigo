@@ -20,7 +20,7 @@ import net.kuujo.vertigo.cluster.InstanceInfo;
 
 /**
  * Default assignment info implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultAssignmentInfo implements AssignmentInfo {

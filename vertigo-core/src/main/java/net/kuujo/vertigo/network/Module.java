@@ -19,14 +19,14 @@ import static net.kuujo.vertigo.util.Component.isModuleName;
 
 /**
  * A module component.
- *
+ * 
  * @author Jordan Halterman
  */
 public class Module extends Component<Module> {
 
   /**
-   * <code>module</code> is a string indicating the module name. This field is
-   * required for all module components.
+   * <code>module</code> is a string indicating the module name. This field is required
+   * for all module components.
    */
   public static final String MODULE_NAME = "module";
 
@@ -56,13 +56,10 @@ public class Module extends Component<Module> {
 
   /**
    * Sets the module name.
-   *
-   * @param moduleName
-   *   The module name.
-   * @return
-   *   The module configuration.
-   * @throws IllegalArgumentException
-   *   If the module name is not a valid module identifier.
+   * 
+   * @param moduleName The module name.
+   * @return The module configuration.
+   * @throws IllegalArgumentException If the module name is not a valid module identifier.
    */
   public Module setModule(String moduleName) {
     if (!isModuleName(moduleName)) {
@@ -74,9 +71,8 @@ public class Module extends Component<Module> {
 
   /**
    * Gets the module name.
-   *
-   * @return
-   *   The module name.
+   * 
+   * @return The module name.
    */
   public String getModule() {
     return module;

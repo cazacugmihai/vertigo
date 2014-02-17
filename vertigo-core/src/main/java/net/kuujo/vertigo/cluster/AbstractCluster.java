@@ -38,7 +38,7 @@ import org.vertx.java.platform.Verticle;
 
 /**
  * An abstract cluster.
- *
+ * 
  * @author Jordan Halterman
  */
 abstract class AbstractCluster implements Cluster {
@@ -107,7 +107,8 @@ abstract class AbstractCluster implements Cluster {
   /**
    * Deploys all network auditors.
    */
-  private void doDeployAuditors(final String network, final Collection<String> auditors, final long messageTimeout, final Handler<AsyncResult<Void>> doneHandler) {
+  private void doDeployAuditors(final String network, final Collection<String> auditors, final long messageTimeout,
+      final Handler<AsyncResult<Void>> doneHandler) {
     doDeployAuditors(network, auditors.iterator(), messageTimeout, new DefaultFutureResult<Void>().setHandler(doneHandler));
   }
 
@@ -118,17 +119,18 @@ abstract class AbstractCluster implements Cluster {
     if (iterator.hasNext()) {
       String address = iterator.next();
       logger.info(String.format("Deploying auditor '%s'", address));
-      cluster.deployVerticle(address, AuditorVerticle.class.getName(), new JsonObject().putString("address", address).putNumber("timeout", messageTimeout), new Handler<AsyncResult<String>>() {
-        @Override
-        public void handle(AsyncResult<String> result) {
-          if (result.failed()) {
-            future.setFailure(result.cause());
-          }
-          else {
-            doDeployAuditors(network, iterator, messageTimeout, future);
-          }
-        }
-      });
+      cluster.deployVerticle(address, AuditorVerticle.class.getName(),
+          new JsonObject().putString("address", address).putNumber("timeout", messageTimeout), new Handler<AsyncResult<String>>() {
+            @Override
+            public void handle(AsyncResult<String> result) {
+              if (result.failed()) {
+                future.setFailure(result.cause());
+              }
+              else {
+                doDeployAuditors(network, iterator, messageTimeout, future);
+              }
+            }
+          });
     }
     else {
       future.setResult((Void) null);
@@ -181,43 +183,47 @@ abstract class AbstractCluster implements Cluster {
       InstanceContext context = iterator.next();
       logger.info(String.format("Deploying '%s' instance %d", context.componentContext().address(), context.number()));
       if (context.componentContext().isModule()) {
-        cluster.deployModule(context.address(), context.<ModuleContext>componentContext().module(), InstanceContext.toJson(context), new Handler<AsyncResult<String>>() {
-          @Override
-          public void handle(AsyncResult<String> result) {
-            if (result.failed()) {
-              future.setFailure(result.cause());
-            }
-            else {
-              doDeployInstances(iterator, future);
-            }
-          }
-        });
+        cluster.deployModule(context.address(), context.<ModuleContext> componentContext().module(), InstanceContext.toJson(context),
+            new Handler<AsyncResult<String>>() {
+              @Override
+              public void handle(AsyncResult<String> result) {
+                if (result.failed()) {
+                  future.setFailure(result.cause());
+                }
+                else {
+                  doDeployInstances(iterator, future);
+                }
+              }
+            });
       }
       else if (((VerticleContext) context.componentContext()).isWorker()) {
-        cluster.deployWorkerVerticle(context.address(), context.<VerticleContext>componentContext().main(), InstanceContext.toJson(context), context.<VerticleContext>componentContext().isMultiThreaded(), new Handler<AsyncResult<String>>() {
-          @Override
-          public void handle(AsyncResult<String> result) {
-            if (result.failed()) {
-              future.setFailure(result.cause());
-            }
-            else {
-              doDeployInstances(iterator, future);
-            }
-          }
-        });
+        cluster.deployWorkerVerticle(context.address(), context.<VerticleContext> componentContext().main(),
+            InstanceContext.toJson(context), context.<VerticleContext> componentContext().isMultiThreaded(),
+            new Handler<AsyncResult<String>>() {
+              @Override
+              public void handle(AsyncResult<String> result) {
+                if (result.failed()) {
+                  future.setFailure(result.cause());
+                }
+                else {
+                  doDeployInstances(iterator, future);
+                }
+              }
+            });
       }
       else {
-        cluster.deployVerticle(context.address(), context.<VerticleContext>componentContext().main(), InstanceContext.toJson(context), new Handler<AsyncResult<String>>() {
-          @Override
-          public void handle(AsyncResult<String> result) {
-            if (result.failed()) {
-              future.setFailure(result.cause());
-            }
-            else {
-              doDeployInstances(iterator, future);
-            }
-          }
-        });
+        cluster.deployVerticle(context.address(), context.<VerticleContext> componentContext().main(), InstanceContext.toJson(context),
+            new Handler<AsyncResult<String>>() {
+              @Override
+              public void handle(AsyncResult<String> result) {
+                if (result.failed()) {
+                  future.setFailure(result.cause());
+                }
+                else {
+                  doDeployInstances(iterator, future);
+                }
+              }
+            });
       }
     }
     else {
@@ -263,14 +269,16 @@ abstract class AbstractCluster implements Cluster {
   /**
    * Undeploys all network auditors.
    */
-  private void doUndeployAuditors(final String network, final Collection<String> auditors, final long messageTimeout, final Handler<AsyncResult<Void>> doneHandler) {
+  private void doUndeployAuditors(final String network, final Collection<String> auditors, final long messageTimeout,
+      final Handler<AsyncResult<Void>> doneHandler) {
     doUndeployAuditors(network, auditors.iterator(), messageTimeout, new DefaultFutureResult<Void>().setHandler(doneHandler));
   }
 
   /**
    * Iteratively undeploys network auditors.
    */
-  private void doUndeployAuditors(final String network, final Iterator<String> iterator, final long messageTimeout, final Future<Void> future) {
+  private void doUndeployAuditors(final String network, final Iterator<String> iterator, final long messageTimeout,
+      final Future<Void> future) {
     if (iterator.hasNext()) {
       String address = iterator.next();
       logger.info(String.format("Undeploying auditor '%s'", address));

@@ -29,36 +29,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Assignment info.
- *
+ * 
  * @author Jordan Halterman
  */
-@JsonTypeInfo(
-  use=JsonTypeInfo.Id.CLASS,
-  include=JsonTypeInfo.As.PROPERTY,
-  property="class",
-  defaultImpl=DefaultAssignmentInfo.class
-)
-@JsonAutoDetect(
-    creatorVisibility=JsonAutoDetect.Visibility.NONE,
-    fieldVisibility=JsonAutoDetect.Visibility.ANY,
-    getterVisibility=JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility=JsonAutoDetect.Visibility.NONE,
-    setterVisibility=JsonAutoDetect.Visibility.NONE
-  )
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class", defaultImpl = DefaultAssignmentInfo.class)
+@JsonAutoDetect(creatorVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public interface AssignmentInfo {
 
   /**
    * Returns the assignment instance.
-   *
-   * @return
-   *   The assignment instance.
+   * 
+   * @return The assignment instance.
    */
   InstanceInfo instance();
 
   /**
    * An assignment info builder.
-   *
+   * 
    * @author Jordan Halterman
    */
   public static class Builder {
@@ -75,9 +63,8 @@ public interface AssignmentInfo {
 
     /**
      * Returns a new assignment info builder.
-     *
-     * @return
-     *   A new builder instance.
+     * 
+     * @return A new builder instance.
      */
     public static Builder newBuilder() {
       return new Builder();
@@ -85,11 +72,9 @@ public interface AssignmentInfo {
 
     /**
      * Returns a new assignment info builder.
-     *
-     * @param info
-     *   Json info with which to start the build.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Json info with which to start the build.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(JsonObject info) {
       return new Builder(info);
@@ -97,11 +82,9 @@ public interface AssignmentInfo {
 
     /**
      * Returns a new assignment info builder.
-     *
-     * @param info
-     *   Existing assignment info with which to initialize the builder.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Existing assignment info with which to initialize the builder.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(AssignmentInfo info) {
       try {
@@ -114,11 +97,9 @@ public interface AssignmentInfo {
 
     /**
      * Sets the assignment instance.
-     *
-     * @param info
-     *   The assignment instance info.
-     * @return
-     *   The builder instance.
+     * 
+     * @param info The assignment instance info.
+     * @return The builder instance.
      */
     public Builder setInstance(InstanceInfo info) {
       try {
@@ -132,9 +113,8 @@ public interface AssignmentInfo {
 
     /**
      * Builds the assignment info.
-     *
-     * @return
-     *   A new assignment info instance.
+     * 
+     * @return A new assignment info instance.
      */
     public AssignmentInfo build() {
       try {

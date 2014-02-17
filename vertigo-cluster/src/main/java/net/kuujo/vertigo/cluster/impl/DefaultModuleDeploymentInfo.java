@@ -22,7 +22,7 @@ import net.kuujo.vertigo.cluster.ModuleDeploymentInfo;
 
 /**
  * Default module deployment info implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultModuleDeploymentInfo extends AbstractDeploymentInfo implements ModuleDeploymentInfo {

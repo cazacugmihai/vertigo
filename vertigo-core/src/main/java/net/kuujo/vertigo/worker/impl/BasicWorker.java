@@ -29,7 +29,7 @@ import org.vertx.java.platform.Container;
 
 /**
  * A basic worker implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class BasicWorker extends AbstractComponent<Worker> implements Worker {

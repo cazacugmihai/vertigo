@@ -24,113 +24,92 @@ import org.vertx.java.core.json.JsonObject;
 
 /**
  * A worker component.
- *
- * Workers are components that both receive and emit messages. Messages arrive
- * in the form of {@link JsonMessage} instances. Messages should always be either
- * acked or failed. Failing to ack or fail a message may result in the message
- * timing out depending on the network configuration. Since network configurations
- * are abstracted from component implementations, it is important that workers
- * always ack or fail messages. Note that messages should be acked or failed
- * after any child messages have been emitted from the worker.
- *
+ * 
+ * Workers are components that both receive and emit messages. Messages arrive in the form
+ * of {@link JsonMessage} instances. Messages should always be either acked or failed.
+ * Failing to ack or fail a message may result in the message timing out depending on the
+ * network configuration. Since network configurations are abstracted from component
+ * implementations, it is important that workers always ack or fail messages. Note that
+ * messages should be acked or failed after any child messages have been emitted from the
+ * worker.
+ * 
  * @author Jordan Halterman
  */
 public interface Worker extends Component<Worker> {
 
   /**
    * Sets a worker message handler.
-   *
-   * @param handler
-   *   A message handler. This handler will be called for each message received
-   *   by the worker.
-   * @return 
-   *   The called worker instance.
+   * 
+   * @param handler A message handler. This handler will be called for each message
+   *          received by the worker.
+   * @return The called worker instance.
    */
   Worker messageHandler(Handler<JsonMessage> handler);
 
   /**
    * Emits a message to the default stream.
-   *
-   * @param body
-   *   The message body.
-   * @return
-   *   The emitted message identifier.
+   * 
+   * @param body The message body.
+   * @return The emitted message identifier.
    */
   MessageId emit(JsonObject body);
 
   /**
    * Emits child message to the default stream.
-   *
-   * @param body
-   *   The message body.
-   * @param parent
-   *   The parent message.
-   * @return
-   *   The emitted message identifier.
+   * 
+   * @param body The message body.
+   * @param parent The parent message.
+   * @return The emitted message identifier.
    */
   MessageId emit(JsonObject body, JsonMessage parent);
 
   /**
    * Emits a copy of the given message to the default stream as a child of itself.
-   *
-   * @param message
-   *   The message to emit.
-   * @return
-   *   The new child message identifier.
+   * 
+   * @param message The message to emit.
+   * @return The new child message identifier.
    */
   MessageId emit(JsonMessage message);
 
   /**
    * Emits data from the worker to a non-default stream.
-   *
-   * @param stream
-   *   The stream to which to emit the message.
-   * @param body
-   *   The message body.
-   * @return
-   *   The emitted message identifier.
+   * 
+   * @param stream The stream to which to emit the message.
+   * @param body The message body.
+   * @return The emitted message identifier.
    */
   MessageId emit(String stream, JsonObject body);
 
   /**
    * Emits child data from the worker to a non-default stream.
-   *
-   * @param stream
-   *   The stream to which to emit the message.
-   * @param body
-   *   The message body.
-   * @param parent
-   *   The parent message.
-   * @return
-   *   The emitted message identifier.
+   * 
+   * @param stream The stream to which to emit the message.
+   * @param body The message body.
+   * @param parent The parent message.
+   * @return The emitted message identifier.
    */
   MessageId emit(String stream, JsonObject body, JsonMessage parent);
 
   /**
    * Emits a copy of the given message to a non-default stream as a child of itself.
-   *
-   * @param stream
-   *   The stream to which to emit the message.
-   * @param message
-   *   The message to emit.
-   * @return
-   *   The new child message identifier.
+   * 
+   * @param stream The stream to which to emit the message.
+   * @param message The message to emit.
+   * @return The new child message identifier.
    */
   MessageId emit(String stream, JsonMessage message);
 
   /**
    * Acknowledges processing of a message.
-   *
-   * @param message
-   *   The message to ack.
+   * 
+   * @param message The message to ack.
    */
   void ack(JsonMessage message);
 
   /**
    * Fails processing of a message.
-   *
-   * @param message
-   *   The message to fail.
+   * 
+   * @param message The message to fail.
    */
   void fail(JsonMessage message);
 

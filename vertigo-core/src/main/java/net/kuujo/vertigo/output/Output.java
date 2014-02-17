@@ -21,13 +21,14 @@ import net.kuujo.vertigo.output.selector.Selector;
 import net.kuujo.vertigo.serializer.Serializable;
 
 /**
- * A component output.<p>
- *
+ * A component output.
+ * <p>
+ * 
  * The output is the polar opposite of the {@link Input}. When a {@link Listener}
- * subscribes to output from a component, its {@link Input} is transformed into
- * an {@link Output}, which indicates the {@link Selector} that is to be used in
- * emitted messages to that input.
- *
+ * subscribes to output from a component, its {@link Input} is transformed into an
+ * {@link Output}, which indicates the {@link Selector} that is to be used in emitted
+ * messages to that input.
+ * 
  * @author Jordan Halterman
  */
 public final class Output implements Serializable {
@@ -50,9 +51,8 @@ public final class Output implements Serializable {
 
   /**
    * Returns the output id.
-   *
-   * @return
-   *   The output id.
+   * 
+   * @return The output id.
    */
   public String id() {
     return id;
@@ -60,9 +60,8 @@ public final class Output implements Serializable {
 
   /**
    * Returns the output count.
-   *
-   * @return
-   *   The output connection count.
+   * 
+   * @return The output connection count.
    */
   public int getCount() {
     return count;
@@ -70,9 +69,8 @@ public final class Output implements Serializable {
 
   /**
    * Returns the output stream.
-   *
-   * @return
-   *   The output stream.
+   * 
+   * @return The output stream.
    */
   public String getStream() {
     return stream;
@@ -80,9 +78,8 @@ public final class Output implements Serializable {
 
   /**
    * Returns the output selector.
-   *
-   * @return
-   *   An output selector.
+   * 
+   * @return An output selector.
    */
   public Selector getSelector() {
     return selector;

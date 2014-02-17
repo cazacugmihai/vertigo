@@ -27,19 +27,19 @@ import net.kuujo.vertigo.message.MessageId;
 
 /**
  * A basic auditor implementation.
- *
- * This auditor tracks message trees by utilizing unique numbers assigned to
- * each message ID. Each time a message is created in the tree, its unique number
- * is added to the tree count. Each time a message is acked in the tree, its
- * number is subtracted from the tree count. Once the tree count returns to zero,
- * the tree is considered fully processed and the message source is notified.
- *
- * This auditor protects against race conditions by allowing creations, acks,
- * and failures to arrive in *any* order. When a creation, ack, or failure arrives
- * for a not-previously-known message tree, the tree will be automatically created.
- * Because of the mathematics involved, the tree will not be considered fully
- * processed until all create/ack/fail messages have been received.
- *
+ * 
+ * This auditor tracks message trees by utilizing unique numbers assigned to each message
+ * ID. Each time a message is created in the tree, its unique number is added to the tree
+ * count. Each time a message is acked in the tree, its number is subtracted from the tree
+ * count. Once the tree count returns to zero, the tree is considered fully processed and
+ * the message source is notified.
+ * 
+ * This auditor protects against race conditions by allowing creations, acks, and failures
+ * to arrive in *any* order. When a creation, ack, or failure arrives for a
+ * not-previously-known message tree, the tree will be automatically created. Because of
+ * the mathematics involved, the tree will not be considered fully processed until all
+ * create/ack/fail messages have been received.
+ * 
  * @author Jordan Halterman
  */
 public class BasicAuditor implements Auditor {
@@ -72,7 +72,8 @@ public class BasicAuditor implements Auditor {
   @Override
   public void start() {
     // Only start the timeouts timer if timeouts are enabled (greater than 0).
-    if (timeout > 0) startTimer();
+    if (timeout > 0)
+      startTimer();
   }
 
   /**
@@ -92,7 +93,8 @@ public class BasicAuditor implements Auditor {
    */
   private void checkTimeout() {
     // If timeout == 0 then timeouts are disabled for the network. Skip the check.
-    if (timeout == 0) return;
+    if (timeout == 0)
+      return;
 
     // Iterate over nodes and fail any nodes whose expiration time has passed.
     // Nodes are stored in a LinkedHashMap in the order in which they're created,
@@ -173,10 +175,10 @@ public class BasicAuditor implements Auditor {
   }
 
   /**
-   * Gets a root. If the root does not yet exist then it will be created. This
-   * protected against race conditions by allowing roots to be created even
-   * before the "create" message is received by the auditor, resulting in creation
-   * simply having the effect of appending forks to the root.
+   * Gets a root. If the root does not yet exist then it will be created. This protected
+   * against race conditions by allowing roots to be created even before the "create"
+   * message is received by the auditor, resulting in creation simply having the effect of
+   * appending forks to the root.
    */
   private Root getRoot(String rootId) {
     if (roots.containsKey(rootId)) {

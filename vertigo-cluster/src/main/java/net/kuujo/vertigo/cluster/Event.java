@@ -23,28 +23,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * A cluster event.
- *
+ * 
  * @author Jordan Halterman
  */
-@JsonTypeInfo(
-    use=JsonTypeInfo.Id.CLASS,
-    include=JsonTypeInfo.As.PROPERTY,
-    property="class",
-    defaultImpl=DefaultEvent.class
-  )
-@JsonAutoDetect(
-    creatorVisibility=JsonAutoDetect.Visibility.NONE,
-    fieldVisibility=JsonAutoDetect.Visibility.ANY,
-    getterVisibility=JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility=JsonAutoDetect.Visibility.NONE,
-    setterVisibility=JsonAutoDetect.Visibility.NONE
-  )
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class", defaultImpl = DefaultEvent.class)
+@JsonAutoDetect(creatorVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public interface Event {
 
   /**
    * An event type.
-   *
+   * 
    * @author Jordan Halterman
    */
   public static enum Type {
@@ -82,13 +71,10 @@ public interface Event {
 
     /**
      * Parses an event type name.
-     *
-     * @param name
-     *   The event type name.
-     * @return
-     *   An event type.
-     * @throws IllegalArgumentException
-     *   If the event type name is invalid.
+     * 
+     * @param name The event type name.
+     * @return An event type.
+     * @throws IllegalArgumentException If the event type name is invalid.
      */
     public static Type parse(String name) {
       switch (name) {
@@ -109,25 +95,22 @@ public interface Event {
 
   /**
    * Returns the event type.
-   *
-   * @return
-   *   The event type.
+   * 
+   * @return The event type.
    */
   Type type();
 
   /**
    * Returns the key on which the event occurred.
-   *
-   * @return
-   *   The key on which the event occurred.
+   * 
+   * @return The key on which the event occurred.
    */
   String key();
 
   /**
    * Returns the event key value.
-   *
-   * @return
-   *   The event key value.
+   * 
+   * @return The event key value.
    */
   <T> T value();
 

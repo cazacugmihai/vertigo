@@ -26,15 +26,13 @@ import org.vertx.java.platform.Verticle;
 
 /**
  * A hook verticle.
- *
- * This verticle should be extended by verticles that are intended to
- * be deployed as a {@link VerticleHook} or {@link ModuleHook}. This
- * verticle implementation provides an interface for handling all hook
- * events available to a component hook. When started, the verticle will
- * automatically register a local handler on the event bus at a specific
- * address, the address to which the hooked component will send event
- * messages.
- *
+ * 
+ * This verticle should be extended by verticles that are intended to be deployed as a
+ * {@link VerticleHook} or {@link ModuleHook}. This verticle implementation provides an
+ * interface for handling all hook events available to a component hook. When started, the
+ * verticle will automatically register a local handler on the event bus at a specific
+ * address, the address to which the hooked component will send event messages.
+ * 
  * @author Jordan Halterman
  */
 public abstract class HookVerticle extends Verticle {
@@ -97,57 +95,50 @@ public abstract class HookVerticle extends Verticle {
 
   /**
    * Called when the hooked component receives a message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   protected abstract void handleReceive(MessageId messageId);
 
   /**
    * Called when the hooked component acks a received message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   protected abstract void handleAck(MessageId messageId);
 
   /**
    * Called when the hooked component fails a received message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   protected abstract void handleFail(MessageId messageId);
 
   /**
    * Called when the hooked component emits a message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   protected abstract void handleEmit(MessageId messageId);
 
   /**
    * Called when the hooked component receives an ack for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   protected abstract void handleAcked(MessageId messageId);
 
   /**
    * Called when the hooked component receives a failure for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   protected abstract void handleFailed(MessageId messageId);
 
   /**
    * Called when the hooked component receives a timeout for an emitted message.
-   *
-   * @param messageId
-   *   The unique message identifier.
+   * 
+   * @param messageId The unique message identifier.
    */
   protected abstract void handleTimeout(MessageId messageId);
 

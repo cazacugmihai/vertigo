@@ -31,27 +31,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A cluster deployment.
- *
+ * 
  * @author Jordan Halterman
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
-@JsonSubTypes({
-  @JsonSubTypes.Type(value=ModuleDeploymentInfo.class, name="module"),
-  @JsonSubTypes.Type(value=VerticleDeploymentInfo.class, name="verticle")
-})
-@JsonAutoDetect(
-    creatorVisibility=JsonAutoDetect.Visibility.NONE,
-    fieldVisibility=JsonAutoDetect.Visibility.ANY,
-    getterVisibility=JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility=JsonAutoDetect.Visibility.NONE,
-    setterVisibility=JsonAutoDetect.Visibility.NONE
-  )
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @JsonSubTypes.Type(value = ModuleDeploymentInfo.class, name = "module"),
+    @JsonSubTypes.Type(value = VerticleDeploymentInfo.class, name = "verticle") })
+@JsonAutoDetect(creatorVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public interface DeploymentInfo {
 
   /**
    * A deployment type.
-   *
+   * 
    * @author Jordan Halterman
    */
   public static enum Type {
@@ -74,9 +66,8 @@ public interface DeploymentInfo {
 
     /**
      * Returns the deployment type name.
-     *
-     * @return
-     *   The deployment type name.
+     * 
+     * @return The deployment type name.
      */
     public String getName() {
       return name;
@@ -91,63 +82,56 @@ public interface DeploymentInfo {
 
   /**
    * Returns the deployment ID.
-   *
-   * @return
-   *   The deployment ID.
+   * 
+   * @return The deployment ID.
    */
   String id();
 
   /**
    * Returns a set of deployment targets.
-   *
-   * @return
-   *   A set of deployment targets.
+   * 
+   * @return A set of deployment targets.
    */
   Set<String> targets();
 
   /**
    * Returns the deployment type.
-   *
-   * @return
-   *   The deployment type.
+   * 
+   * @return The deployment type.
    */
   Type type();
 
   /**
    * Returns a boolean indicating whether the deployment is a module.
-   *
-   * @return
-   *   Indicates whether the deployment is a module.
+   * 
+   * @return Indicates whether the deployment is a module.
    */
   boolean isModule();
 
   /**
    * Returns a boolean indicating whether the deployment is a verticle.
-   *
-   * @return
-   *   Indicates whether the deployment is a verticle.
+   * 
+   * @return Indicates whether the deployment is a verticle.
    */
   boolean isVerticle();
 
   /**
    * Returns the deployment configuration.
-   *
-   * @return
-   *   The deployment configuration.
+   * 
+   * @return The deployment configuration.
    */
   JsonObject config();
 
   /**
    * Returns the number of deployment instances.
-   *
-   * @return
-   *   The number of deployment instances.
+   * 
+   * @return The number of deployment instances.
    */
   int instances();
 
   /**
    * A deployment info builder.
-   *
+   * 
    * @author Jordan Halterman
    */
   public static class Builder {
@@ -164,9 +148,8 @@ public interface DeploymentInfo {
 
     /**
      * Returns a new deployment info builder.
-     *
-     * @return
-     *   A new builder instance.
+     * 
+     * @return A new builder instance.
      */
     public static Builder newBuilder() {
       return new Builder();
@@ -174,11 +157,9 @@ public interface DeploymentInfo {
 
     /**
      * Returns a new deployment info builder.
-     *
-     * @param info
-     *   Json info with which to start the build.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Json info with which to start the build.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(JsonObject info) {
       return new Builder(info);
@@ -186,11 +167,9 @@ public interface DeploymentInfo {
 
     /**
      * Returns a new deployment info builder.
-     *
-     * @param info
-     *   Existing node info with which to initialize the builder.
-     * @return
-     *   A new builder instance.
+     * 
+     * @param info Existing node info with which to initialize the builder.
+     * @return A new builder instance.
      */
     public static Builder newBuilder(DeploymentInfo info) {
       try {
@@ -203,11 +182,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the deployment ID.
-     *
-     * @param id
-     *   The deployment ID.
-     * @return
-     *   The builder instance.
+     * 
+     * @param id The deployment ID.
+     * @return The builder instance.
      */
     public Builder setId(String id) {
       info.putString("id", id);
@@ -216,11 +193,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the deployment type.
-     *
-     * @param type
-     *   The deployment type.
-     * @return
-     *   The builder instance.
+     * 
+     * @param type The deployment type.
+     * @return The builder instance.
      */
     public Builder setType(Type type) {
       info.putString("type", type.getName());
@@ -229,11 +204,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the deployment targets.
-     *
-     * @param targets
-     *   The deployment targets.
-     * @return
-     *   The builder instance.
+     * 
+     * @param targets The deployment targets.
+     * @return The builder instance.
      */
     public Builder setTargets(String... targets) {
       info.putArray("targets", new JsonArray(targets));
@@ -242,11 +215,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the deployment targets.
-     *
-     * @param targets
-     *   The deployment targets.
-     * @return
-     *   The builder instance.
+     * 
+     * @param targets The deployment targets.
+     * @return The builder instance.
      */
     public Builder setTargets(Set<String> targets) {
       info.putArray("targets", new JsonArray(targets.toArray(new String[targets.size()])));
@@ -255,11 +226,9 @@ public interface DeploymentInfo {
 
     /**
      * Adds a deployment target.
-     *
-     * @param target
-     *   The deployment target.
-     * @return
-     *   The builder instance.
+     * 
+     * @param target The deployment target.
+     * @return The builder instance.
      */
     public Builder addTarget(String target) {
       if (!info.containsField("targets")) {
@@ -274,11 +243,9 @@ public interface DeploymentInfo {
 
     /**
      * Adds deployment targets.
-     *
-     * @param targets
-     *   The deployment targets.
-     * @return
-     *   The builder instance.
+     * 
+     * @param targets The deployment targets.
+     * @return The builder instance.
      */
     public Builder addTargets(String... targets) {
       for (String target : targets) {
@@ -289,11 +256,9 @@ public interface DeploymentInfo {
 
     /**
      * Adds deployment targets.
-     *
-     * @param targets
-     *   The deployment targets.
-     * @return
-     *   The builder instance.
+     * 
+     * @param targets The deployment targets.
+     * @return The builder instance.
      */
     public Builder addTargets(Set<String> targets) {
       for (String target : targets) {
@@ -304,11 +269,9 @@ public interface DeploymentInfo {
 
     /**
      * Removes a deployment target.
-     *
-     * @param target
-     *   The deployment target.
-     * @return
-     *   The builder instance.
+     * 
+     * @param target The deployment target.
+     * @return The builder instance.
      */
     public Builder removeTarget(String target) {
       if (!info.containsField("targets")) {
@@ -326,11 +289,9 @@ public interface DeploymentInfo {
 
     /**
      * Removes deployment targets.
-     *
-     * @param targets
-     *   The deployment targets.
-     * @return
-     *   The builder instance.
+     * 
+     * @param targets The deployment targets.
+     * @return The builder instance.
      */
     public Builder removeTargets(String... targets) {
       for (String target : targets) {
@@ -341,11 +302,9 @@ public interface DeploymentInfo {
 
     /**
      * Removes deployment targets.
-     *
-     * @param targets
-     *   The deployment targets.
-     * @return
-     *   The builder instance.
+     * 
+     * @param targets The deployment targets.
+     * @return The builder instance.
      */
     public Builder removeTargets(Set<String> targets) {
       for (String target : targets) {
@@ -356,11 +315,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the deployment configuration.
-     *
-     * @param config
-     *   The deployment configuration.
-     * @return
-     *   The builder instance.
+     * 
+     * @param config The deployment configuration.
+     * @return The builder instance.
      */
     public Builder setConfig(JsonObject config) {
       info.putObject("config", config);
@@ -369,11 +326,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the number of deployment instances.
-     *
-     * @param instances
-     *   The number of deployment instances.
-     * @return
-     *   The builder instance.
+     * 
+     * @param instances The number of deployment instances.
+     * @return The builder instance.
      */
     public Builder setInstances(int instances) {
       info.putNumber("instances", instances);
@@ -382,11 +337,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the deployment module.
-     *
-     * @param moduleName
-     *   The deployment module.
-     * @return
-     *   The builder instance.
+     * 
+     * @param moduleName The deployment module.
+     * @return The builder instance.
      */
     public Builder setModule(String moduleName) {
       info.putString("module", moduleName);
@@ -395,11 +348,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets the deployment verticle main.
-     *
-     * @param main
-     *   The deployment verticle main.
-     * @return
-     *   The builder instance.
+     * 
+     * @param main The deployment verticle main.
+     * @return The builder instance.
      */
     public Builder setMain(String main) {
       info.putString("main", main);
@@ -408,11 +359,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets whether the deployment is a worker verticle.
-     *
-     * @param isWorker
-     *   Indicates whether the deployment is a worker.
-     * @return
-     *   The builder instance.
+     * 
+     * @param isWorker Indicates whether the deployment is a worker.
+     * @return The builder instance.
      */
     public Builder setWorker(boolean isWorker) {
       info.putBoolean("worker", isWorker);
@@ -421,11 +370,9 @@ public interface DeploymentInfo {
 
     /**
      * Sets whether the deployment is a multi-threaded worker verticle.
-     *
-     * @param isMultiThreaded
-     *   Indicates whether the deployment is multi-threaded.
-     * @return
-     *   The builder instance.
+     * 
+     * @param isMultiThreaded Indicates whether the deployment is multi-threaded.
+     * @return The builder instance.
      */
     public Builder setMultiThreaded(boolean isMultiThreaded) {
       setWorker(true);
@@ -435,9 +382,8 @@ public interface DeploymentInfo {
 
     /**
      * Builds the deployment info.
-     *
-     * @return
-     *   A new deployment info instance.
+     * 
+     * @return A new deployment info instance.
      */
     public DeploymentInfo build() {
       try {

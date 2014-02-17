@@ -35,18 +35,15 @@ import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
 /**
- * A component context which contains information regarding each
- * component instance within a single network component. Contexts
- * are immutable as they are constructed once a network has been
- * deployed.
- *
+ * A component context which contains information regarding each component instance within
+ * a single network component. Contexts are immutable as they are constructed once a
+ * network has been deployed.
+ * 
  * @author Jordan Halterman
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="deploy")
-@JsonSubTypes({
-  @JsonSubTypes.Type(value=ModuleContext.class, name=Component.COMPONENT_DEPLOYMENT_MODULE),
-  @JsonSubTypes.Type(value=VerticleContext.class, name=Component.COMPONENT_DEPLOYMENT_VERTICLE)
-})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "deploy")
+@JsonSubTypes({ @JsonSubTypes.Type(value = ModuleContext.class, name = Component.COMPONENT_DEPLOYMENT_MODULE),
+    @JsonSubTypes.Type(value = VerticleContext.class, name = Component.COMPONENT_DEPLOYMENT_VERTICLE) })
 public abstract class ComponentContext<T extends ComponentContext<T>> implements Context {
   private String address;
   private Component.Type type;
@@ -56,17 +53,15 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
   private Set<String> targets = new HashSet<>();
   private List<ComponentHook> hooks = new ArrayList<>();
   private List<InputContext> inputs = new ArrayList<>();
-  private @JsonIgnore NetworkContext network;
+  private @JsonIgnore
+  NetworkContext network;
 
   /**
    * Creates a component context from JSON.
-   *
-   * @param context
-   *   A JSON representation of the component context.
-   * @return
-   *   A component context instance.
-   * @throws MalformedContextException
-   *   If the context is malformed.
+   * 
+   * @param context A JSON representation of the component context.
+   * @return A component context instance.
+   * @throws MalformedContextException If the context is malformed.
    */
   @SuppressWarnings("unchecked")
   public static <T extends ComponentContext<T>> T fromJson(JsonObject context) {
@@ -78,11 +73,9 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Serializes a component context to JSON.
-   *
-   * @param context
-   *   The component context to serialize.
-   * @return
-   *   A Json representation of the component context.
+   * 
+   * @param context The component context to serialize.
+   * @return A Json representation of the component context.
    */
   public static <T extends ComponentContext<T>> JsonObject toJson(ComponentContext<T> context) {
     Serializer serializer = SerializerFactory.getSerializer(ComponentContext.class);
@@ -108,9 +101,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets the unique component address.
-   *
-   * @return
-   *   The component address.
+   * 
+   * @return The component address.
    */
   public String address() {
     return address;
@@ -118,9 +110,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets the component type.
-   *
-   * @return
-   *   The component type.
+   * 
+   * @return The component type.
    */
   public Component.Type type() {
     return type;
@@ -138,9 +129,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Returns a boolean indicating whether the component is a module.
-   *
-   * @return
-   *   Indicates whether the component is a module.
+   * 
+   * @return Indicates whether the component is a module.
    */
   public boolean isModule() {
     return false;
@@ -148,9 +138,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Returns a boolean indicating whether the component is a verticle.
-   *
-   * @return
-   *   Indicates whether the component is a verticle.
+   * 
+   * @return Indicates whether the component is a verticle.
    */
   public boolean isVerticle() {
     return false;
@@ -158,9 +147,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets the component configuration.
-   *
-   * @return
-   *   The component configuration.
+   * 
+   * @return The component configuration.
    */
   public JsonObject config() {
     return config != null ? new JsonObject(config) : new JsonObject();
@@ -168,9 +156,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets a list of all component instance contexts.
-   *
-   * @return
-   *   A list of component instance contexts.
+   * 
+   * @return A list of component instance contexts.
    */
   public List<InstanceContext> instanceContexts() {
     for (InstanceContext instance : instances) {
@@ -181,9 +168,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Returns the number of component instances.
-   *
-   * @return
-   *   The number of component instances.
+   * 
+   * @return The number of component instances.
    */
   public int numInstances() {
     return instances.size();
@@ -191,11 +177,9 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets a component instance context by instance ID.
-   *
-   * @param id
-   *   The instance ID.
-   * @return
-   *   A component instance or <code>null</code> if the instance doesn't exist.
+   * 
+   * @param id The instance ID.
+   * @return A component instance or <code>null</code> if the instance doesn't exist.
    */
   public InstanceContext instanceContext(int instanceNumber) {
     for (InstanceContext instance : instances) {
@@ -208,11 +192,9 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets a component instance context by instance address.
-   *
-   * @param address
-   *   The instance address.
-   * @return
-   *   A component instance or <code>null</code> if the instance doesn't exist.
+   * 
+   * @param address The instance address.
+   * @return A component instance or <code>null</code> if the instance doesn't exist.
    */
   public InstanceContext instanceContext(String address) {
     for (InstanceContext instance : instances) {
@@ -225,9 +207,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets the component heartbeat interval.
-   *
-   * @return
-   *   The component heartbeat interval.
+   * 
+   * @return The component heartbeat interval.
    */
   public long heartbeatInterval() {
     return heartbeat;
@@ -235,24 +216,21 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Returns a set of deployment targets for the component.
-   *
-   * @return
-   *   A set of event bus addresses indicating nodes to which the
-   *   component can be deployed.
+   * 
+   * @return A set of event bus addresses indicating nodes to which the component can be
+   *         deployed.
    */
   public Set<String> getDeploymenTargets() {
     return targets;
   }
 
   /**
-   * Returns a boolean indicating whether the component can be
-   * deployed to a specific node.
-   *
-   * @param address
-   *   The address of the node to check.
-   * @return
-   *   Indicates whether instances of the component can be deployed
-   *   to the given node.
+   * Returns a boolean indicating whether the component can be deployed to a specific
+   * node.
+   * 
+   * @param address The address of the node to check.
+   * @return Indicates whether instances of the component can be deployed to the given
+   *         node.
    */
   public boolean hasDeploymentTarget(String address) {
     return targets.contains(address);
@@ -260,9 +238,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Gets a list of component hooks.
-   *
-   * @return
-   *   A list of component hooks.
+   * 
+   * @return A list of component hooks.
    */
   public List<ComponentHook> hooks() {
     return hooks;
@@ -270,9 +247,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Returns a list of component input contexts.
-   *
-   * @return
-   *   A list of component input contexts.
+   * 
+   * @return A list of component input contexts.
    */
   public List<InputContext> inputContexts() {
     for (InputContext input : inputs) {
@@ -283,9 +259,8 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
 
   /**
    * Returns the parent network context.
-   *
-   * @return
-   *   The parent network context.
+   * 
+   * @return The parent network context.
    */
   public NetworkContext networkContext() {
     return network;

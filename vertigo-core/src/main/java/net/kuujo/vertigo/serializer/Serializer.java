@@ -18,11 +18,12 @@ package net.kuujo.vertigo.serializer;
 import org.vertx.java.core.json.JsonObject;
 
 /**
- * Json serializer.<p>
- *
- * Vertigo serializers serialize objects to Vert.x {@link JsonObject} instances
- * for easy passage over the Vert.x event bus.
- *
+ * Json serializer.
+ * <p>
+ * 
+ * Vertigo serializers serialize objects to Vert.x {@link JsonObject} instances for easy
+ * passage over the Vert.x event bus.
+ * 
  * @author Jordan Halterman
  */
 public interface Serializer {
@@ -30,28 +31,21 @@ public interface Serializer {
   /**
    * Serializes an object to Json. If an error occurs during serialization, a
    * {@link SerializationException} will be thrown.
-   *
-   * @param object
-   *   The object to serialize.
-   * @return
-   *   A Json representation of the serializable object.
-   * @throws SerializationException
-   *   If an error occurs during serialization.
+   * 
+   * @param object The object to serialize.
+   * @return A Json representation of the serializable object.
+   * @throws SerializationException If an error occurs during serialization.
    */
   <T extends Serializable> JsonObject serialize(T object);
 
   /**
    * Deserializes an object from Json. If an error occurs during deserialization, a
    * {@link DeserializationException} will be thrown.
-   *
-   * @param json
-   *   A Json representation of the serializable object.
-   * @param type
-   *   The type to which to deserialize the object.
-   * @return
-   *   The deserialized object.
-   * @throws DeserializationException
-   *   If an error occurs during deserialization.
+   * 
+   * @param json A Json representation of the serializable object.
+   * @param type The type to which to deserialize the object.
+   * @return The deserialized object.
+   * @throws DeserializationException If an error occurs during deserialization.
    */
   <T extends Serializable> T deserialize(JsonObject json, Class<T> type);
 

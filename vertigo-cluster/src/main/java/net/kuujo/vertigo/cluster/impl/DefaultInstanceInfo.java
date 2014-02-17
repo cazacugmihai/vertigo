@@ -20,7 +20,7 @@ import net.kuujo.vertigo.cluster.InstanceInfo;
 
 /**
  * Default instance info implementation.
- *
+ * 
  * @author Jordan Halterman
  */
 public class DefaultInstanceInfo implements InstanceInfo {

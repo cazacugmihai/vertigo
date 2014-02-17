@@ -34,45 +34,44 @@ import net.kuujo.vertigo.input.grouping.Grouping;
 import net.kuujo.vertigo.serializer.Serializable;
 
 /**
- * A network component definition.<p>
- *
- * Components are the primary elements of processing in Vertigo. They can
- * be represented as <code>feeders</code>, <code>executors</code>,
- * or <code>workers</code>. Each network may consist of any number of components,
- * each of which may subscribe to the output of other components inside or
- * outside of the network. Internally, components are represented as Vert.x modules
- * or verticles. Just as with Vert.x modules and verticles, components may consist
- * of several instances.<p>
- *
+ * A network component definition.
+ * <p>
+ * 
+ * Components are the primary elements of processing in Vertigo. They can be represented
+ * as <code>feeders</code>, <code>executors</code>, or <code>workers</code>. Each network
+ * may consist of any number of components, each of which may subscribe to the output of
+ * other components inside or outside of the network. Internally, components are
+ * represented as Vert.x modules or verticles. Just as with Vert.x modules and verticles,
+ * components may consist of several instances.
+ * <p>
+ * 
  * @author Jordan Haltermam
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="deploy")
-@JsonSubTypes({
-  @JsonSubTypes.Type(value=Module.class, name=Component.COMPONENT_DEPLOYMENT_MODULE),
-  @JsonSubTypes.Type(value=Verticle.class, name=Component.COMPONENT_DEPLOYMENT_VERTICLE)
-})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "deploy")
+@JsonSubTypes({ @JsonSubTypes.Type(value = Module.class, name = Component.COMPONENT_DEPLOYMENT_MODULE),
+    @JsonSubTypes.Type(value = Verticle.class, name = Component.COMPONENT_DEPLOYMENT_VERTICLE) })
 public abstract class Component<T extends Component<T>> implements Config {
 
   /**
-   * <code>address</code> is a string indicating the globally unique component
-   * event bus address. Components will use this address to register a handler
-   * which listens for subscriptions from other components, so this address must
-   * be unique across a Vert.x cluster.
+   * <code>address</code> is a string indicating the globally unique component event bus
+   * address. Components will use this address to register a handler which listens for
+   * subscriptions from other components, so this address must be unique across a Vert.x
+   * cluster.
    */
   public static final String COMPONENT_ADDRESS = "address";
 
   /**
-   * <code>type</code> is a string indicating the type of component that will be
-   * deployed. This can be either <code>feeder</code>, <code>worker</code>, or
-   * <code>executor</code>. If the component type does not match the implementation
-   * then an error will occur upon deployment of the component. This field is required.
+   * <code>type</code> is a string indicating the type of component that will be deployed.
+   * This can be either <code>feeder</code>, <code>worker</code>, or <code>executor</code>
+   * . If the component type does not match the implementation then an error will occur
+   * upon deployment of the component. This field is required.
    */
   public static final String COMPONENT_TYPE = "type";
 
   /**
-   * <code>deploy</code> is a string indicating the deployment method for the
-   * component. This can be either <code>module</code> or <code>verticle</code>.
-   * This field is required.
+   * <code>deploy</code> is a string indicating the deployment method for the component.
+   * This can be either <code>module</code> or <code>verticle</code>. This field is
+   * required.
    */
   public static final String COMPONENT_DEPLOYMENT_METHOD = "deploy";
 
@@ -87,9 +86,9 @@ public abstract class Component<T extends Component<T>> implements Config {
   public static final String COMPONENT_DEPLOYMENT_VERTICLE = "verticle";
 
   /**
-   * <code>config</code> is an object defining the configuration to pass to each
-   * instance of the component. If no configuration is provided then an empty
-   * configuration will be passed to component instances.
+   * <code>config</code> is an object defining the configuration to pass to each instance
+   * of the component. If no configuration is provided then an empty configuration will be
+   * passed to component instances.
    */
   public static final String COMPONENT_CONFIG = "config";
 
@@ -101,24 +100,24 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * <code>targets</code> is an array of target nodes to which this component can be
-   * deployed. If this array is empty or null, the component can be deployed
-   * to any node within a cluster.
+   * deployed. If this array is empty or null, the component can be deployed to any node
+   * within a cluster.
    */
   public static final String COMPONENT_TARGETS = "targets";
 
   /**
-   * <code>heartbeat</code> is a number indicating the interval at which the
-   * component should send heartbeat messages to network monitors (in milliseconds).
-   * Defaults to <code>5000</code> milliseconds.
+   * <code>heartbeat</code> is a number indicating the interval at which the component
+   * should send heartbeat messages to network monitors (in milliseconds). Defaults to
+   * <code>5000</code> milliseconds.
    */
   public static final String COMPONENT_HEARTBEAT_INTERVAL = "heartbeat";
 
   /**
-   * <code>hooks</code> is an array of hook configurations. Each hook configuration
-   * must contain at least a <code>type</code> key which indicates the fully
-   * qualified name of the hook class. Other configuration options depend on the
-   * specific hook implementation. In most cases, json properties are directly
-   * correlated to fields within the hook class.
+   * <code>hooks</code> is an array of hook configurations. Each hook configuration must
+   * contain at least a <code>type</code> key which indicates the fully qualified name of
+   * the hook class. Other configuration options depend on the specific hook
+   * implementation. In most cases, json properties are directly correlated to fields
+   * within the hook class.
    */
   public static final String COMPONENT_HOOKS = "hooks";
 
@@ -127,16 +126,17 @@ public abstract class Component<T extends Component<T>> implements Config {
    * must contain the <code>address</code> to which the input subscribes. Additionally,
    * each configuration may contain a <code>grouping</code> field indicating the input
    * grouping method. This must be an object containing at least a <code>type</code>
-   * field. The <code>type</code> field can be one of <code>round</code>, <code>random</code>,
-   * <code>fields</code>, or <code>all</code>. The <code>grouping</code> defaults to
-   * <code>round</code>. Finally, a <code>stream</code> field may be provided to
-   * indicate the stream to which to subscribe. This field defaults to <code>default</code>.
+   * field. The <code>type</code> field can be one of <code>round</code>,
+   * <code>random</code>, <code>fields</code>, or <code>all</code>. The
+   * <code>grouping</code> defaults to <code>round</code>. Finally, a <code>stream</code>
+   * field may be provided to indicate the stream to which to subscribe. This field
+   * defaults to <code>default</code>.
    */
   public static final String COMPONENT_INPUTS = "inputs";
 
   /**
    * Component type.
-   *
+   * 
    * @author Jordan Halterman
    */
   public static enum Type {
@@ -159,9 +159,8 @@ public abstract class Component<T extends Component<T>> implements Config {
 
     /**
      * Returns the component type name.
-     *
-     * @return
-     *   The component type name.
+     * 
+     * @return The component type name.
      */
     public String getName() {
       return name;
@@ -174,13 +173,10 @@ public abstract class Component<T extends Component<T>> implements Config {
 
     /**
      * Parses a component type name.
-     *
-     * @param name
-     *   The component type name.
-     * @return
-     *   A component type.
-     * @throws IllegalArgumentException
-     *   If the compoennt type name is invalid.
+     * 
+     * @param name The component type name.
+     * @return A component type.
+     * @throws IllegalArgumentException If the compoennt type name is invalid.
      */
     public static Type parse(String name) {
       switch (name) {
@@ -230,28 +226,26 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Returns the component address.
-   *
-   * This address is an event bus address at which the component will register
-   * a handler to listen for connections when started. Thus, this address must
-   * be unique.
-   *
-   * @return
-   *   The component address.
+   * 
+   * This address is an event bus address at which the component will register a handler
+   * to listen for connections when started. Thus, this address must be unique.
+   * 
+   * @return The component address.
    */
   public String getAddress() {
     return address;
   }
 
   /**
-   * Gets the component type.<p>
-   *
+   * Gets the component type.
+   * <p>
+   * 
    * The component type is a type that indicates the nature of the component
    * implementation (module or verticle). For instance, if the component is a
    * <code>Feeder</code> component, the module or verticle must be a
    * <code>FeederVerticle</code> instance.
-   *
-   * @return
-   *   The component type.
+   * 
+   * @return The component type.
    */
   public Type getType() {
     return type;
@@ -269,9 +263,8 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Returns a boolean indicating whether the component is a module.
-   *
-   * @return
-   *   Indicates whether the component is a module.
+   * 
+   * @return Indicates whether the component is a module.
    */
   public boolean isModule() {
     return false;
@@ -279,9 +272,8 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Returns a boolean indicating whether the component is a verticle.
-   *
-   * @return
-   *   Indicates whether the component is a verticle.
+   * 
+   * @return Indicates whether the component is a verticle.
    */
   public boolean isVerticle() {
     return false;
@@ -289,24 +281,22 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Returns the component configuration.
-   *
-   * @return
-   *   The component configuration.
+   * 
+   * @return The component configuration.
    */
   public JsonObject getConfig() {
     return config != null ? new JsonObject(config) : new JsonObject();
   }
 
   /**
-   * Sets the component configuration.<p>
-   *
-   * This configuration will be passed to component implementations as the verticle
-   * or module configuration when the component is started.
-   *
-   * @param config
-   *   The component configuration.
-   * @return
-   *   The component configuration.
+   * Sets the component configuration.
+   * <p>
+   * 
+   * This configuration will be passed to component implementations as the verticle or
+   * module configuration when the component is started.
+   * 
+   * @param config The component configuration.
+   * @return The component configuration.
    */
   @SuppressWarnings("unchecked")
   public T setConfig(JsonObject config) {
@@ -316,9 +306,8 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Returns the number of component instances to deploy within the network.
-   *
-   * @return
-   *   The number of component instances.
+   * 
+   * @return The number of component instances.
    */
   public int getNumInstances() {
     return instances;
@@ -326,11 +315,9 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Sets the number of component instances to deploy within the network.
-   *
-   * @param numInstances
-   *   The number of component instances.
-   * @return
-   *   The component configuration.
+   * 
+   * @param numInstances The number of component instances.
+   * @return The component configuration.
    */
   @SuppressWarnings("unchecked")
   public T setNumInstances(int numInstances) {
@@ -343,11 +330,9 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a deployment target to the component.
-   *
-   * @param node
-   *   The node to add to the component.
-   * @return
-   *   The component configuration.
+   * 
+   * @param node The node to add to the component.
+   * @return The component configuration.
    */
   @SuppressWarnings("unchecked")
   public T addDeploymentTarget(String node) {
@@ -357,11 +342,9 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a set of deployment targets to the component.
-   *
-   * @param nodes
-   *   A list of nodes to which the component may deploy.
-   * @return
-   *   The component configuration.
+   * 
+   * @param nodes A list of nodes to which the component may deploy.
+   * @return The component configuration.
    */
   @SuppressWarnings("unchecked")
   public T setDeploymentTargets(String... nodes) {
@@ -374,34 +357,30 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Returns a set of deployment targets for the component.
-   *
-   * @return
-   *   A set of event bus addresses indicating nodes to which the
-   *   component can be deployed.
+   * 
+   * @return A set of event bus addresses indicating nodes to which the component can be
+   *         deployed.
    */
   public Set<String> getDeploymentTargets() {
     return targets;
   }
 
   /**
-   * Returns the component heartbeat interval. This is the interval at which
-   * component instances will send heartbeat messages to network monitors.
-   *
-   * @return
-   *   The component heartbeat interval.
+   * Returns the component heartbeat interval. This is the interval at which component
+   * instances will send heartbeat messages to network monitors.
+   * 
+   * @return The component heartbeat interval.
    */
   public long getHeartbeatInterval() {
     return heartbeat;
   }
 
   /**
-   * Sets the component heartbeat interval. This is the interval at which
-   * component instances will send heartbeat messages to network monitors.
-   *
-   * @param interval
-   *   The component heartbeat interval.
-   * @return
-   *   The component configuration.
+   * Sets the component heartbeat interval. This is the interval at which component
+   * instances will send heartbeat messages to network monitors.
+   * 
+   * @param interval The component heartbeat interval.
+   * @return The component configuration.
    */
   @SuppressWarnings("unchecked")
   public T setHeartbeatInterval(long interval) {
@@ -411,20 +390,18 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component hook to the component.
-   *
-   * The output hook can be used to receive notifications on events that occur
-   * within the component instance's inputs and outputs. Hooks should implement
-   * the {@link ComponentHook} interface. Hook state will be automatically
-   * serialized to json using an internal <code>Serializer</code>. By default, this means
-   * that any primitives, primitive wrappers, collections, or {@link Serializable}
-   * fields will be serialized. Finer grained control over serialization of hooks
-   * can be provided by either using Jackson annotations within the hook implementation
-   * or by providing a custom serializer for the hook.
-   *
-   * @param hook
-   *   A component hook.
-   * @return
-   *   The component configuration.
+   * 
+   * The output hook can be used to receive notifications on events that occur within the
+   * component instance's inputs and outputs. Hooks should implement the
+   * {@link ComponentHook} interface. Hook state will be automatically serialized to json
+   * using an internal <code>Serializer</code>. By default, this means that any
+   * primitives, primitive wrappers, collections, or {@link Serializable} fields will be
+   * serialized. Finer grained control over serialization of hooks can be provided by
+   * either using Jackson annotations within the hook implementation or by providing a
+   * custom serializer for the hook.
+   * 
+   * @param hook A component hook.
+   * @return The component configuration.
    * @see ComponentHook
    */
   @SuppressWarnings("unchecked")
@@ -435,9 +412,8 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Returns a list of all component hooks.
-   *
-   * @return
-   *   A list of component hooks.
+   * 
+   * @return A list of component hooks.
    */
   public List<ComponentHook> getHooks() {
     return hooks;
@@ -445,9 +421,8 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Gets a list of component inputs.
-   *
-   * @return
-   *   A list of component inputs.
+   * 
+   * @return A list of component inputs.
    */
   public List<Input> getInputs() {
     return inputs;
@@ -455,11 +430,9 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input.
-   *
-   * @param input
-   *   The input to add.
-   * @return
-   *   The new input instance.
+   * 
+   * @param input The input to add.
+   * @return The new input instance.
    */
   public Input addInput(Input input) {
     inputs.add(input);
@@ -468,11 +441,9 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input from another component.
-   *
-   * @param component
-   *   The component from which to receive input.
-   * @return
-   *   The new input instance.
+   * 
+   * @param component The component from which to receive input.
+   * @return The new input instance.
    */
   public Input addInput(Component<?> component) {
     return addInput(new Input(component.getAddress()));
@@ -480,13 +451,10 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input from another component on a specific stream.
-   *
-   * @param component
-   *   The component from which to receive input.
-   * @param stream
-   *   The stream on which to receive input.
-   * @return
-   *   The new input instance.
+   * 
+   * @param component The component from which to receive input.
+   * @param stream The stream on which to receive input.
+   * @return The new input instance.
    */
   public Input addInput(Component<?> component, String stream) {
     return addInput(new Input(component.getAddress(), stream));
@@ -494,13 +462,10 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input from another component.
-   *
-   * @param component
-   *   The component from which to receive input.
-   * @param grouping
-   *   The grouping by which to group the input.
-   * @return
-   *   The new input instance.
+   * 
+   * @param component The component from which to receive input.
+   * @param grouping The grouping by which to group the input.
+   * @return The new input instance.
    */
   public Input addInput(Component<?> component, Grouping grouping) {
     return addInput(new Input(component.getAddress()).groupBy(grouping));
@@ -508,15 +473,11 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input from another component on a specific stream.
-   *
-   * @param component
-   *   The component from which to receive input.
-   * @param stream
-   *   The stream on which to receive input.
-   * @param grouping
-   *   The grouping by which to group the input.
-   * @return
-   *   The new input instance.
+   * 
+   * @param component The component from which to receive input.
+   * @param stream The stream on which to receive input.
+   * @param grouping The grouping by which to group the input.
+   * @return The new input instance.
    */
   public Input addInput(Component<?> component, String stream, Grouping grouping) {
     return addInput(new Input(component.getAddress(), stream).groupBy(grouping));
@@ -524,12 +485,10 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input on the default stream.
-   *
-   * @param address
-   *   The input address. This is the event bus address of a component to which
-   *   this component will listen for output.
-   * @return
-   *   The new input instance.
+   * 
+   * @param address The input address. This is the event bus address of a component to
+   *          which this component will listen for output.
+   * @return The new input instance.
    */
   public Input addInput(String address) {
     return addInput(new Input(address));
@@ -537,14 +496,11 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input on a specific stream.
-   *
-   * @param address
-   *   The input address. This is the event bus address of a component to which
-   *   this component will listen for output.
-   * @param stream
-   *   The stream on which to receive input.
-   * @return
-   *   The new input instance.
+   * 
+   * @param address The input address. This is the event bus address of a component to
+   *          which this component will listen for output.
+   * @param stream The stream on which to receive input.
+   * @return The new input instance.
    */
   public Input addInput(String address, String stream) {
     return addInput(new Input(address, stream));
@@ -552,15 +508,12 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input on the default stream with a grouping.
-   *
-   * @param address
-   *   The input address. This is the event bus address of a component to which
-   *   this component will listen for output.
-   * @param grouping
-   *   An input grouping. This input grouping helps determine how messages will
-   *   be distributed among multiple instances of this component.
-   * @return
-   *   The new input instance.
+   * 
+   * @param address The input address. This is the event bus address of a component to
+   *          which this component will listen for output.
+   * @param grouping An input grouping. This input grouping helps determine how messages
+   *          will be distributed among multiple instances of this component.
+   * @return The new input instance.
    */
   public Input addInput(String address, Grouping grouping) {
     return addInput(new Input(address).groupBy(grouping));
@@ -568,17 +521,13 @@ public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * Adds a component input on a specific stream with a grouping.
-   *
-   * @param address
-   *   The input address. This is the event bus address of a component to which
-   *   this component will listen for output.
-   * @param stream
-   *   The stream on which to receive input.
-   * @param grouping
-   *   An input grouping. This input grouping helps determine how messages will
-   *   be distributed among multiple instances of this component.
-   * @return
-   *   The new input instance.
+   * 
+   * @param address The input address. This is the event bus address of a component to
+   *          which this component will listen for output.
+   * @param stream The stream on which to receive input.
+   * @param grouping An input grouping. This input grouping helps determine how messages
+   *          will be distributed among multiple instances of this component.
+   * @return The new input instance.
    */
   public Input addInput(String address, String stream, Grouping grouping) {
     return addInput(new Input(address, stream).groupBy(grouping));
