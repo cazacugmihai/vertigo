@@ -33,7 +33,6 @@ import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.context.VerticleContext;
 import net.kuujo.vertigo.coordinator.heartbeat.HeartbeatMonitor;
 import net.kuujo.vertigo.coordinator.heartbeat.impl.DefaultHeartbeatMonitor;
-import net.kuujo.vertigo.events.Events;
 import net.kuujo.vertigo.serializer.SerializationException;
 
 import org.vertx.java.busmods.BusModBase;
@@ -55,7 +54,6 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 abstract class AbstractCoordinator extends BusModBase implements Handler<Message<JsonObject>> {
   protected NetworkContext context;
   protected Logger logger;
-  protected Events events;
   protected Map<String, String> deploymentMap = new HashMap<>();
   protected Map<String, InstanceContext> contextMap = new HashMap<>();
   protected Map<String, HeartbeatMonitor> heartbeats = new HashMap<>();
@@ -66,7 +64,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
   @Override
   public void start() {
     super.start();
-    events = new Events(eb);
     context = NetworkContext.fromJson(config);
     logger = LoggerFactory.getLogger(String.format("%s-%s", getClass().getName(), context.address()));
     eb.registerHandler(context.address(), this);
@@ -224,9 +221,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   container.logger().error("Failed to deploy network.", result.cause());
                   container.exit();
                 }
-                else {
-                  events.trigger(Events.Network.Deploy.class, context.address(), context);
-                }
               }
             });
           }
@@ -240,9 +234,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
           if (result.failed()) {
             container.logger().error("Failed to deploy network.", result.cause());
             container.exit();
-          }
-          else {
-            events.trigger(Events.Network.Deploy.class, context.address(), context);
           }
         }
       });
@@ -421,7 +412,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
         for (String address : auditorDeploymentIds) {
           undeployVerticle(address);
         }
-        events.trigger(Events.Network.Shutdown.class, context.address(), context);
         message.reply(result.succeeded());
       }
     });
@@ -454,13 +444,10 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
       if (logger.isDebugEnabled()) {
         logger.debug(String.format("%s is ready", id));
       }
-      InstanceContext context = contextMap.get(id);
-      events.trigger(Events.Component.Start.class, context.componentContext().address(), context);
       if (ready.size() == instances.size()) {
         if (logger.isInfoEnabled()) {
           logger.info("Starting components");
         }
-        events.trigger(Events.Network.Start.class, this.context.address(), this.context);
         for (Message<JsonObject> replyMessage : ready.values()) {
           replyMessage.reply();
         }
@@ -693,7 +680,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   future.setResult(result.result());
                 }
                 else {
-                  events.trigger(Events.Component.Deploy.class, context.componentContext().address(), context);
                   future.setFailure(result.cause());
                 }
               }
@@ -708,7 +694,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   future.setResult(result.result());
                 }
                 else {
-                  events.trigger(Events.Component.Deploy.class, context.componentContext().address(), context);
                   future.setFailure(result.cause());
                 }
               }
@@ -724,7 +709,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                 future.setResult(result.result());
               }
               else {
-                events.trigger(Events.Component.Deploy.class, context.componentContext().address(), context);
                 future.setFailure(result.cause());
               }
             }
@@ -750,7 +734,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   future.setFailure(result.cause());
                 }
                 else {
-                  events.trigger(Events.Component.Shutdown.class, context.componentContext().address(), context);
                   future.setResult(result.result());
                 }
               }
@@ -764,7 +747,6 @@ abstract class AbstractCoordinator extends BusModBase implements Handler<Message
                   future.setFailure(result.cause());
                 }
                 else {
-                  events.trigger(Events.Component.Shutdown.class, context.componentContext().address(), context);
                   future.setResult(result.result());
                 }
               }
