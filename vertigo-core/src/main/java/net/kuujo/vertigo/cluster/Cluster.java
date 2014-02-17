@@ -38,9 +38,6 @@ public interface Cluster {
    */
   void deployNetwork(Network network);
 
-  @Deprecated
-  void deploy(Network network);
-
   /**
    * Deploys a network to the cluster.
    *
@@ -53,9 +50,6 @@ public interface Cluster {
    */
   void deployNetwork(Network network, Handler<AsyncResult<NetworkContext>> doneHandler);
 
-  @Deprecated
-  void deploy(Network network, Handler<AsyncResult<NetworkContext>> doneHandler);
-
   /**
    * Shuts down a network in the cluster.
    *
@@ -63,9 +57,6 @@ public interface Cluster {
    *   The context of the network to shutdown.
    */
   void shutdownNetwork(NetworkContext context);
-
-  @Deprecated
-  void shutdown(NetworkContext context);
 
   /**
    * Shuts down a network in the cluster.
@@ -76,8 +67,5 @@ public interface Cluster {
    *   A handler to be called once the shutdown is complete.
    */
   void shutdownNetwork(NetworkContext context, Handler<AsyncResult<Void>> doneHandler);
-
-  @Deprecated
-  void shutdown(NetworkContext context, Handler<AsyncResult<Void>> doneHandler);
 
 }
