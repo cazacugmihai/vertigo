@@ -52,7 +52,7 @@ public class InputContext implements Context {
    *   If the JSON context is malformed.
    */
   public static InputContext fromJson(JsonObject context) {
-    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    Serializer serializer = SerializerFactory.getSerializer(InputContext.class);
     InputContext input = serializer.deserialize(context.getObject("input"), InputContext.class);
     ComponentContext<?> component = ComponentContext.fromJson(context);
     return input.setComponentContext(component);
@@ -67,7 +67,7 @@ public class InputContext implements Context {
    *   A Json representation of the input context.
    */
   public static JsonObject toJson(InputContext context) {
-    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    Serializer serializer = SerializerFactory.getSerializer(InputContext.class);
     JsonObject json = ComponentContext.toJson(context.componentContext());
     return json.putObject("input", serializer.serialize(context));
   }

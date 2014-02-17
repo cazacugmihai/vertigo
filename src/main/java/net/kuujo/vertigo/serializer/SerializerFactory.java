@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,8 @@ import net.kuujo.vertigo.serializer.impl.DefaultSerializerFactory;
 public abstract class SerializerFactory {
   private static final String SERIALIZER_FACTORY_CLASS_NAME = "net.kuujo.vertigo.serializer-factory";
   private static SerializerFactory instance;
-  private static Map<String, Serializer> serializers = new HashMap<>();
+  private static Map<Class<?>, Class<?>> serializableTypes = new HashMap<>();
+  private static Map<Class<?>, Serializer> serializers = new HashMap<>();
 
   /**
    * Gets a singleton serializer factory instance.
@@ -50,7 +51,7 @@ public abstract class SerializerFactory {
    * @return
    *   The current serializer factory instance.
    */
-  public static SerializerFactory getInstance() {
+  private static SerializerFactory getInstance() {
     if (instance == null) {
       String className = DefaultSerializerFactory.class.getName();
       try {
@@ -84,32 +85,68 @@ public abstract class SerializerFactory {
    *   A serializer instance.
    */
   public static Serializer getSerializer(Class<?> type) {
-    return getSerializer(type.getCanonicalName());
+    Class<?> serializable = findSerializableType(type);
+    Serializer serializer = serializers.get(serializable);
+    if (serializer == null) {
+      serializer = getInstance().createSerializer(serializable);
+      serializers.put(serializable, serializer);
+    }
+    return serializer;
   }
 
   /**
-   * Gets a serializer instance.
-   *
-   * @param name
-   *   The serializer name.
-   * @return
-   *   A serializer instance.
+   * Iterates over the class hierarchy searching for the base serializable type.
    */
-  public static Serializer getSerializer(String name) {
-    if (!serializers.containsKey(name)) {
-      serializers.put(name, getInstance().createSerializer(name));
+  private static Class<?> findSerializableType(Class<?> type) {
+    if (serializableTypes.containsKey(type)) {
+      return serializableTypes.get(type);
     }
-    return serializers.get(name);
+
+    Class<?> current = type;
+    while (current != null && current != Object.class) {
+      Class<?> serializable = findSerializableInterface(current);
+      if (serializable != null) {
+        serializableTypes.put(type, serializable);
+        return serializable;
+      }
+      current = current.getSuperclass();
+    }
+    throw new SerializationException("Invalid serializable type.");
+  }
+
+  /**
+   * Recursively iterates over the interface hierarchy to find the base serializable
+   * interface. This is the interface that initially extends the Serializable
+   * interface and it used to group serializers together.
+   */
+  private static Class<?> findSerializableInterface(Class<?> type) {
+    Class<?>[] interfaces = type.getInterfaces();
+    if (interfaces.length > 0) {
+      for (Class<?> iface : interfaces) {
+        if (iface == Serializable.class) {
+          return type;
+        }
+      }
+
+      for (Class<?> iface : interfaces) {
+        Class<?> serializable = findSerializableType(iface);
+        if (serializable != null) {
+          return serializable;
+        }
+      }
+      return null;
+    }
+    return null;
   }
 
   /**
    * Creates a new serializer instance.
    *
-   * @param name
-   *   The serializer name.
+   * @param type
+   *   The serializer class.
    * @return
    *   A new serializer instance.
    */
-  public abstract Serializer createSerializer(String name);
+  public abstract Serializer createSerializer(Class<?> clazz);
 
 }

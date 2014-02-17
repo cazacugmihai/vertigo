@@ -24,7 +24,6 @@ import net.kuujo.vertigo.input.grouping.FieldsGrouping;
 import net.kuujo.vertigo.input.grouping.Grouping;
 import net.kuujo.vertigo.input.grouping.RandomGrouping;
 import net.kuujo.vertigo.input.grouping.RoundGrouping;
-import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
 /**
@@ -32,7 +31,7 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  *
  * @author Jordan Halterman
  */
-public class Input implements Serializable {
+public class Input implements Config {
 
   /**
    * <code>address</code> is a string that indicates the address to which this

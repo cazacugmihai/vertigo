@@ -65,7 +65,7 @@ public final class NetworkContext implements Context {
    *   A serialized network context.
    */
   public static JsonObject toJson(NetworkContext context) {
-    return new JsonObject().putObject("network", SerializerFactory.getSerializer(Context.class).serialize(context));
+    return new JsonObject().putObject("network", SerializerFactory.getSerializer(NetworkContext.class).serialize(context));
   }
 
   /**

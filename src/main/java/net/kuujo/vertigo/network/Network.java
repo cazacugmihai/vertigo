@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.SerializationException;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 import static net.kuujo.vertigo.util.Component.isModuleName;
@@ -39,7 +38,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
  *
  * @author Jordan Halterman
  */
-public final class Network implements Serializable {
+public final class Network implements Config {
 
   /**
    * <code>address</code> is a string indicating the unique network address. This

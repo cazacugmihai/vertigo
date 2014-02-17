@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.kuujo.vertigo.serializer.impl;
+package net.kuujo.vertigo.network;
 
-import net.kuujo.vertigo.serializer.Serializer;
-import net.kuujo.vertigo.serializer.SerializerFactory;
+import net.kuujo.vertigo.serializer.Serializable;
 
 /**
- * A default serializer factory implementation.
+ * A base network configuration type.
  *
  * @author Jordan Halterman
  */
-public class DefaultSerializerFactory extends SerializerFactory {
-
-  @Override
-  public Serializer createSerializer(Class<?> type) {
-    return new DefaultSerializer();
-  }
-
+public interface Config extends Serializable {
 }

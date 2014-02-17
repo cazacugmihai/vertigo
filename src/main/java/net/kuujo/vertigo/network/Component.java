@@ -51,7 +51,7 @@ import net.kuujo.vertigo.serializer.Serializable;
   @JsonSubTypes.Type(value=Module.class, name=Component.COMPONENT_DEPLOYMENT_MODULE),
   @JsonSubTypes.Type(value=Verticle.class, name=Component.COMPONENT_DEPLOYMENT_VERTICLE)
 })
-public abstract class Component<T extends Component<T>> implements Serializable {
+public abstract class Component<T extends Component<T>> implements Config {
 
   /**
    * <code>address</code> is a string indicating the globally unique component

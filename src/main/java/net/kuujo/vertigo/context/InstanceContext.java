@@ -48,7 +48,7 @@ public final class InstanceContext implements Serializable {
    *   If the JSON context is malformed.
    */
   public static InstanceContext fromJson(JsonObject context) {
-    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
     InstanceContext instance = serializer.deserialize(context.getObject("instance"), InstanceContext.class);
     ComponentContext<?> component = ComponentContext.fromJson(context);
     return instance.setComponentContext(component);
@@ -63,7 +63,7 @@ public final class InstanceContext implements Serializable {
    *   A Json representation of the instance context.
    */
   public static JsonObject toJson(InstanceContext context) {
-    Serializer serializer = SerializerFactory.getSerializer(Context.class);
+    Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
     JsonObject json = ComponentContext.toJson(context.componentContext().isModule() ?
         context.<ModuleContext>componentContext() : context.<VerticleContext>componentContext());
     return json.putObject("instance", serializer.serialize(context));

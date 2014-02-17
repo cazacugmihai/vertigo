@@ -20,7 +20,6 @@ import java.util.UUID;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import net.kuujo.vertigo.context.Context;
 import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.network.MalformedNetworkException;
 import net.kuujo.vertigo.network.Network;
@@ -47,7 +46,7 @@ public final class ContextBuilder {
    */
   public static NetworkContext buildContext(Network network) throws MalformedNetworkException {
     try {
-      Serializer serializer = SerializerFactory.getSerializer(Context.class);
+      Serializer serializer = SerializerFactory.getSerializer(NetworkContext.class);
       JsonObject serialized = serializer.serialize(network);
       JsonArray auditors = new JsonArray();
       for (int i = 1; i < network.getNumAuditors()+1; i++) {
