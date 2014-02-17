@@ -86,6 +86,15 @@ public interface ClusterManager {
   <T> ClusterManager get(String key, Handler<AsyncResult<T>> resultHandler);
 
   /**
+   * Deletes a key in the cluster.
+   *
+   * @param key The key to delete.
+   * @param doneHandler An asynchronous handler to be called with the result.
+   * @return The cluster manager.
+   */
+  ClusterManager delete(String key, Handler<AsyncResult<Boolean>> doneHandler);
+
+  /**
    * Checks if a key exists in the cluster.
    * 
    * @param key The key to check.
