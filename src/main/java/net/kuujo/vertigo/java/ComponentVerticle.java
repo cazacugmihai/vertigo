@@ -16,8 +16,6 @@
 package net.kuujo.vertigo.java;
 
 import net.kuujo.vertigo.Vertigo;
-import net.kuujo.vertigo.VertigoException;
-import net.kuujo.vertigo.annotations.Config;
 import net.kuujo.vertigo.component.Component;
 import net.kuujo.vertigo.context.InstanceContext;
 import static net.kuujo.vertigo.util.Context.parseContext;
@@ -63,12 +61,6 @@ abstract class ComponentVerticle<T extends Component<T>> extends Verticle {
     config = container.config();
     final T component = createComponent(context);
     vertigo = new Vertigo(this);
-    try {
-      checkConfig(container.config());
-    }
-    catch (Exception e) {
-      return;
-    }
 
     component.start(new Handler<AsyncResult<T>>() {
       @Override
@@ -92,28 +84,6 @@ abstract class ComponentVerticle<T extends Component<T>> extends Verticle {
    *   The component that was started.
    */
   protected void start(T component) {
-  }
-
-  /**
-   * Checks the worker configuration.
-   */
-  private void checkConfig(JsonObject config) {
-    Config configInfo = getClass().getAnnotation(Config.class);
-    if (configInfo != null) {
-      for (Config.Field field : configInfo.value()) {
-        Object value = config.getValue(field.name());
-        if (value != null) {
-          if (!field.type().isAssignableFrom(value.getClass())) {
-            throw new VertigoException("Invalid component configuration.");
-          }
-        }
-        else {
-          if (field.required()) {
-            throw new VertigoException("Invalid component configuration.");
-          }
-        }
-      }
-    }
   }
 
 }
