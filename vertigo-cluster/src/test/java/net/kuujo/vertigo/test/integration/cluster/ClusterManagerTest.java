@@ -15,6 +15,8 @@
  */
 package net.kuujo.vertigo.test.integration.cluster;
 
+import java.util.Collection;
+
 import net.kuujo.vertigo.cluster.ClusterManager;
 import net.kuujo.vertigo.cluster.VertigoNode;
 import net.kuujo.vertigo.cluster.impl.DefaultClusterManager;
@@ -23,6 +25,7 @@ import org.junit.Test;
 
 import static org.vertx.testtools.VertxAssert.assertTrue;
 import static org.vertx.testtools.VertxAssert.assertEquals;
+import static org.vertx.testtools.VertxAssert.assertNull;
 import static org.vertx.testtools.VertxAssert.testComplete;
 
 import org.vertx.java.core.AsyncResult;
@@ -39,6 +42,164 @@ import org.vertx.testtools.TestVerticle;
  * @author Jordan Halterman
  */
 public class ClusterManagerTest extends TestVerticle {
+
+  @Test
+  public void testSetGetToSingleNodeCluster() {
+    deployCluster(1, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+        cluster.set("test", "Hello world!", new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            assertTrue(result.succeeded());
+            cluster.get("test", new Handler<AsyncResult<String>>() {
+              @Override
+              public void handle(AsyncResult<String> result) {
+                assertTrue(result.succeeded());
+                assertEquals("Hello world!", result.result());
+                testComplete();
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testUpdateGetToSingleNodeCluster() {
+    deployCluster(1, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+        cluster.set("test", "Hello world!", new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            assertTrue(result.succeeded());
+            cluster.set("test", "Hello world again!", new Handler<AsyncResult<Void>>() {
+              @Override
+              public void handle(AsyncResult<Void> result) {
+                assertTrue(result.succeeded());
+                cluster.get("test", new Handler<AsyncResult<String>>() {
+                  @Override
+                  public void handle(AsyncResult<String> result) {
+                    assertTrue(result.succeeded());
+                    assertEquals("Hello world again!", result.result());
+                    testComplete();
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testSetDeleteToSingleNodeCluster() {
+    deployCluster(1, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+        cluster.set("test", "Hello world!", new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            assertTrue(result.succeeded());
+            cluster.get("test", new Handler<AsyncResult<String>>() {
+              @Override
+              public void handle(AsyncResult<String> result) {
+                assertTrue(result.succeeded());
+                assertEquals("Hello world!", result.result());
+                cluster.delete("test", new Handler<AsyncResult<Boolean>>() {
+                  @Override
+                  public void handle(AsyncResult<Boolean> result) {
+                    assertTrue(result.succeeded());
+                    cluster.get("test", new Handler<AsyncResult<String>>() {
+                      @Override
+                      public void handle(AsyncResult<String> result) {
+                        assertTrue(result.succeeded());
+                        assertNull(result.result());
+                        testComplete();
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testSetExistsToSingleNodeCluster() {
+    deployCluster(1, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+        cluster.set("test", "Hello world!", new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            assertTrue(result.succeeded());
+            cluster.exists("test", new Handler<AsyncResult<Boolean>>() {
+              @Override
+              public void handle(AsyncResult<Boolean> result) {
+                assertTrue(result.succeeded());
+                assertTrue(result.result());
+                testComplete();
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testSetKeysToSingleNodeCluster() {
+    deployCluster(1, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+        cluster.set("test1", "Hello world1!", new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            assertTrue(result.succeeded());
+            cluster.set("test2", "Hello world2!", new Handler<AsyncResult<Void>>() {
+              @Override
+              public void handle(AsyncResult<Void> result) {
+                assertTrue(result.succeeded());
+                cluster.set("test3", "Hello world3!", new Handler<AsyncResult<Void>>() {
+                  @Override
+                  public void handle(AsyncResult<Void> result) {
+                    assertTrue(result.succeeded());
+                    cluster.keys(new Handler<AsyncResult<Collection<String>>>() {
+                      @Override
+                      public void handle(AsyncResult<Collection<String>> result) {
+                        assertTrue(result.succeeded());
+                        assertTrue(result.result().contains("test1"));
+                        assertTrue(result.result().contains("test2"));
+                        assertTrue(result.result().contains("test3"));
+                        testComplete();
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  }
 
   @Test
   public void testDeployVerticleToSingleNodeCluster() {
@@ -71,38 +232,8 @@ public class ClusterManagerTest extends TestVerticle {
   }
 
   @Test
-  public void testDeployVerticle() {
-    deployCluster(3, new Handler<AsyncResult<Void>>() {
-      @Override
-      public void handle(AsyncResult<Void> result) {
-        assertTrue(result.succeeded());
-        vertx.eventBus().registerHandler("foo", new Handler<Message<String>>() {
-          @Override
-          public void handle(Message<String> message) {
-            if (message.body().equals("Hello world!")) {
-              testComplete();
-            }
-          }
-        }, new Handler<AsyncResult<Void>>() {
-          @Override
-          public void handle(AsyncResult<Void> result) {
-            assertTrue(result.succeeded());
-            final ClusterManager cluster = new DefaultClusterManager("test", vertx);
-            cluster.deployVerticle("test", TestVerticle.class.getName(), new Handler<AsyncResult<String>>() {
-              @Override
-              public void handle(AsyncResult<String> result) {
-                
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-
-  @Test
-  public void testDeployVerticleResult() {
-    deployCluster(3, new Handler<AsyncResult<Void>>() {
+  public void testDeployVerticleResultToSingleNodeCluster() {
+    deployCluster(1, new Handler<AsyncResult<Void>>() {
       @Override
       public void handle(AsyncResult<Void> result) {
         assertTrue(result.succeeded());

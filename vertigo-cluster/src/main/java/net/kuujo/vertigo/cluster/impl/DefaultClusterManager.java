@@ -92,7 +92,7 @@ public class DefaultClusterManager implements ClusterManager {
 
   @Override
   public ClusterManager set(String key, Object value, long expire, Handler<AsyncResult<Void>> doneHandler) {
-    JsonObject message = new JsonObject().putString("action", "set").putString("key", key).putValue("vaule", value)
+    JsonObject message = new JsonObject().putString("action", "set").putString("key", key).putValue("value", value)
         .putNumber("expire", expire);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncVoidHandler(doneHandler));
     return this;
@@ -692,13 +692,29 @@ public class DefaultClusterManager implements ClusterManager {
   }
 
   private ClusterManager doDeploy(Set<String> targets, String type, String deploymentID, String main, JsonObject config, int instances,
-      boolean worker, boolean multiThreaded, Handler<AsyncResult<String>> doneHandler) {
+      boolean worker, boolean multiThreaded, final Handler<AsyncResult<String>> doneHandler) {
     JsonObject message = new JsonObject().putString("action", "deploy")
         .putArray("targets", targets != null ? new JsonArray(targets.toArray(new String[targets.size()])) : new JsonArray())
         .putString("id", deploymentID).putString("type", type).putString(type.equals("module") ? "module" : "main", main)
         .putObject("config", config).putNumber("instances", instances).putBoolean("worker", worker)
         .putBoolean("multi-threaded", multiThreaded);
-    vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncValueHandler(doneHandler));
+    vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, new Handler<AsyncResult<Message<JsonObject>>>() {
+      @Override
+      public void handle(AsyncResult<Message<JsonObject>> result) {
+        if (result.failed()) {
+          new DefaultFutureResult<String>(result.cause()).setHandler(doneHandler);
+        }
+        else {
+          JsonObject body = result.result().body();
+          if (body.getString("status").equals("error")) {
+            new DefaultFutureResult<String>(new ClusterException(body.getString("message"))).setHandler(doneHandler);
+          }
+          else {
+            new DefaultFutureResult<String>(body.getString("id")).setHandler(doneHandler);
+          }
+        }
+      }
+    });
     return this;
   }
 

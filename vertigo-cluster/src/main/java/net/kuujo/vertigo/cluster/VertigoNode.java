@@ -993,7 +993,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
                   else {
                     try {
                       replica.submitCommand("updateNode", new JsonObject().putString("replica", node.replica).putString("id", node.id)
-                          .putObject("info", new JsonObject(mapper.writeValueAsString(node))), new Handler<AsyncResult<Boolean>>() {
+                          .putString("address", node.address).putObject("info", new JsonObject(mapper.writeValueAsString(node))), new Handler<AsyncResult<Boolean>>() {
                         @Override
                         public void handle(AsyncResult<Boolean> result) {
                           if (result.failed()) {
