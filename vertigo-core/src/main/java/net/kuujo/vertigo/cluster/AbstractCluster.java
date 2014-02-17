@@ -37,19 +37,26 @@ import org.vertx.java.platform.Verticle;
  * @author Jordan Halterman
  */
 abstract class AbstractCluster implements Cluster {
+  private String address;
   private EventBus eventBus;
   private Container container;
   protected String coordinator;
-  protected String master;
 
-  public AbstractCluster(Verticle verticle) {
+  public AbstractCluster(String address, Verticle verticle) {
+    this.address = address;
     this.eventBus = verticle.getVertx().eventBus();
     this.container = verticle.getContainer();
   }
 
-  public AbstractCluster(Vertx vertx, Container container) {
+  public AbstractCluster(String address, Vertx vertx, Container container) {
+    this.address = address;
     this.eventBus = vertx.eventBus();
     this.container = container;
+  }
+
+  @Override
+  public String address() {
+    return address;
   }
 
   @Override

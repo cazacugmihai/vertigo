@@ -37,14 +37,13 @@ import net.kuujo.vertigo.coordinator.RemoteCoordinator;
  */
 public class RemoteCluster extends AbstractCluster {
 
-  public RemoteCluster(Verticle verticle) {
-    super(verticle);
+  public RemoteCluster(String address, Verticle verticle) {
+    super(address, verticle);
   }
 
-  public RemoteCluster(Vertx vertx, Container container, String address) {
-    super(vertx, container);
+  public RemoteCluster(String address, Vertx vertx, Container container) {
+    super(address, vertx, container);
     coordinator = RemoteCoordinator.class.getName();
-    this.master = address;
   }
 
 }

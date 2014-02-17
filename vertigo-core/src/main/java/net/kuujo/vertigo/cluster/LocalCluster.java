@@ -31,13 +31,13 @@ import net.kuujo.vertigo.coordinator.LocalCoordinator;
  */
 public class LocalCluster extends AbstractCluster {
 
-  public LocalCluster(Verticle verticle) {
-    super(verticle);
+  public LocalCluster(String address, Verticle verticle) {
+    super(address, verticle);
     coordinator = LocalCoordinator.class.getName();
   }
 
-  public LocalCluster(Vertx vertx, Container container) {
-    super(vertx, container);
+  public LocalCluster(String address, Vertx vertx, Container container) {
+    super(address, vertx, container);
     coordinator = LocalCoordinator.class.getName();
   }
 

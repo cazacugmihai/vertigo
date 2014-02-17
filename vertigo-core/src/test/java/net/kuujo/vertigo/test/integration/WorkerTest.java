@@ -190,7 +190,7 @@ public class WorkerTest extends TestVerticle {
   }
 
   private void deployNetwork(Network network) {
-    Cluster cluster = new LocalCluster(vertx, container);
+    Cluster cluster = new LocalCluster("test", vertx, container);
     cluster.deployNetwork(network, new Handler<AsyncResult<NetworkContext>>() {
       @Override
       public void handle(AsyncResult<NetworkContext> result) {

@@ -31,6 +31,14 @@ import net.kuujo.vertigo.network.Network;
 public interface Cluster {
 
   /**
+   * Returns the cluster address.
+   *
+   * @return
+   *   The cluster address.
+   */
+  String address();
+
+  /**
    * Deploys a network to the cluster.
    *
    * @param network

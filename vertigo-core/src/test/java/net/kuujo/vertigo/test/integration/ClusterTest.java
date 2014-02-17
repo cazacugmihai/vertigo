@@ -48,7 +48,7 @@ public class ClusterTest extends TestVerticle {
     network.addWorker("test.worker1", TestWorker.class.getName(), 2).addInput("test.feeder", "stream1");
     network.addWorker("test.worker2", TestWorker.class.getName(), 2).addInput("test.feeder", "stream2");
 
-    Cluster cluster = new LocalCluster(this);
+    Cluster cluster = new LocalCluster("test", this);
     cluster.deployNetwork(network, new Handler<AsyncResult<NetworkContext>>() {
       @Override
       public void handle(AsyncResult<NetworkContext> result) {
@@ -66,7 +66,7 @@ public class ClusterTest extends TestVerticle {
     network.addWorker("test.worker1", TestWorker.class.getName(), 2).addInput("test.feeder", "stream1");
     network.addWorker("test.worker2", TestWorker.class.getName(), 2).addInput("test.feeder", "stream2");
 
-    final Cluster cluster = new LocalCluster(this);
+    final Cluster cluster = new LocalCluster("test", this);
     cluster.deployNetwork(network, new Handler<AsyncResult<NetworkContext>>() {
       @Override
       public void handle(AsyncResult<NetworkContext> result) {

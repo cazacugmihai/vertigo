@@ -71,13 +71,15 @@ public final class Vertigo {
    * to deploy network verticles and modules using the current Vert.x {@link Container}
    * instance.
    *
+   * @param address
+   *   The cluster to which to deploy the network.
    * @param network
    *   The network to deploy.
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo deployLocalNetwork(Network network) {
-    Cluster cluster = new LocalCluster(vertx, container);
+  public Vertigo deployLocalNetwork(String address, Network network) {
+    Cluster cluster = new LocalCluster(address, vertx, container);
     cluster.deployNetwork(network);
     return this;
   }
@@ -89,6 +91,8 @@ public final class Vertigo {
    * to deploy network verticles and modules using the current Vert.x {@link Container}
    * instance.
    *
+   * @param address
+   *   The cluster to which to deploy the network.
    * @param network
    *   The network to deploy.
    * @param doneHandler
@@ -98,8 +102,8 @@ public final class Vertigo {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo deployLocalNetwork(Network network, Handler<AsyncResult<NetworkContext>> doneHandler) {
-    Cluster cluster = new LocalCluster(vertx, container);
+  public Vertigo deployLocalNetwork(String address, Network network, Handler<AsyncResult<NetworkContext>> doneHandler) {
+    Cluster cluster = new LocalCluster(address, vertx, container);
     cluster.deployNetwork(network, doneHandler);
     return this;
   }
@@ -107,13 +111,15 @@ public final class Vertigo {
   /**
    * Shuts down a local network.
    *
+   * @param address
+   *   The cluster from which to shutdown the network.
    * @param context
    *   The context of the network to shutdown.
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo shutdownLocalNetwork(NetworkContext context) {
-    Cluster cluster = new LocalCluster(vertx, container);
+  public Vertigo shutdownLocalNetwork(String address, NetworkContext context) {
+    Cluster cluster = new LocalCluster(address, vertx, container);
     cluster.shutdownNetwork(context);
     return this;
   }
@@ -121,6 +127,8 @@ public final class Vertigo {
   /**
    * Shuts down a local network.
    *
+   * @param address
+   *   The cluster from which to shutdown the network.
    * @param context
    *   The context of the network to shutdown.
    * @param doneHandler
@@ -128,8 +136,8 @@ public final class Vertigo {
    * @return
    *   The called Vertigo instance.
    */
-  public Vertigo shutdownLocalNetwork(NetworkContext context, Handler<AsyncResult<Void>> doneHandler) {
-    Cluster cluster = new LocalCluster(vertx, container);
+  public Vertigo shutdownLocalNetwork(String address, NetworkContext context, Handler<AsyncResult<Void>> doneHandler) {
+    Cluster cluster = new LocalCluster(address, vertx, container);
     cluster.shutdownNetwork(context, doneHandler);
     return this;
   }
@@ -153,7 +161,7 @@ public final class Vertigo {
    *   The called Vertigo instance.
    */
   public Vertigo deployRemoteNetwork(String address, Network network) {
-    Cluster cluster = new RemoteCluster(vertx, container, address);
+    Cluster cluster = new RemoteCluster(address, vertx, container);
     cluster.deployNetwork(network);
     return this;
   }
@@ -181,7 +189,7 @@ public final class Vertigo {
    *   The called Vertigo instance.
    */
   public Vertigo deployRemoteNetwork(String address, Network network, Handler<AsyncResult<NetworkContext>> doneHandler) {
-    Cluster cluster = new RemoteCluster(vertx, container, address);
+    Cluster cluster = new RemoteCluster(address, vertx, container);
     cluster.deployNetwork(network, doneHandler);
     return this;
   }
@@ -201,7 +209,7 @@ public final class Vertigo {
    *   The called Vertigo instance.
    */
   public Vertigo shutdownRemoteNetwork(String address, NetworkContext context) {
-    Cluster cluster = new RemoteCluster(vertx, container, address);
+    Cluster cluster = new RemoteCluster(address, vertx, container);
     cluster.shutdownNetwork(context);
     return this;
   }
@@ -223,7 +231,7 @@ public final class Vertigo {
    *   The called Vertigo instance.
    */
   public Vertigo shutdownRemoteNetwork(String address, NetworkContext context, Handler<AsyncResult<Void>> doneHandler) {
-    Cluster cluster = new RemoteCluster(vertx, container, address);
+    Cluster cluster = new RemoteCluster(address, vertx, container);
     cluster.shutdownNetwork(context, doneHandler);
     return this;
   }
