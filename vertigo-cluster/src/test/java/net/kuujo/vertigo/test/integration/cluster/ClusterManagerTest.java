@@ -41,6 +41,36 @@ import org.vertx.testtools.TestVerticle;
 public class ClusterManagerTest extends TestVerticle {
 
   @Test
+  public void testDeployVerticleToSingleNodeCluster() {
+    deployCluster(1, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        vertx.eventBus().registerHandler("foo", new Handler<Message<String>>() {
+          @Override
+          public void handle(Message<String> message) {
+            if (message.body().equals("Hello world!")) {
+              testComplete();
+            }
+          }
+        }, new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            assertTrue(result.succeeded());
+            final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+            cluster.deployVerticle("test", TestVerticle.class.getName(), new Handler<AsyncResult<String>>() {
+              @Override
+              public void handle(AsyncResult<String> result) {
+                
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @Test
   public void testDeployVerticle() {
     deployCluster(3, new Handler<AsyncResult<Void>>() {
       @Override

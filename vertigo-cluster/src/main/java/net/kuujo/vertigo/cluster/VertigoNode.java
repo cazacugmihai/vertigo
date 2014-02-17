@@ -566,6 +566,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
                             startResult.setFailure(result.cause());
                           }
                           else {
+                            addNode(nodeAddress, internalAddress, replica.address());
                             startResult.setResult((Void) null);
                           }
                         }
@@ -962,8 +963,8 @@ public class VertigoNode extends BusModBase implements StateMachine {
     if (instance < instances.size()) {
       final NodeReference node = pickNode(nodes);
       if (node == null) {
-        new DefaultFutureResult<Void>().setHandler(doneHandler).setFailure(
-            new DeploymentException("Failed to assign deployment to any node."));
+        new DefaultFutureResult<Void>().setHandler(doneHandler)
+            .setFailure(new DeploymentException("Failed to assign deployment to any node."));
       }
       else {
         final AssignmentInfo assignment = AssignmentInfo.Builder.newBuilder().setInstance(instances.get(instance)).build();
@@ -1037,7 +1038,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
     final String id = info.instance().id();
     if (info.instance().deployment().type().equals(DeploymentInfo.Type.MODULE)) {
       ModuleDeploymentInfo deployment = (ModuleDeploymentInfo) info.instance().deployment();
-      container.deployModule(deployment.module(), deployment.config(), deployment.instances(), new Handler<AsyncResult<String>>() {
+      container.deployModule(deployment.module(), deployment.config(), 1, new Handler<AsyncResult<String>>() {
         @Override
         public void handle(AsyncResult<String> result) {
           if (result.failed()) {
@@ -1053,7 +1054,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
     else if (info.instance().deployment().type().equals(DeploymentInfo.Type.VERTICLE)) {
       VerticleDeploymentInfo deployment = (VerticleDeploymentInfo) info.instance().deployment();
       if (deployment.isWorker()) {
-        container.deployWorkerVerticle(deployment.main(), deployment.config(), deployment.instances(), deployment.isMultiThreaded(),
+        container.deployWorkerVerticle(deployment.main(), deployment.config(), 1, deployment.isMultiThreaded(),
             new Handler<AsyncResult<String>>() {
               @Override
               public void handle(AsyncResult<String> result) {
@@ -1068,7 +1069,18 @@ public class VertigoNode extends BusModBase implements StateMachine {
             });
       }
       else {
-
+        container.deployVerticle(deployment.main(), deployment.config(), new Handler<AsyncResult<String>>() {
+          @Override
+          public void handle(AsyncResult<String> result) {
+            if (result.failed()) {
+              sendError(message, result.cause().getMessage());
+            }
+            else {
+              assignments.put(id, new AssignmentInfoInternal(result.result(), AssignmentInfoInternal.VERTICLE));
+              sendOK(message, new JsonObject().putString("id", id));
+            }
+          }
+        });
       }
     }
     else {
