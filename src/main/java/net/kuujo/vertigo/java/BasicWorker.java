@@ -22,7 +22,6 @@ import net.kuujo.vertigo.component.impl.DefaultComponentFactory;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.worker.Worker;
-import net.kuujo.vertigo.worker.impl.BasicWorker;
 
 /**
  * A Java worker verticle.<p>
@@ -45,13 +44,13 @@ import net.kuujo.vertigo.worker.impl.BasicWorker;
  *
  * @author Jordan Halterman
  */
-public abstract class WorkerVerticle extends ComponentVerticle<Worker> {
+public abstract class BasicWorker extends ComponentVerticle<Worker> {
   protected Worker worker;
 
   @Override
   protected Worker createComponent(InstanceContext context) {
     ComponentFactory componentFactory = new DefaultComponentFactory(vertx, container);
-    return componentFactory.createComponent(BasicWorker.class, context);
+    return componentFactory.createComponent(net.kuujo.vertigo.worker.impl.BasicWorker.class, context);
   }
 
   @Override

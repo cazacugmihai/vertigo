@@ -22,7 +22,6 @@ import net.kuujo.vertigo.component.ComponentFactory;
 import net.kuujo.vertigo.component.impl.DefaultComponentFactory;
 import net.kuujo.vertigo.context.InstanceContext;
 import net.kuujo.vertigo.feeder.Feeder;
-import net.kuujo.vertigo.feeder.impl.BasicFeeder;
 
 /**
  * A feeder verticle implementation.<p>
@@ -46,13 +45,13 @@ import net.kuujo.vertigo.feeder.impl.BasicFeeder;
  *
  * @author Jordan Halterman
  */
-public abstract class FeederVerticle extends ComponentVerticle<Feeder> {
+public abstract class BasicFeeder extends ComponentVerticle<Feeder> {
   protected Feeder feeder;
 
   @Override
   protected Feeder createComponent(InstanceContext context) {
     ComponentFactory componentFactory = new DefaultComponentFactory(vertx, container);
-    return componentFactory.createComponent(BasicFeeder.class, context);
+    return componentFactory.createComponent(net.kuujo.vertigo.feeder.impl.BasicFeeder.class, context);
   }
 
   @Override
