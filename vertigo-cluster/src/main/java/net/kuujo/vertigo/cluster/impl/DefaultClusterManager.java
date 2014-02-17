@@ -134,10 +134,16 @@ public class DefaultClusterManager implements ClusterManager {
                 new DefaultFutureResult<Collection<String>>(new ClusterException(body.getString("message"))).setHandler(resultHandler);
               }
               else {
-                JsonArray jsonKeys = body.getArray("keys");
+                JsonArray jsonKeys = body.getArray("result");
                 if (jsonKeys != null) {
-                  new DefaultFutureResult<Collection<String>>(Arrays.<String> asList((String[]) jsonKeys.toArray()))
-                      .setHandler(resultHandler);
+                  List<String> keys = new ArrayList<>();
+                  for (Object key : jsonKeys) {
+                    keys.add((String) key);
+                  }
+                  new DefaultFutureResult<Collection<String>>(keys).setHandler(resultHandler);
+                }
+                else {
+                  new DefaultFutureResult<Collection<String>>().setHandler(resultHandler).setResult(null);
                 }
               }
             }

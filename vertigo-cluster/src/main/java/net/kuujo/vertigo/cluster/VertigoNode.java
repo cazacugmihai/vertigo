@@ -728,14 +728,14 @@ public class VertigoNode extends BusModBase implements StateMachine {
    * Called when a keys command is received.
    */
   private void doClusterKeys(final Message<JsonObject> message) {
-    replica.submitCommand("keys", message.body(), new Handler<AsyncResult<JsonArray>>() {
+    replica.submitCommand("keys", message.body(), new Handler<AsyncResult<List<String>>>() {
       @Override
-      public void handle(AsyncResult<JsonArray> result) {
+      public void handle(AsyncResult<List<String>> result) {
         if (result.failed()) {
           sendError(message, result.cause().getMessage());
         }
         else {
-          sendOK(message, new JsonObject().putArray("result", result.result()));
+          sendOK(message, new JsonObject().putArray("result", new JsonArray(result.result().toArray(new Object[result.result().size()]))));
         }
       }
     });
