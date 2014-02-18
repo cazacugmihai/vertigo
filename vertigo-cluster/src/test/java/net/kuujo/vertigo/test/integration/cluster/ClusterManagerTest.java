@@ -995,7 +995,7 @@ public class ClusterManagerTest extends TestVerticle {
   private void deployCluster(final int id, final int count, final Handler<AsyncResult<Void>> doneHandler) {
     if (id < count) {
       container.deployVerticle(VertigoNode.class.getName(), new JsonObject().putString("cluster", "test")
-          .putString("address", String.format("test.%d", id+1)), new Handler<AsyncResult<String>>() {
+          .putString("address", String.format("test.%d", id+1)).putString("mode", "test"), new Handler<AsyncResult<String>>() {
         @Override
         public void handle(AsyncResult<String> result) {
           if (result.failed()) {

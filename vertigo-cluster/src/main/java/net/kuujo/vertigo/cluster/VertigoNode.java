@@ -15,6 +15,7 @@
  */
 package net.kuujo.vertigo.cluster;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Jordan Halterman
  */
 public class VertigoNode extends BusModBase implements StateMachine {
+  private static final String MODE_NORMAL = "normal";
+  private static final String MODE_TEST = "test";
   private static final ObjectMapper mapper = new ObjectMapper();
+  private String mode;
+  private String logFileName;
   private String clusterAddress;
   private String nodeAddress;
   private String internalAddress;
@@ -540,10 +545,16 @@ public class VertigoNode extends BusModBase implements StateMachine {
   public void start(final Future<Void> startResult) {
     super.start();
     startFuture = startResult;
+    mode = getOptionalStringConfig("mode", MODE_NORMAL);
     clusterAddress = getMandatoryStringConfig("cluster");
     nodeAddress = getMandatoryStringConfig("address");
+    logFileName = String.format("%s.log", nodeAddress);
     CopyCat copycat = new CopyCat(this);
     replica = copycat.createReplica(String.format("%s.replica", nodeAddress), this, config);
+    replica.setLogFile(logFileName);
+    if (mode.equals(MODE_TEST)) {
+      new File(logFileName).deleteOnExit();
+    }
     internalAddress = String.format("%s.internal", replica.address());
     vertx.setPeriodic(1000, broadcastTimer);
 
