@@ -552,9 +552,6 @@ public class VertigoNode extends BusModBase implements StateMachine {
     CopyCat copycat = new CopyCat(this);
     replica = copycat.createReplica(String.format("%s.replica", nodeAddress), this, config);
     replica.setLogFile(logFileName);
-    if (mode.equals(MODE_TEST)) {
-      new File(logFileName).deleteOnExit();
-    }
     internalAddress = String.format("%s.internal", replica.address());
     vertx.setPeriodic(1000, broadcastTimer);
 
@@ -609,6 +606,9 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
   @Override
   public void stop() {
+    if (mode.equals(MODE_TEST)) {
+      new File(logFileName).delete();
+    }
     replica.stop();
   }
 
