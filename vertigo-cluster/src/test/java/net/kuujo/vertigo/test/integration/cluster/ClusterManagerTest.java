@@ -243,6 +243,7 @@ public class ClusterManagerTest extends TestVerticle {
           public void handle(AsyncResult<String> result) {
             assertTrue(result.succeeded());
             assertEquals("test", result.result());
+            testComplete();
           }
         });
       }
