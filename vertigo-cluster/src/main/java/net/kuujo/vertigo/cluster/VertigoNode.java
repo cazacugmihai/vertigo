@@ -175,10 +175,11 @@ public class VertigoNode extends BusModBase implements StateMachine {
   private final Handler<Long> broadcastTimer = new Handler<Long>() {
     @Override
     public void handle(Long timerID) {
-      eb.publish(
-          clusterAddress,
-          new JsonObject().putString("action", "broadcast").putString("address", nodeAddress).putString("id", internalAddress)
-              .putString("replica", replica.address()));
+      eb.publish(clusterAddress, new JsonObject()
+          .putString("action", "broadcast")
+          .putString("address", nodeAddress)
+          .putString("id", internalAddress)
+          .putString("replica", replica.address()));
     }
   };
 
