@@ -326,9 +326,17 @@ public class VertigoNode extends BusModBase implements StateMachine {
    */
   @Command(type = Command.Type.WRITE)
   public void set(@Argument("key") String key, @Argument("value") Object value, @Argument(value = "expire", required = false) long expire) {
-    data.put(key, new Value(value, expire));
-    if (replica.isLeader()) {
-      triggerEvent("set", key, value);
+    if (!data.containsKey(key)) {
+      data.put(key, new Value(value, expire));
+      if (replica.isLeader()) {
+        triggerEvent("create", key, value);
+      }
+    }
+    else {
+      data.put(key, new Value(value, expire));
+      if (replica.isLeader()) {
+        triggerEvent("update", key, value);
+      }
     }
   }
 
@@ -416,18 +424,20 @@ public class VertigoNode extends BusModBase implements StateMachine {
    * @param timeout The key timeout.
    */
   @Command(type = Command.Type.WRITE)
-  public void timeout(final @Argument("key") String key, @Argument(value = "timeout", required = false) Long timeout) {
+  public void timeout(final @Argument("key") String key, @Argument(value = "timeout", required = false) long timeout) {
+    boolean updated = false;
     if (data.containsKey(key)) {
       Value oldValue = data.get(key);
       if (oldValue.timer > 0) {
         vertx.cancelTimer(oldValue.timer);
       }
-      if (timeout == null) {
-        timeout = oldValue.expire;
+      if (timeout == 0) {
+        timeout = (long) oldValue.value;
       }
+      updated = true;
     }
 
-    if (timeout == null) {
+    if (timeout == 0) {
       throw new IllegalArgumentException("No timeout specified.");
     }
 
@@ -442,7 +452,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
         }
 
         if (replica.isLeader()) {
-          triggerEvent("timeout", key, value.expire);
+          triggerEvent("timeout", key, value.value);
         }
       }
     });
@@ -450,7 +460,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
     data.put(key, value);
 
     if (replica.isLeader()) {
-      triggerEvent("set", key, timeout);
+      triggerEvent(updated ? "update" : "create", key, timeout);
     }
   }
 
@@ -466,6 +476,9 @@ public class VertigoNode extends BusModBase implements StateMachine {
       Value value = data.remove(key);
       vertx.cancelTimer(value.timer);
       value.timer = 0;
+      if (replica.isLeader()) {
+        triggerEvent("delete", key, value.expire);
+      }
       return true;
     }
     return false;

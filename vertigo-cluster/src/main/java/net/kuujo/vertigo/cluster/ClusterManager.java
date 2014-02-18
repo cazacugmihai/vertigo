@@ -89,6 +89,14 @@ public interface ClusterManager {
    * Deletes a key in the cluster.
    *
    * @param key The key to delete.
+   * @return The cluster manager.
+   */
+  ClusterManager delete(String key);
+
+  /**
+   * Deletes a key in the cluster.
+   *
+   * @param key The key to delete.
    * @param doneHandler An asynchronous handler to be called with the result.
    * @return The cluster manager.
    */
@@ -132,7 +140,7 @@ public interface ClusterManager {
   ClusterManager timeout(String key, long timeout, Handler<AsyncResult<Void>> doneHandler);
 
   /**
-   * Resets a key in the cluster.
+   * Resets a timer in the cluster.
    * 
    * @param key The key to reset.
    * @return The cluster manager.
@@ -140,7 +148,7 @@ public interface ClusterManager {
   ClusterManager reset(String key);
 
   /**
-   * Resets a key in the cluster.
+   * Resets a timer in the cluster.
    * 
    * @param key The key to reset.
    * @param doneHandler An asynchronous handler to be called once the timeout has been
@@ -148,6 +156,23 @@ public interface ClusterManager {
    * @return The cluster manager.
    */
   ClusterManager reset(String key, Handler<AsyncResult<Void>> doneHandler);
+
+  /**
+   * Cancels a timer in the cluster.
+   *
+   * @param key The timer key.
+   * @return The cluster manager.
+   */
+  ClusterManager cancel(String key);
+
+  /**
+   * Cancels a timer in the cluster.
+   *
+   * @param key The timer key.
+   * @param doneHandler An asynchronous handler to be called once the timer has been cancelled.
+   * @return The cluster manager.
+   */
+  ClusterManager cancel(String key, Handler<AsyncResult<Void>> doneHandler);
 
   /**
    * Watches a key in the cluster.

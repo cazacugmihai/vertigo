@@ -106,6 +106,11 @@ public class DefaultClusterManager implements ClusterManager {
   }
 
   @Override
+  public ClusterManager delete(String key) {
+    return delete(key, null);
+  }
+
+  @Override
   public ClusterManager delete(String key, Handler<AsyncResult<Boolean>> resultHandler) {
     JsonObject message = new JsonObject().putString("action", "delete").putString("key", key);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncValueHandler(resultHandler));
@@ -172,6 +177,18 @@ public class DefaultClusterManager implements ClusterManager {
   @Override
   public ClusterManager reset(String key, Handler<AsyncResult<Void>> doneHandler) {
     JsonObject message = new JsonObject().putString("action", "reset").putString("key", key);
+    vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncVoidHandler(doneHandler));
+    return this;
+  }
+
+  @Override
+  public ClusterManager cancel(String key) {
+    return cancel(key, null);
+  }
+
+  @Override
+  public ClusterManager cancel(String key, Handler<AsyncResult<Void>> doneHandler) {
+    JsonObject message = new JsonObject().putString("action", "cancel").putString("key", key);
     vertx.eventBus().sendWithTimeout(address, message, DEFAULT_TIMEOUT, createAsyncVoidHandler(doneHandler));
     return this;
   }
