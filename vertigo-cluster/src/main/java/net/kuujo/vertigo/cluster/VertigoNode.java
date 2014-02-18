@@ -57,6 +57,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class VertigoNode extends BusModBase implements StateMachine {
   private static final String MODE_NORMAL = "normal";
   private static final String MODE_TEST = "test";
+
   private static final ObjectMapper mapper = new ObjectMapper();
   private String mode;
   private String logFileName;
@@ -67,6 +68,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
   private Replica replica;
   private boolean started;
   private Future<Void> startFuture;
+  @Stateful
   private final Map<String, Set<Watcher>> watchers = new HashMap<>();
   @Stateful
   private final Map<String, NodeReference> nodes = new HashMap<>();
@@ -280,8 +282,11 @@ public class VertigoNode extends BusModBase implements StateMachine {
    * A data store key.
    */
   private static class Value {
+    @JsonProperty("address")
     private Object value;
+    @JsonProperty("address")
     private long expire;
+    @JsonIgnore
     private long timer;
 
     private Value(Object value) {
@@ -303,7 +308,9 @@ public class VertigoNode extends BusModBase implements StateMachine {
    * A key watcher.
    */
   private static class Watcher {
+    @JsonProperty("address")
     private final String address;
+    @JsonProperty("address")
     private final Event.Type event;
 
     private Watcher(String address) {
@@ -548,12 +555,19 @@ public class VertigoNode extends BusModBase implements StateMachine {
     mode = getOptionalStringConfig("mode", MODE_NORMAL);
     clusterAddress = getMandatoryStringConfig("cluster");
     nodeAddress = getMandatoryStringConfig("address");
+    internalAddress = String.format("%s.internal", nodeAddress);
     logFileName = String.format("%s.log", nodeAddress);
+
     CopyCat copycat = new CopyCat(this);
     replica = copycat.createReplica(String.format("%s.replica", nodeAddress), this, config);
     replica.setLogFile(logFileName);
-    internalAddress = String.format("%s.internal", replica.address());
-    vertx.setPeriodic(1000, broadcastTimer);
+    replica.setMaxLogSize(getOptionalLongConfig("max_log_size", 32 * 1024 * 1024));
+    replica.setHeartbeatInterval(getOptionalLongConfig("heartbeat_interval", 2500));
+    replica.setElectionTimeout(getOptionalLongConfig("election_timeout", 5000));
+    replica.setRequireReadMajority(getOptionalBooleanConfig("require_read_majority", true));
+    replica.setRequireWriteMajority(getOptionalBooleanConfig("require_write_majority", true));
+
+    vertx.setPeriodic(getOptionalLongConfig("broadcast_interval", 2500), broadcastTimer);
 
     // Start the replica first. We need the replica to start and determine a
     // cluster leader before registering handlers on the event bus.
