@@ -530,6 +530,73 @@ public class ClusterManagerTest extends TestVerticle {
   }
 
   @Test
+  public void testRecoverKeysViaSnapshotToSingleNodeCluster() {
+    container.deployVerticle(VertigoNode.class.getName(), new JsonObject().putString("cluster", "test")
+        .putString("address", String.format("test.1")).putNumber("max_log_size", 1028), new Handler<AsyncResult<String>>() {
+      @Override
+      public void handle(AsyncResult<String> result) {
+        final String deploymentID = result.result();
+        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+        setKeys(cluster, "test", 100, new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            if (result.failed()) {
+              fail(result.cause().getMessage());
+            }
+
+            container.undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
+              @Override
+              public void handle(AsyncResult<Void> result) {
+                assertTrue(result.succeeded());
+                container.deployVerticle(VertigoNode.class.getName(), new JsonObject().putString("cluster", "test")
+                  .putString("address", String.format("test.1")).putString("mode", "test").putNumber("max_log_size", 1028), new Handler<AsyncResult<String>>() {
+                    @Override
+                    public void handle(AsyncResult<String> result) {
+                      assertTrue(result.succeeded());
+                      cluster.get("test1", new Handler<AsyncResult<String>>() {
+                        @Override
+                        public void handle(AsyncResult<String> result) {
+                          if (result.failed()) {
+                            fail(result.cause().getMessage());
+                          }
+                          assertEquals("Hello world1!", result.result());
+                          testComplete();
+                        }
+                      });
+                    }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  private void setKeys(ClusterManager cluster, String prefix, int total, Handler<AsyncResult<Void>> doneHandler) {
+    setKeys(cluster, prefix, 0, total, doneHandler);
+  }
+
+  private void setKeys(final ClusterManager cluster, final String prefix, final int count, final int total, final Handler<AsyncResult<Void>> doneHandler) {
+    if (count < total) {
+      cluster.set(String.format("%s%s", prefix, count+1), String.format("Hello world%d!", count+1), new Handler<AsyncResult<Void>>() {
+        @Override
+        public void handle(AsyncResult<Void> result) {
+          if (result.failed()) {
+            new DefaultFutureResult<Void>(result.cause()).setHandler(doneHandler);
+          }
+          else {
+            setKeys(cluster, prefix, count+1, total, doneHandler);
+          }
+        }
+      });
+    }
+    else {
+      new DefaultFutureResult<Void>((Void) null).setHandler(doneHandler);
+    }
+  }
+
+  @Test
   public void testSetGetToMultiNodeCluster() {
     deployCluster(3, new Handler<AsyncResult<Void>>() {
       @Override

@@ -69,13 +69,12 @@ public class VertigoNode extends BusModBase implements StateMachine {
   private boolean started;
   private Future<Void> startFuture;
   @Stateful
-  private final Map<String, Set<Watcher>> watchers = new HashMap<>();
+  private Map<String, Set<Watcher>> watchers = new HashMap<>();
   @Stateful
-  private final Map<String, NodeReference> nodes = new HashMap<>();
+  private Map<String, Value> data = new HashMap<>();
   @Stateful
-  private final Map<String, AssignmentInfoInternal> assignments = new HashMap<>();
-  @Stateful
-  private final Map<String, Value> data = new HashMap<>();
+  private Map<String, NodeReference> nodes = new HashMap<>();
+  private Map<String, AssignmentInfoInternal> assignments = new HashMap<>();
 
   // Handles messages sent to the cluster.
   private final Handler<Message<JsonObject>> clusterHandler = new Handler<Message<JsonObject>>() {
@@ -207,6 +206,39 @@ public class VertigoNode extends BusModBase implements StateMachine {
     }
   };
 
+  @Stateful("watchers")
+  public void setWatchers(Map<String, List<Map<String, Object>>> watchers) {
+    this.watchers = new HashMap<>();
+    for (Map.Entry<String, List<Map<String, Object>>> entry : watchers.entrySet()) {
+      Set<Watcher> watchersSet = new HashSet<>();
+      for (Map<String, Object> watcher : entry.getValue()) {
+        watchersSet.add(new Watcher(watcher.get("address").toString(), watcher.containsKey("event") ? Event.Type.parse(watcher.get("event").toString()) : null));
+      }
+      this.watchers.put(entry.getKey(), watchersSet);
+    }
+  }
+
+  @Stateful("data")
+  public void setData(Map<String, Map<String, Object>> data) {
+    this.data = new HashMap<>();
+    for (Map.Entry<String, Map<String, Object>> entry : data.entrySet()) {
+      this.data.put(entry.getKey(), new Value(entry.getValue().get("value"), entry.getValue().containsKey("expire") ? ((Number) entry.getValue().get("expire")).longValue() : 0));
+    }
+  }
+
+  @Stateful("nodes")
+  public void setNodes(Map<String, Map<String, Object>> nodes) {
+    this.nodes = new HashMap<>();
+    for (Map.Entry<String, Map<String, Object>> entry : nodes.entrySet()) {
+      try {
+        this.nodes.put(entry.getKey(), mapper.readValue(mapper.writeValueAsString(nodes), NodeReference.class));
+      }
+      catch (IOException e) {
+        continue;
+      }
+    }
+  }
+
   /**
    * A state machine command for adding a node to the cluster.
    * 
@@ -227,6 +259,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
 
     node.id = id;
     node.replica = replica;
+    node.resetTimer();
 
     if (!started) {
       String leader = VertigoNode.this.replica.getCurrentLeader();
@@ -282,9 +315,9 @@ public class VertigoNode extends BusModBase implements StateMachine {
    * A data store key.
    */
   private static class Value {
-    @JsonProperty("address")
+    @JsonProperty
     private Object value;
-    @JsonProperty("address")
+    @JsonProperty
     private long expire;
     @JsonIgnore
     private long timer;
@@ -308,9 +341,9 @@ public class VertigoNode extends BusModBase implements StateMachine {
    * A key watcher.
    */
   private static class Watcher {
-    @JsonProperty("address")
+    @JsonProperty
     private final String address;
-    @JsonProperty("address")
+    @JsonProperty
     private final Event.Type event;
 
     private Watcher(String address) {
@@ -603,6 +636,11 @@ public class VertigoNode extends BusModBase implements StateMachine {
                           }
                           else {
                             addNode(nodeAddress, internalAddress, replica.address());
+                            // If the current node is the cluster leader then
+                            // replicate the current cluster configuration.
+                            if (replica.isLeader()) {
+                              replica.config().setMembers(config.getMembers());
+                            }
                             startResult.setResult((Void) null);
                           }
                         }
@@ -622,6 +660,7 @@ public class VertigoNode extends BusModBase implements StateMachine {
   public void stop() {
     if (mode.equals(MODE_TEST)) {
       new File(logFileName).delete();
+      new File(String.format("%s.snapshot", logFileName)).delete();
     }
     replica.stop();
   }
@@ -1335,7 +1374,24 @@ public class VertigoNode extends BusModBase implements StateMachine {
           container.logger().warn(result.cause());
         }
         else {
-          container.logger().info("Successfully redeployed " + node.address + " assignments.");
+          try {
+            node.info = NodeInfo.Builder.newBuilder(node.info).setAssignments(new ArrayList<AssignmentInfo>()).build();
+            replica.submitCommand("updateNode", new JsonObject().putString("replica", node.replica).putString("id", node.id)
+                .putString("address", node.address).putObject("info", new JsonObject(mapper.writeValueAsString(node.info))), new Handler<AsyncResult<Boolean>>() {
+              @Override
+              public void handle(AsyncResult<Boolean> result) {
+                if (result.failed()) {
+                  container.logger().warn(result.cause());
+                }
+                else {
+                  container.logger().info("Successfully redeployed " + node.address + " assignments.");
+                }
+              }
+            });
+          }
+          catch (JsonProcessingException e) {
+            container.logger().warn(e);
+          }
         }
       }
     });
@@ -1373,8 +1429,14 @@ public class VertigoNode extends BusModBase implements StateMachine {
     private String replica;
     @JsonIgnore
     private long timerID;
+    @JsonIgnore
     private Handler<String> timeoutHandler;
+    @JsonProperty
     private NodeInfo info;
+
+    private NodeReference() {
+      address = null;
+    }
 
     private NodeReference(String address, String id, String replica) {
       this.address = address;
