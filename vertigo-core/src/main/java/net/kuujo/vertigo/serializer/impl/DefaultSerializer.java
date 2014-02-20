@@ -17,6 +17,7 @@ package net.kuujo.vertigo.serializer.impl;
 
 import org.vertx.java.core.json.JsonObject;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -63,6 +64,16 @@ public class DefaultSerializer implements Serializer {
   }
 
   @Override
+  public <T> T deserializeFromString(String json, TypeReference<T> type) {
+    try {
+      return mapper.readValue(json, type);
+    }
+    catch (Exception e) {
+      throw new SerializationException(e.getMessage());
+    }
+  }
+
+  @Override
   public <T extends Serializable> JsonObject serializeToObject(T object) {
     try {
       return new JsonObject(mapper.writeValueAsString(object));
@@ -74,6 +85,16 @@ public class DefaultSerializer implements Serializer {
 
   @Override
   public <T extends Serializable> T deserializeFromObject(JsonObject json, Class<T> type) {
+    try {
+      return mapper.readValue(json.encode(), type);
+    }
+    catch (Exception e) {
+      throw new DeserializationException(e.getMessage());
+    }
+  }
+
+  @Override
+  public <T> T deserializeFromObject(JsonObject json, TypeReference<T> type) {
     try {
       return mapper.readValue(json.encode(), type);
     }

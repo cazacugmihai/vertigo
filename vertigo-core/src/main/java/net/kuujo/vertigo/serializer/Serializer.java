@@ -17,6 +17,8 @@ package net.kuujo.vertigo.serializer;
 
 import org.vertx.java.core.json.JsonObject;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 /**
  * Json serializer.
  * <p>
@@ -50,6 +52,17 @@ public interface Serializer {
   <T extends Serializable> T deserializeFromString(String json, Class<T> type);
 
   /**
+   * Deserializes an object from Json. If an error occurs during deserialization, a
+   * {@link DeserializationException} will be thrown.
+   * 
+   * @param json A Json representation of the serializable object.
+   * @param type The type to which to deserialize the object.
+   * @return The deserialized object.
+   * @throws DeserializationException If an error occurs during deserialization.
+   */
+  <T> T deserializeFromString(String json, TypeReference<T> type);
+
+  /**
    * Serializes an object to Json. If an error occurs during serialization, a
    * {@link SerializationException} will be thrown.
    * 
@@ -69,5 +82,16 @@ public interface Serializer {
    * @throws DeserializationException If an error occurs during deserialization.
    */
   <T extends Serializable> T deserializeFromObject(JsonObject json, Class<T> type);
+
+  /**
+   * Deserializes an object from Json. If an error occurs during deserialization, a
+   * {@link DeserializationException} will be thrown.
+   * 
+   * @param json A Json representation of the serializable object.
+   * @param type The type to which to deserialize the object.
+   * @return The deserialized object.
+   * @throws DeserializationException If an error occurs during deserialization.
+   */
+  <T> T deserializeFromObject(JsonObject json, TypeReference<T> type);
 
 }
