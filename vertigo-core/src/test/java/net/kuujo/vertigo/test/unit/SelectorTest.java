@@ -21,10 +21,9 @@ import java.util.List;
 import java.util.Set;
 
 import net.kuujo.vertigo.message.JsonMessage;
-import net.kuujo.vertigo.message.impl.JsonMessageBuilder;
+import net.kuujo.vertigo.message.impl.DefaultJsonMessage;
 import net.kuujo.vertigo.output.OutputConnection;
 import net.kuujo.vertigo.output.impl.DefaultOutputConnection;
-import net.kuujo.vertigo.output.impl.DefaultPseudoConnection;
 import net.kuujo.vertigo.output.selector.AllSelector;
 import net.kuujo.vertigo.output.selector.FieldsSelector;
 import net.kuujo.vertigo.output.selector.RandomSelector;
@@ -47,11 +46,11 @@ public class SelectorTest {
   private List<OutputConnection> testConnections = new ArrayList<OutputConnection>() {{
     add(new DefaultOutputConnection("foo", null));
     add(new DefaultOutputConnection("bar", null));
-    add(new DefaultPseudoConnection(null));
+    add(new DefaultOutputConnection("baz", null));
   }};
 
-  private JsonMessage testMessage = new JsonMessageBuilder("test").createNew("auditor")
-      .setBody(new JsonObject().putString("body", "Hello world!")).toMessage();
+  private JsonMessage testMessage = DefaultJsonMessage.Builder.newBuilder()
+      .setBody(new JsonObject().putString("body", "Hello world!")).build();
 
   @Test
   public void testAllSelector() {

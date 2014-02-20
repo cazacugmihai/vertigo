@@ -23,7 +23,6 @@ import net.kuujo.vertigo.acker.DefaultAcker;
 import net.kuujo.vertigo.auditor.AuditorVerticle;
 import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.message.MessageId;
-import net.kuujo.vertigo.message.impl.JsonMessageBuilder;
 
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;
@@ -101,6 +100,7 @@ public class AuditorTest extends TestVerticle {
           @Override
           public void handle(AsyncResult<Void> result) {
             assertTrue(result.succeeded());
+            
             JsonMessageBuilder builder = new JsonMessageBuilder("test");
             JsonMessage message = builder.createNew(auditor).toMessage();
             MessageId source = message.messageId();
