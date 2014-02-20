@@ -31,6 +31,7 @@ import net.kuujo.vertigo.output.selector.RoundSelector;
 import net.kuujo.vertigo.output.selector.Selector;
 
 import org.junit.Test;
+import org.vertx.java.core.impl.DefaultVertx;
 import org.vertx.java.core.json.JsonObject;
 
 import static org.junit.Assert.assertEquals;
@@ -44,9 +45,9 @@ import static org.junit.Assert.assertTrue;
 public class SelectorTest {
   @SuppressWarnings("serial")
   private List<OutputConnection> testConnections = new ArrayList<OutputConnection>() {{
-    add(new DefaultOutputConnection("foo", null));
-    add(new DefaultOutputConnection("bar", null));
-    add(new DefaultOutputConnection("baz", null));
+    add(new DefaultOutputConnection("foo", new DefaultVertx()));
+    add(new DefaultOutputConnection("bar", new DefaultVertx()));
+    add(new DefaultOutputConnection("baz", new DefaultVertx()));
   }};
 
   private JsonMessage testMessage = DefaultJsonMessage.Builder.newBuilder()
@@ -93,23 +94,21 @@ public class SelectorTest {
   public void testFieldsSelector() {
     Selector selector = new FieldsSelector("test");
 
-    JsonMessageBuilder builder = new JsonMessageBuilder("test");
-
-    JsonMessage test1 = builder.createNew("auditor").setBody(new JsonObject().putString("test", "a")).toMessage();
+    JsonMessage test1 = DefaultJsonMessage.Builder.newBuilder().setBody(new JsonObject().putString("test", "a")).build();
     List<OutputConnection> connections1 = selector.select(test1, testConnections);
     assertEquals(1, connections1.size());
     List<OutputConnection> connections2 = selector.select(test1, testConnections);
     assertEquals(1, connections2.size());
     assertEquals(connections1.get(0), connections2.get(0));
 
-    JsonMessage test2 = builder.createNew("auditor").setBody(new JsonObject().putString("test", "a")).toMessage();
+    JsonMessage test2 = DefaultJsonMessage.Builder.newBuilder().setBody(new JsonObject().putString("test", "a")).build();
     List<OutputConnection> connections3 = selector.select(test2, testConnections);
     assertEquals(1, connections3.size());
     List<OutputConnection> connections4 = selector.select(test2, testConnections);
     assertEquals(1, connections4.size());
     assertEquals(connections3.get(0), connections4.get(0));
 
-    JsonMessage test3 = builder.createNew("auditor").setBody(new JsonObject().putString("test", "a")).toMessage();
+    JsonMessage test3 = DefaultJsonMessage.Builder.newBuilder().setBody(new JsonObject().putString("test", "a")).build();
     List<OutputConnection> connections5 = selector.select(test3, testConnections);
     assertEquals(1, connections5.size());
     List<OutputConnection> connections6 = selector.select(test3, testConnections);
@@ -118,21 +117,21 @@ public class SelectorTest {
 
     Selector multiSelector = new FieldsSelector("test1", "test2");
 
-    JsonMessage test4 = builder.createNew("auditor").setBody(new JsonObject().putString("test1", "a")).toMessage();
+    JsonMessage test4 = DefaultJsonMessage.Builder.newBuilder().setBody(new JsonObject().putString("test1", "a")).build();
     List<OutputConnection> connections7 = multiSelector.select(test4, testConnections);
     assertEquals(1, connections7.size());
     List<OutputConnection> connections8 = multiSelector.select(test4, testConnections);
     assertEquals(1, connections8.size());
     assertEquals(connections7.get(0), connections8.get(0));
 
-    JsonMessage test5 = builder.createNew("auditor").setBody(new JsonObject().putString("test2", "ab")).toMessage();
+    JsonMessage test5 = DefaultJsonMessage.Builder.newBuilder().setBody(new JsonObject().putString("test2", "ab")).build();
     List<OutputConnection> connections9 = multiSelector.select(test5, testConnections);
     assertEquals(1, connections9.size());
     List<OutputConnection> connections10 = multiSelector.select(test5, testConnections);
     assertEquals(1, connections10.size());
     assertEquals(connections9.get(0), connections10.get(0));
 
-    JsonMessage test6 = builder.createNew("auditor").setBody(new JsonObject().putString("test1", "ab").putString("test2", "abc")).toMessage();
+    JsonMessage test6 = DefaultJsonMessage.Builder.newBuilder().setBody(new JsonObject().putString("test1", "ab").putString("test2", "abc")).build();
     List<OutputConnection> connections11 = multiSelector.select(test6, testConnections);
     assertEquals(1, connections11.size());
     List<OutputConnection> connections12 = multiSelector.select(test6, testConnections);

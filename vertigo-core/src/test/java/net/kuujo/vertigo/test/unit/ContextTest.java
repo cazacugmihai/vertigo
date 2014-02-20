@@ -22,7 +22,6 @@ import net.kuujo.vertigo.context.NetworkContext;
 import net.kuujo.vertigo.context.OutputStreamContext;
 import net.kuujo.vertigo.context.VerticleContext;
 import net.kuujo.vertigo.context.impl.ContextBuilder;
-import net.kuujo.vertigo.feeder.Feeder;
 import net.kuujo.vertigo.hooks.ComponentHook;
 import net.kuujo.vertigo.input.grouping.RandomGrouping;
 import net.kuujo.vertigo.message.MessageId;
@@ -30,7 +29,6 @@ import net.kuujo.vertigo.network.Component;
 import net.kuujo.vertigo.network.Module;
 import net.kuujo.vertigo.network.Network;
 import net.kuujo.vertigo.network.Verticle;
-import net.kuujo.vertigo.worker.Worker;
 
 import org.junit.Test;
 import org.vertx.java.core.json.JsonObject;
