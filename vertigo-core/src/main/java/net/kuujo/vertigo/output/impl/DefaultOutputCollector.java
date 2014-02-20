@@ -18,6 +18,7 @@ package net.kuujo.vertigo.output.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
@@ -223,6 +224,7 @@ public class DefaultOutputCollector implements OutputCollector {
   private JsonMessage createNewMessage(String stream, JsonObject body) {
     String auditor = auditors.get(random.nextInt(auditors.size()));
     MessageId messageId = DefaultMessageId.Builder.newBuilder()
+        .setCorrelationId(UUID.randomUUID().toString())
         .setAuditor(auditor)
         .setCode(random.nextInt())
         .setOwner(context.instance().address())
