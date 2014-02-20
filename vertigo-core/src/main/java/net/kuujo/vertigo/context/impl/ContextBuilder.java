@@ -84,6 +84,7 @@ public final class ContextBuilder {
         // Set up basic module configuratin options.
         ModuleContext.Builder module = ModuleContext.Builder.newBuilder();
         module.setAddress(component.getAddress());
+        module.setType(component.getType());
         module.setModule(((Module) component).getModule());
         module.setConfig(component.getConfig());
         module.setHooks(component.getHooks());
@@ -107,6 +108,7 @@ public final class ContextBuilder {
         // Set up basic verticle configuration options.
         VerticleContext.Builder verticle = VerticleContext.Builder.newBuilder();
         verticle.setAddress(component.getAddress());
+        verticle.setType(component.getType());
         verticle.setMain(((Verticle) component).getMain());
         verticle.setWorker(((Verticle) component).isWorker());
         verticle.setMultiThreaded(((Verticle) component).isMultiThreaded());
