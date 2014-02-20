@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.message.MessageId;
-import net.kuujo.vertigo.message.impl.DefaultMessageId;
+import net.kuujo.vertigo.serializer.Serializer;
+import net.kuujo.vertigo.serializer.SerializerFactory;
 
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
@@ -20,6 +22,7 @@ import org.vertx.java.core.json.JsonObject;
  * @author Jordan Halterman
  */
 public class DefaultAcker implements Acker {
+  private static final Serializer serializer = SerializerFactory.getSerializer(JsonMessage.class);
   private final String address;
   private final EventBus eventBus;
   private Map<String, List<MessageId>> children = new HashMap<>();
@@ -71,7 +74,7 @@ public class DefaultAcker implements Acker {
     if (ackHandler != null) {
       JsonObject id = message.body().getObject("id");
       if (id != null) {
-        ackHandler.handle(DefaultMessageId.fromJson(id));
+        ackHandler.handle(serializer.deserialize(id, MessageId.class));
       }
     }
   }
@@ -86,7 +89,7 @@ public class DefaultAcker implements Acker {
     if (failHandler != null) {
       JsonObject id = message.body().getObject("id");
       if (id != null) {
-        failHandler.handle(DefaultMessageId.fromJson(id));
+        failHandler.handle(serializer.deserialize(id, MessageId.class));
       }
     }
   }
@@ -101,7 +104,7 @@ public class DefaultAcker implements Acker {
     if (timeoutHandler != null) {
       JsonObject id = message.body().getObject("id");
       if (id != null) {
-        timeoutHandler.handle(DefaultMessageId.fromJson(id));
+        timeoutHandler.handle(serializer.deserialize(id, MessageId.class));
       }
     }
   }
@@ -112,11 +115,11 @@ public class DefaultAcker implements Acker {
     if (messageIds != null && !messageIds.isEmpty()) {
       eventBus.send(
           messageId.auditor(),
-          new JsonObject().putString("action", "create").putObject("id", messageId.toJson())
+          new JsonObject().putString("action", "create").putObject("id", serializer.serialize(messageId))
               .putArray("children", messageIdsToArray(messageIds)));
     }
     else {
-      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "create").putObject("id", messageId.toJson()));
+      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "create").putObject("id", serializer.serialize(messageId)));
     }
     return this;
   }
@@ -139,11 +142,11 @@ public class DefaultAcker implements Acker {
     if (messageIds != null) {
       eventBus.send(
           messageId.auditor(),
-          new JsonObject().putString("action", "ack").putObject("id", messageId.toJson())
+          new JsonObject().putString("action", "ack").putObject("id", serializer.serialize(messageId))
               .putArray("children", messageIdsToArray(messageIds)));
     }
     else {
-      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "ack").putObject("id", messageId.toJson()));
+      eventBus.send(messageId.auditor(), new JsonObject().putString("action", "ack").putObject("id", serializer.serialize(messageId)));
     }
     return this;
   }
@@ -151,7 +154,7 @@ public class DefaultAcker implements Acker {
   @Override
   public Acker fail(MessageId messageId) {
     children.remove(messageId.correlationId());
-    eventBus.send(messageId.auditor(), new JsonObject().putString("action", "fail").putObject("id", messageId.toJson()));
+    eventBus.send(messageId.auditor(), new JsonObject().putString("action", "fail").putObject("id", serializer.serialize(messageId)));
     return this;
   }
 
@@ -161,7 +164,7 @@ public class DefaultAcker implements Acker {
   private static JsonArray messageIdsToArray(List<MessageId> messageIds) {
     JsonArray ids = new JsonArray();
     for (MessageId id : messageIds) {
-      ids.add(id.toJson());
+      ids.add(serializer.serialize(id));
     }
     return ids;
   }
