@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package net.kuujo.vertigo.output;
 
+import net.kuujo.vertigo.context.OutputContext;
 import net.kuujo.vertigo.hooks.OutputHook;
 import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.message.MessageId;
@@ -39,11 +40,11 @@ import org.vertx.java.core.json.JsonObject;
 public interface OutputCollector {
 
   /**
-   * Returns the output address. This should be identical to a component address.
-   * 
-   * @return The output address.
+   * Returns the component output context.
+   *
+   * @return The current component output context.
    */
-  String getAddress();
+  OutputContext output();
 
   /**
    * Adds an output hook to the output collector.

@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import net.kuujo.vertigo.message.JsonMessage;
-import net.kuujo.vertigo.output.Connection;
+import net.kuujo.vertigo.output.OutputConnection;
 import net.kuujo.vertigo.serializer.Serializable;
 
 /**
@@ -31,7 +31,7 @@ import net.kuujo.vertigo.serializer.Serializable;
  * used to subscribe to the output of another component, the input's grouping
  * is converted to an output {@link Selector}. Each time a message is emitted
  * to the resulting output channel, the selector is used to select which
- * {@link Connection}s to which to send the message.
+ * {@link OutputConnection}s to which to send the message.
  *
  * @author Jordan Halterman
  */
@@ -49,11 +49,11 @@ public interface Selector extends Serializable {
    *
    * @param message
    *   The message being emitted.
-   * @param connections
+   * @param outputConnections
    *   A list of connections from which to select.
    * @return
    *   A list of selected connections.
    */
-  List<Connection> select(JsonMessage message, List<Connection> connections);
+  List<OutputConnection> select(JsonMessage message, List<OutputConnection> outputConnections);
 
 }

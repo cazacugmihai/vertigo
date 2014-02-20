@@ -21,7 +21,17 @@ package net.kuujo.vertigo.context;
  * @author Jordan Halterman
  */
 public class InputStreamContext extends Context<InputStreamContext> {
+  private String stream;
   private ConnectionContext connection;
+
+  /**
+   * Returns the stream name.
+   *
+   * @return The input stream name.
+   */
+  public String stream() {
+    return stream;
+  }
 
   /**
    * Returns the input connection context.
@@ -71,6 +81,17 @@ public class InputStreamContext extends Context<InputStreamContext> {
      */
     public static Builder newBuilder(InputStreamContext context) {
       return new Builder(context);
+    }
+
+    /**
+     * Sets the input stream name.
+     *
+     * @param stream The stream name.
+     * @return The context builder.
+     */
+    public Builder setStream(String stream) {
+      context.stream = stream;
+      return this;
     }
 
     /**

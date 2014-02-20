@@ -154,6 +154,7 @@ public final class ContextBuilder {
           // Iterate through input instances and add unique addresses to the output stream.
           for (InstanceContext inputInstanceContext : inputComponentContext.instances()) {
             InputStreamContext.Builder inputStream = InputStreamContext.Builder.newBuilder();
+            inputStream.setStream(info.getStream());
             ConnectionContext connection = ConnectionContext.Builder.newBuilder().setAddress(UUID.randomUUID().toString()).build();
             inputStream.setConnection(connection); // Set the input stream connection.
             outputStream.addConnection(connection); // Add the connection to the output stream.

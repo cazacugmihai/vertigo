@@ -65,10 +65,10 @@ public interface JsonMessage extends Serializable {
   String source();
 
   /**
-   * Returns a JSON representation of the message.
-   * 
-   * @return A JSON representation of the message.
+   * Copies the message.
+   *
+   * @return A new copy of the message.
    */
-  JsonObject toJson();
+  JsonMessage copy();
 
 }

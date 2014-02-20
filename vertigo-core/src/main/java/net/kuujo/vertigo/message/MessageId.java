@@ -18,8 +18,6 @@ package net.kuujo.vertigo.message;
 import net.kuujo.vertigo.message.impl.DefaultJsonMessage;
 import net.kuujo.vertigo.serializer.Serializable;
 
-import org.vertx.java.core.json.JsonObject;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -110,10 +108,10 @@ public interface MessageId extends Serializable {
   String auditor();
 
   /**
-   * Gets a JSON representation of the message.
-   * 
-   * @return A JSON representation of the message.
+   * Copies the message ID.
+   *
+   * @return A copy of the message ID.
    */
-  JsonObject toJson();
+  MessageId copy();
 
 }

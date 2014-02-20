@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,14 @@ import net.kuujo.vertigo.message.MessageId;
  * 
  * @author Jordan Halterman
  */
-public interface Connection {
+public interface OutputConnection {
 
   /**
    * Gets the remote connection address.
    * 
    * @return The remote connection address.
    */
-  String getAddress();
+  String address();
 
   /**
    * Writes a message to the connection.

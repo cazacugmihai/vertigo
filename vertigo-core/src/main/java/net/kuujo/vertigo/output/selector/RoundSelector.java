@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.kuujo.vertigo.message.JsonMessage;
-import net.kuujo.vertigo.output.Connection;
+import net.kuujo.vertigo.output.OutputConnection;
 
 /**
  * A *round* selector.
@@ -36,14 +36,14 @@ public class RoundSelector implements Selector {
   }
 
   @Override
-  public List<Connection> select(JsonMessage message, List<Connection> connections) {
-    if (connections.size() == 0) {
-      return new ArrayList<Connection>();
+  public List<OutputConnection> select(JsonMessage message, List<OutputConnection> outputConnections) {
+    if (outputConnections.size() == 0) {
+      return new ArrayList<OutputConnection>();
     }
-    else if (current >= connections.size()) {
+    else if (current >= outputConnections.size()) {
       current = 0;
     }
-    List<Connection> results = connections.subList(current, current+1);
+    List<OutputConnection> results = outputConnections.subList(current, current+1);
     current++;
     return results;
   }

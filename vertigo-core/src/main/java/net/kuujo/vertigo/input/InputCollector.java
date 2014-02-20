@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package net.kuujo.vertigo.input;
 
+import net.kuujo.vertigo.context.InputContext;
 import net.kuujo.vertigo.hooks.InputHook;
 import net.kuujo.vertigo.message.JsonMessage;
 
@@ -33,6 +34,13 @@ import org.vertx.java.core.Handler;
  * @author Jordan Halterman
  */
 public interface InputCollector {
+
+  /**
+   * Returns the component input context.
+   *
+   * @return The input context.
+   */
+  InputContext context();
 
   /**
    * Adds an input hook to the input collector.

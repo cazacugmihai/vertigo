@@ -22,8 +22,8 @@ import java.util.Set;
 
 import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.message.impl.JsonMessageBuilder;
-import net.kuujo.vertigo.output.Connection;
-import net.kuujo.vertigo.output.impl.DefaultConnection;
+import net.kuujo.vertigo.output.OutputConnection;
+import net.kuujo.vertigo.output.impl.DefaultOutputConnection;
 import net.kuujo.vertigo.output.impl.DefaultPseudoConnection;
 import net.kuujo.vertigo.output.selector.AllSelector;
 import net.kuujo.vertigo.output.selector.FieldsSelector;
@@ -44,9 +44,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class SelectorTest {
   @SuppressWarnings("serial")
-  private List<Connection> testConnections = new ArrayList<Connection>() {{
-    add(new DefaultConnection("foo", null));
-    add(new DefaultConnection("bar", null));
+  private List<OutputConnection> testConnections = new ArrayList<OutputConnection>() {{
+    add(new DefaultOutputConnection("foo", null));
+    add(new DefaultOutputConnection("bar", null));
     add(new DefaultPseudoConnection(null));
   }};
 
@@ -56,21 +56,21 @@ public class SelectorTest {
   @Test
   public void testAllSelector() {
     Selector selector = new AllSelector();
-    for (Connection connection : selector.select(testMessage, testConnections)) {
-      assertTrue(testConnections.contains(connection));
+    for (OutputConnection outputConnection : selector.select(testMessage, testConnections)) {
+      assertTrue(testConnections.contains(outputConnection));
     }
   }
 
   @Test
   public void testRandomSelector() {
     Selector selector = new RandomSelector();
-    Set<Connection> selected = new HashSet<Connection>();
+    Set<OutputConnection> selected = new HashSet<OutputConnection>();
     while (selected.size() < testConnections.size()) {
-      List<Connection> connections = selector.select(testMessage, testConnections);
-      assertEquals(1, connections.size());
-      Connection connection = connections.get(0);
-      if (!selected.contains(connection)) {
-        selected.add(connection);
+      List<OutputConnection> outputConnections = selector.select(testMessage, testConnections);
+      assertEquals(1, outputConnections.size());
+      OutputConnection outputConnection = outputConnections.get(0);
+      if (!selected.contains(outputConnection)) {
+        selected.add(outputConnection);
       }
     }
   }
@@ -81,10 +81,10 @@ public class SelectorTest {
     for (int i = 0; i < 5; i++) {
       int expected = 0;
       for (int j = 0; j < testConnections.size(); j++) {
-        List<Connection> connections = selector.select(testMessage, testConnections);
-        assertEquals(1, connections.size());
-        Connection connection = connections.get(0);
-        assertEquals(testConnections.get(expected), connection);
+        List<OutputConnection> outputConnections = selector.select(testMessage, testConnections);
+        assertEquals(1, outputConnections.size());
+        OutputConnection outputConnection = outputConnections.get(0);
+        assertEquals(testConnections.get(expected), outputConnection);
         expected++;
       }
     }
@@ -97,46 +97,46 @@ public class SelectorTest {
     JsonMessageBuilder builder = new JsonMessageBuilder("test");
 
     JsonMessage test1 = builder.createNew("auditor").setBody(new JsonObject().putString("test", "a")).toMessage();
-    List<Connection> connections1 = selector.select(test1, testConnections);
+    List<OutputConnection> connections1 = selector.select(test1, testConnections);
     assertEquals(1, connections1.size());
-    List<Connection> connections2 = selector.select(test1, testConnections);
+    List<OutputConnection> connections2 = selector.select(test1, testConnections);
     assertEquals(1, connections2.size());
     assertEquals(connections1.get(0), connections2.get(0));
 
     JsonMessage test2 = builder.createNew("auditor").setBody(new JsonObject().putString("test", "a")).toMessage();
-    List<Connection> connections3 = selector.select(test2, testConnections);
+    List<OutputConnection> connections3 = selector.select(test2, testConnections);
     assertEquals(1, connections3.size());
-    List<Connection> connections4 = selector.select(test2, testConnections);
+    List<OutputConnection> connections4 = selector.select(test2, testConnections);
     assertEquals(1, connections4.size());
     assertEquals(connections3.get(0), connections4.get(0));
 
     JsonMessage test3 = builder.createNew("auditor").setBody(new JsonObject().putString("test", "a")).toMessage();
-    List<Connection> connections5 = selector.select(test3, testConnections);
+    List<OutputConnection> connections5 = selector.select(test3, testConnections);
     assertEquals(1, connections5.size());
-    List<Connection> connections6 = selector.select(test3, testConnections);
+    List<OutputConnection> connections6 = selector.select(test3, testConnections);
     assertEquals(1, connections6.size());
     assertEquals(connections5.get(0), connections6.get(0));
 
     Selector multiSelector = new FieldsSelector("test1", "test2");
 
     JsonMessage test4 = builder.createNew("auditor").setBody(new JsonObject().putString("test1", "a")).toMessage();
-    List<Connection> connections7 = multiSelector.select(test4, testConnections);
+    List<OutputConnection> connections7 = multiSelector.select(test4, testConnections);
     assertEquals(1, connections7.size());
-    List<Connection> connections8 = multiSelector.select(test4, testConnections);
+    List<OutputConnection> connections8 = multiSelector.select(test4, testConnections);
     assertEquals(1, connections8.size());
     assertEquals(connections7.get(0), connections8.get(0));
 
     JsonMessage test5 = builder.createNew("auditor").setBody(new JsonObject().putString("test2", "ab")).toMessage();
-    List<Connection> connections9 = multiSelector.select(test5, testConnections);
+    List<OutputConnection> connections9 = multiSelector.select(test5, testConnections);
     assertEquals(1, connections9.size());
-    List<Connection> connections10 = multiSelector.select(test5, testConnections);
+    List<OutputConnection> connections10 = multiSelector.select(test5, testConnections);
     assertEquals(1, connections10.size());
     assertEquals(connections9.get(0), connections10.get(0));
 
     JsonMessage test6 = builder.createNew("auditor").setBody(new JsonObject().putString("test1", "ab").putString("test2", "abc")).toMessage();
-    List<Connection> connections11 = multiSelector.select(test6, testConnections);
+    List<OutputConnection> connections11 = multiSelector.select(test6, testConnections);
     assertEquals(1, connections11.size());
-    List<Connection> connections12 = multiSelector.select(test6, testConnections);
+    List<OutputConnection> connections12 = multiSelector.select(test6, testConnections);
     assertEquals(1, connections12.size());
     assertEquals(connections11.get(0), connections12.get(0));
   }
