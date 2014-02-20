@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Jordan Halterman
  */
 abstract class IOContext<T extends IOContext<T>> extends Context<T> {
-  protected Collection<StreamContext> streams = new ArrayList<>();
+  protected Collection<OutputStreamContext> streams = new ArrayList<>();
   @JsonIgnore
   private InstanceContext instance;
 
@@ -37,15 +37,6 @@ abstract class IOContext<T extends IOContext<T>> extends Context<T> {
   T setInstanceContext(InstanceContext instance) {
     this.instance = instance;
     return (T) this;
-  }
-
-  /**
-   * Returns a collection of I/O streams.
-   *
-   * @return A collection of I/O streams.
-   */
-  public Collection<StreamContext> streams() {
-    return streams;
   }
 
   /**

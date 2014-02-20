@@ -15,6 +15,7 @@
  */
 package net.kuujo.vertigo.context;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -32,6 +33,7 @@ import org.vertx.java.core.json.JsonObject;
  * @author Jordan Halterman
  */
 public class InputContext extends IOContext<InputContext> {
+  private Collection<InputStreamContext> streams = new ArrayList<>();
 
   /**
    * Creates a new input context from JSON.
@@ -59,12 +61,21 @@ public class InputContext extends IOContext<InputContext> {
     return json.putObject("input", serializer.serialize(context));
   }
 
+  /**
+   * Returns the input's stream contexts.
+   *
+   * @return A collection of input stream contexts.
+   */
+  public Collection<InputStreamContext> streams() {
+    return streams;
+  }
+
   @Override
   public void notify(InputContext update) {
     super.notify(update);
-    for (StreamContext stream : streams) {
+    for (InputStreamContext stream : streams) {
       boolean updated = false;
-      for (StreamContext s : update.streams()) {
+      for (InputStreamContext s : update.streams()) {
         if (stream.equals(s)) {
           stream.notify(s);
           updated = true;
@@ -118,7 +129,7 @@ public class InputContext extends IOContext<InputContext> {
      * @param streams An array of input stream contexts.
      * @return The context builder.
      */
-    public Builder setStreams(StreamContext... streams) {
+    public Builder setStreams(InputStreamContext... streams) {
       context.streams = Arrays.asList(streams);
       return this;
     }
@@ -129,7 +140,7 @@ public class InputContext extends IOContext<InputContext> {
      * @param streams A collection of input stream contexts.
      * @return The context builder.
      */
-    public Builder setStreams(Collection<StreamContext> streams) {
+    public Builder setStreams(Collection<InputStreamContext> streams) {
       context.streams = streams;
       return this;
     }
@@ -140,7 +151,7 @@ public class InputContext extends IOContext<InputContext> {
      * @param stream An input stream context.
      * @return The context builder.
      */
-    public Builder addStream(StreamContext stream) {
+    public Builder addStream(InputStreamContext stream) {
       context.streams.add(stream);
       return this;
     }
@@ -151,7 +162,7 @@ public class InputContext extends IOContext<InputContext> {
      * @param stream An input stream context.
      * @return The context builder.
      */
-    public Builder removeStream(StreamContext stream) {
+    public Builder removeStream(InputStreamContext stream) {
       context.streams.remove(stream);
       return this;
     }

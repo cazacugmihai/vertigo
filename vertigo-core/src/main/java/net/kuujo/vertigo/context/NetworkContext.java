@@ -17,6 +17,7 @@ package net.kuujo.vertigo.context;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -314,7 +315,7 @@ public final class NetworkContext extends Context<NetworkContext> {
      * @param components A list of component contexts.
      * @return The context builder.
      */
-    public Builder setComponents(List<ComponentContext<?>> components) {
+    public Builder setComponents(Collection<ComponentContext<?>> components) {
       context.components = new HashMap<>();
       for (ComponentContext<?> component : components) {
         context.components.put(component.address(), component);

@@ -15,6 +15,7 @@
  */
 package net.kuujo.vertigo.context;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -31,6 +32,7 @@ import org.vertx.java.core.json.JsonObject;
  * @author Jordan Halterman
  */
 public class OutputContext extends IOContext<OutputContext> {
+  private Collection<OutputStreamContext> streams = new ArrayList<>();
 
   /**
    * Creates a new output context from JSON.
@@ -58,12 +60,21 @@ public class OutputContext extends IOContext<OutputContext> {
     return json.putObject("output", serializer.serialize(context));
   }
 
+  /**
+   * Returns the output's stream contexts.
+   *
+   * @return A collection of output stream contexts.
+   */
+  public Collection<OutputStreamContext> streams() {
+    return streams;
+  }
+
   @Override
   public void notify(OutputContext update) {
     super.notify(update);
-    for (StreamContext stream : streams) {
+    for (OutputStreamContext stream : streams) {
       boolean updated = false;
-      for (StreamContext s : update.streams()) {
+      for (OutputStreamContext s : update.streams()) {
         if (stream.equals(s)) {
           stream.notify(s);
           updated = true;
@@ -117,7 +128,7 @@ public class OutputContext extends IOContext<OutputContext> {
      * @param streams An array of output stream contexts.
      * @return The context builder.
      */
-    public Builder setStreams(StreamContext... streams) {
+    public Builder setStreams(OutputStreamContext... streams) {
       context.streams = Arrays.asList(streams);
       return this;
     }
@@ -128,7 +139,7 @@ public class OutputContext extends IOContext<OutputContext> {
      * @param streams A collection of output stream contexts.
      * @return The context builder.
      */
-    public Builder setStreams(Collection<StreamContext> streams) {
+    public Builder setStreams(Collection<OutputStreamContext> streams) {
       context.streams = streams;
       return this;
     }
@@ -139,7 +150,7 @@ public class OutputContext extends IOContext<OutputContext> {
      * @param stream An output stream context.
      * @return The context builder.
      */
-    public Builder addStream(StreamContext stream) {
+    public Builder addStream(OutputStreamContext stream) {
       context.streams.add(stream);
       return this;
     }
@@ -150,7 +161,7 @@ public class OutputContext extends IOContext<OutputContext> {
      * @param stream An output stream context.
      * @return The context builder.
      */
-    public Builder removeStream(StreamContext stream) {
+    public Builder removeStream(OutputStreamContext stream) {
       context.streams.remove(stream);
       return this;
     }
