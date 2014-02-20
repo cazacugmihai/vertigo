@@ -35,7 +35,7 @@ public class DefaultInputStream implements InputStream {
 
   public DefaultInputStream(Vertx vertx, InputStreamContext context) {
     this.context = context;
-    connection = new DefaultInputConnection(context.connection().address(), vertx.eventBus());
+    connection = new DefaultInputConnection(context.connection().address(), vertx);
   }
 
   @Override

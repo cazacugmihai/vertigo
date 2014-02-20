@@ -17,6 +17,7 @@ package net.kuujo.vertigo.input.impl;
 
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
@@ -51,9 +52,9 @@ public class DefaultInputConnection implements InputConnection {
     }
   };
 
-  public DefaultInputConnection(String address, EventBus eventBus) {
+  public DefaultInputConnection(String address, Vertx vertx) {
     this.address = address;
-    this.eventBus = eventBus;
+    this.eventBus = vertx.eventBus();
   }
 
   @Override

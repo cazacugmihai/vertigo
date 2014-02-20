@@ -15,6 +15,7 @@
  */
 package net.kuujo.vertigo.output.impl;
 
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
 
 import net.kuujo.vertigo.message.JsonMessage;
@@ -33,9 +34,9 @@ public class DefaultOutputConnection implements OutputConnection {
   private final String address;
   private final EventBus eventBus;
 
-  public DefaultOutputConnection(String address, EventBus eventBus) {
+  public DefaultOutputConnection(String address, Vertx vertx) {
     this.address = address;
-    this.eventBus = eventBus;
+    this.eventBus = vertx.eventBus();
   }
 
   @Override

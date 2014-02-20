@@ -70,7 +70,7 @@ public class DefaultOutputStream implements OutputStream {
   public OutputStream start(final Handler<AsyncResult<Void>> doneHandler) {
     connections = new ArrayList<>();
     for (ConnectionContext connectionContext : context.connections()) {
-      connections.add(new DefaultOutputConnection(connectionContext.address(), vertx.eventBus()));
+      connections.add(new DefaultOutputConnection(connectionContext.address(), vertx));
     }
     vertx.runOnContext(new Handler<Void>() {
       @Override

@@ -15,8 +15,10 @@
  */
 package net.kuujo.vertigo.hooks;
 
+import net.kuujo.vertigo.message.JsonMessage;
 import net.kuujo.vertigo.message.MessageId;
-import net.kuujo.vertigo.message.impl.DefaultMessageId;
+import net.kuujo.vertigo.serializer.Serializer;
+import net.kuujo.vertigo.serializer.SerializerFactory;
 
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
@@ -36,6 +38,7 @@ import org.vertx.java.platform.Verticle;
  * @author Jordan Halterman
  */
 public abstract class HookVerticle extends Verticle {
+  private static final Serializer serializer = SerializerFactory.getSerializer(JsonMessage.class);
 
   @Override
   public void start(final Future<Void> future) {
@@ -51,25 +54,25 @@ public abstract class HookVerticle extends Verticle {
               handleStart();
               break;
             case "receive":
-              handleReceive(DefaultMessageId.fromJson(body.getObject("id")));
+              handleReceive(serializer.deserialize(body.getObject("id"), MessageId.class));
               break;
             case "ack":
-              handleAck(DefaultMessageId.fromJson(body.getObject("id")));
+              handleAck(serializer.deserialize(body.getObject("id"), MessageId.class));
               break;
             case "fail":
-              handleFail(DefaultMessageId.fromJson(body.getObject("id")));
+              handleFail(serializer.deserialize(body.getObject("id"), MessageId.class));
               break;
             case "emit":
-              handleEmit(DefaultMessageId.fromJson(body.getObject("id")));
+              handleEmit(serializer.deserialize(body.getObject("id"), MessageId.class));
               break;
             case "acked":
-              handleAcked(DefaultMessageId.fromJson(body.getObject("id")));
+              handleAcked(serializer.deserialize(body.getObject("id"), MessageId.class));
               break;
             case "failed":
-              handleFailed(DefaultMessageId.fromJson(body.getObject("id")));
+              handleFailed(serializer.deserialize(body.getObject("id"), MessageId.class));
               break;
             case "timeout":
-              handleTimeout(DefaultMessageId.fromJson(body.getObject("id")));
+              handleTimeout(serializer.deserialize(body.getObject("id"), MessageId.class));
               break;
             case "stop":
               handleStop();
