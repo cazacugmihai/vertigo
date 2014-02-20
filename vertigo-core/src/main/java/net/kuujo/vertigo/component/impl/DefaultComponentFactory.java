@@ -91,23 +91,23 @@ public class DefaultComponentFactory implements ComponentFactory {
 
         // Set up the factory arguments.
         Class<?>[] params = method.getParameterTypes();
-        List<Object> args = new ArrayList<>();
+        Object[] args = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
-          args.set(i, null);
+          args[i] = null;
           if (Vertx.class.isAssignableFrom(params[i])) {
-            args.set(i, vertx);
+            args[i] = vertx;
           }
           else if (Container.class.isAssignableFrom(params[i])) {
-            args.set(i, container);
+            args[i] = container;
           }
           else if (InstanceContext.class.isAssignableFrom(params[i])) {
-            args.set(i, context);
+            args[i] = context;
           }
         }
 
         // Invoke the factory method.
         try {
-          return (T) method.invoke(null, args.toArray());
+          return (T) method.invoke(null, args);
         }
         catch (IllegalAccessException | InvocationTargetException e) {
           continue; // Just skip it. An exception will be thrown later.
