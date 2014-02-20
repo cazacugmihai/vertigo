@@ -17,7 +17,7 @@ package net.kuujo.vertigo.context;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import net.kuujo.vertigo.input.grouping.Grouping;
 
@@ -32,7 +32,7 @@ public class OutputStreamContext extends Context<OutputStreamContext> {
   private static final String DEFAULT_STREAM = "default";
   private String stream = DEFAULT_STREAM;
   private Grouping grouping;
-  private Collection<ConnectionContext> connections = new ArrayList<>();
+  private List<ConnectionContext> connections = new ArrayList<>();
 
   /**
    * Returns the stream name.
@@ -57,7 +57,7 @@ public class OutputStreamContext extends Context<OutputStreamContext> {
    *
    * @return A collection of connections in the stream.
    */
-  public Collection<ConnectionContext> connections() {
+  public List<ConnectionContext> connections() {
     return connections;
   }
 
@@ -153,7 +153,7 @@ public class OutputStreamContext extends Context<OutputStreamContext> {
      * @param connections A collection of stream connections.
      * @return The context builder.
      */
-    public Builder setConnections(Collection<ConnectionContext> connections) {
+    public Builder setConnections(List<ConnectionContext> connections) {
       context.connections = connections;
       return this;
     }

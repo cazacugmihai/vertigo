@@ -229,7 +229,7 @@ public class FeederTest extends TestVerticle {
   }
 
   private void deployNetwork(Network network) {
-    Cluster cluster = new LocalCluster("test", vertx, container);
+    Cluster cluster = new LocalCluster("test.cluster", vertx, container);
     cluster.deployNetwork(network, new Handler<AsyncResult<NetworkContext>>() {
       @Override
       public void handle(AsyncResult<NetworkContext> result) {

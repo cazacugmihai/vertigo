@@ -65,7 +65,7 @@ public class DefaultInputCollector implements InputCollector {
 
   @Override
   public InputCollector messageHandler(Handler<JsonMessage> handler) {
-    messageHandler = wrapMessageHandler(handler);
+    messageHandler = handler != null ? wrapMessageHandler(handler) : null;
     for (InputStream stream : streams) {
       stream.messageHandler(messageHandler);
     }
@@ -76,10 +76,8 @@ public class DefaultInputCollector implements InputCollector {
     return new Handler<JsonMessage>() {
       @Override
       public void handle(JsonMessage message) {
-        if (messageHandler != null) {
-          messageHandler.handle(message);
-          hookReceived(message.messageId());
-        }
+        handler.handle(message);
+        hookReceived(message.messageId());
       }
     };
   }
@@ -176,7 +174,7 @@ public class DefaultInputCollector implements InputCollector {
               startCounter.succeed();
             }
           }
-        }));
+        }).messageHandler(messageHandler));
       }
     }
     return this;

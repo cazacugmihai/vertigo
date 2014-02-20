@@ -588,7 +588,6 @@ public class VertigoNode extends BusModBase implements StateMachine {
     mode = getOptionalStringConfig("mode", MODE_NORMAL);
     clusterAddress = getMandatoryStringConfig("cluster");
     nodeAddress = getMandatoryStringConfig("address");
-    internalAddress = String.format("%s.internal", nodeAddress);
     logFileName = String.format("%s.log", nodeAddress);
 
     CopyCat copycat = new CopyCat(this);
@@ -599,6 +598,8 @@ public class VertigoNode extends BusModBase implements StateMachine {
     replica.setElectionTimeout(getOptionalLongConfig("election_timeout", 5000));
     replica.setRequireReadMajority(getOptionalBooleanConfig("require_read_majority", true));
     replica.setRequireWriteMajority(getOptionalBooleanConfig("require_write_majority", true));
+
+    internalAddress = String.format("%s.internal", replica.address());
 
     vertx.setPeriodic(getOptionalLongConfig("broadcast_interval", 2500), broadcastTimer);
 

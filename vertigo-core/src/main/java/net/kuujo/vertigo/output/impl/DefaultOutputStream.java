@@ -68,9 +68,10 @@ public class DefaultOutputStream implements OutputStream {
 
   @Override
   public OutputStream start(final Handler<AsyncResult<Void>> doneHandler) {
+    selector = context.grouping().createSelector();
     connections = new ArrayList<>();
-    for (ConnectionContext connectionContext : context.connections()) {
-      connections.add(new DefaultOutputConnection(connectionContext.address(), vertx));
+    for (ConnectionContext connection : context.connections()) {
+      connections.add(new DefaultOutputConnection(connection.address(), vertx));
     }
     vertx.runOnContext(new Handler<Void>() {
       @Override

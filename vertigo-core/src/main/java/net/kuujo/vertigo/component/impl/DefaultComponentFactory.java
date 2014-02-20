@@ -81,8 +81,8 @@ public class DefaultComponentFactory implements ComponentFactory {
     for (Method method : type.getDeclaredMethods()) {
       if (method.isAnnotationPresent(Factory.class)) {
         // The method must be public static.
-        if (!method.isAccessible() || !Modifier.isStatic(method.getModifiers())) {
-          throw new IllegalArgumentException("Factory method " + method.getName() + " in " + type.getCanonicalName() + " must be public state.");
+        if (!Modifier.isPublic(method.getModifiers()) || !Modifier.isStatic(method.getModifiers())) {
+          throw new IllegalArgumentException("Factory method " + method.getName() + " in " + type.getCanonicalName() + " must be public and static.");
         }
         // The method return type must be a Class<T> instance.
         if (!method.getReturnType().equals(type)) {
