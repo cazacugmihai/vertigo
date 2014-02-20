@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 package net.kuujo.vertigo.context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.vertx.java.core.json.JsonObject;
 
@@ -31,9 +34,9 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  * 
  * @author Jordan Halterman
  */
-public final class NetworkContext implements Context {
+public final class NetworkContext extends Context<NetworkContext> {
   private String address;
-  private List<String> auditors = new ArrayList<>();
+  private Set<String> auditors = new HashSet<>();
   private boolean acking = true;
   private long timeout = 30000;
   private Map<String, ComponentContext<?>> components = new HashMap<>();
@@ -81,11 +84,11 @@ public final class NetworkContext implements Context {
   }
 
   /**
-   * Returns a list of network auditor addresses.
+   * Returns a set of network auditor addresses.
    * 
-   * @return A list of network auditors.
+   * @return A set of network auditors.
    */
-  public List<String> auditors() {
+  public Set<String> auditors() {
     return auditors;
   }
 
@@ -121,12 +124,22 @@ public final class NetworkContext implements Context {
    * 
    * @return A list of network component contexts.
    */
-  public List<ComponentContext<?>> componentContexts() {
+  public List<ComponentContext<?>> components() {
     List<ComponentContext<?>> components = new ArrayList<>();
     for (ComponentContext<?> component : this.components.values()) {
       components.add(component.setNetworkContext(this));
     }
     return components;
+  }
+
+  /**
+   * Returns a boolean indicating whether the component exists.
+   *
+   * @param address The address of the component to check.
+   * @return Indicates whether a component with that address exists.
+   */
+  public boolean hasComponent(String address) {
+    return components.containsKey(address);
   }
 
   /**
@@ -137,7 +150,7 @@ public final class NetworkContext implements Context {
    * @throws IllegalArgumentException If a component does not exist at the given address.
    */
   @SuppressWarnings("unchecked")
-  public <T extends ComponentContext<T>> T componentContext(String address) {
+  public <T extends ComponentContext<T>> T component(String address) {
     if (components.containsKey(address)) {
       return (T) components.get(address).setNetworkContext(this);
     }
@@ -145,8 +158,207 @@ public final class NetworkContext implements Context {
   }
 
   @Override
+  public void notify(NetworkContext update) {
+    super.notify(update);
+    for (ComponentContext<?> component : components.values()) {
+      boolean updated = false;
+      for (ComponentContext<?> c : update.components()) {
+        if (component.equals(c)) {
+          component.notify(c);
+          updated = true;
+          break;
+        }
+      }
+      if (!updated) {
+        component.notify(null);
+      }
+    }
+  }
+
+  @Override
   public String toString() {
     return address();
+  }
+
+  /**
+   * Network context builder.
+   *
+   * @author Jordan Halterman
+   */
+  public static class Builder {
+    private NetworkContext context;
+
+    private Builder() {
+      context = new NetworkContext();
+    }
+
+    private Builder(NetworkContext context) {
+      this.context = context;
+    }
+
+    /**
+     * Returns a new context builder.
+     *
+     * @return A new context builder.
+     */
+    public static Builder newBuilder() {
+      return new Builder();
+    }
+
+    /**
+     * Creates a new context builder from an existing context.
+     *
+     * @param context The starting context.
+     * @return A new context builder.
+     */
+    public static Builder newBuilder(NetworkContext context) {
+      return new Builder(context);
+    }
+
+    /**
+     * Sets the network address.
+     *
+     * @param address The network address.
+     * @return The context builder.
+     */
+    public Builder setAddress(String address) {
+      context.address = address;
+      return this;
+    }
+
+    /**
+     * Sets the network auditors.
+     *
+     * @param addresses An array of auditor addresses.
+     * @return The context builder.
+     */
+    public Builder setAuditors(String... addresses) {
+      context.auditors = new HashSet<String>(Arrays.asList(addresses));
+      return this;
+    }
+
+    /**
+     * Sets the network auditors.
+     *
+     * @param addresses A set of auditor addresses.
+     * @return The context builder.
+     */
+    public Builder setAuditors(Set<String> addresses) {
+      context.auditors = addresses;
+      return this;
+    }
+
+    /**
+     * Adds an auditor to the network.
+     *
+     * @param address An auditor address.
+     * @return The context builder.
+     */
+    public Builder addAuditor(String address) {
+      context.auditors.add(address);
+      return this;
+    }
+
+    /**
+     * Removes an auditor from the network.
+     *
+     * @param address An auditor address.
+     * @return The context builder.
+     */
+    public Builder removeAuditor(String address) {
+      context.auditors.remove(address);
+      return this;
+    }
+
+    /**
+     * Sets whether acking is enabled.
+     *
+     * @param enabled Whether acking is enabled.
+     * @return The context builder.
+     */
+    public Builder setAckingEnabled(boolean enabled) {
+      context.acking = enabled;
+      return this;
+    }
+
+    /**
+     * Sets whether message timeouts are enabled.
+     *
+     * @param enabled Whether message timeouts are enabled.
+     * @return The context builder.
+     */
+    public Builder setMessageTimeoutsEnabled(boolean enabled) {
+      if (!enabled) {
+        context.timeout = 0;
+      }
+      else if (context.timeout == 0) {
+        context.timeout = 30000;
+      }
+      return this;
+    }
+
+    /**
+     * Sets the network message timeout.
+     *
+     * @param timeout The network message timeout.
+     * @return The context builder.
+     */
+    public Builder setMessageTimeout(long timeout) {
+      context.timeout = timeout;
+      return this;
+    }
+
+    /**
+     * Set the network components.
+     *
+     * @param components A list of component contexts.
+     * @return The context builder.
+     */
+    public Builder setComponents(List<ComponentContext<?>> components) {
+      context.components = new HashMap<>();
+      for (ComponentContext<?> component : components) {
+        context.components.put(component.address(), component);
+      }
+      return this;
+    }
+
+    /**
+     * Adds a component to the network.
+     *
+     * @param component The component context to add.
+     * @return The context builder.
+     */
+    public Builder addComponent(ComponentContext<?> component) {
+      if (context.components == null) {
+        context.components = new HashMap<>();
+      }
+      context.components.put(component.address(), component);
+      return this;
+    }
+
+    /**
+     * Removes a component from the network.
+     *
+     * @param component The component context to remove.
+     * @return The context builder.
+     */
+    public Builder removeComponent(ComponentContext<?> component) {
+      if (context.components == null) {
+        context.components = new HashMap<>();
+      }
+      context.components.remove(component.address());
+      return this;
+    }
+
+    /**
+     * Builds the network context.
+     *
+     * @return A new network context.
+     */
+    public NetworkContext build() {
+      return context;
+    }
+
   }
 
 }

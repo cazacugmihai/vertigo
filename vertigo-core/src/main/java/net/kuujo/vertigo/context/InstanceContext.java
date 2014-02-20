@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package net.kuujo.vertigo.context;
 
-import net.kuujo.vertigo.serializer.Serializable;
 import net.kuujo.vertigo.serializer.Serializer;
 import net.kuujo.vertigo.serializer.SerializerFactory;
 
@@ -29,11 +28,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  * @author Jordan Halterman
  */
-public final class InstanceContext implements Serializable {
+public final class InstanceContext extends Context<InstanceContext> {
   private String id;
   private int number;
-  private @JsonIgnore
-  ComponentContext<?> component;
+  private InputContext input;
+  private OutputContext output;
+  @JsonIgnore
+  private ComponentContext<?> component;
 
   private InstanceContext() {
   }
@@ -60,8 +61,8 @@ public final class InstanceContext implements Serializable {
    */
   public static JsonObject toJson(InstanceContext context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
-    JsonObject json = ComponentContext.toJson(context.componentContext().isModule() ? context.<ModuleContext> componentContext() : context
-        .<VerticleContext> componentContext());
+    JsonObject json = ComponentContext.toJson(context.component().isModule() ?
+        context.<ModuleContext>component() : context.<VerticleContext>component());
     return json.putObject("instance", serializer.serialize(context));
   }
 
@@ -97,7 +98,25 @@ public final class InstanceContext implements Serializable {
    * @return The unique instance address.
    */
   public String address() {
-    return String.format("%s-%d", componentContext().address(), number());
+    return String.format("%s-%d", component().address(), number());
+  }
+
+  /**
+   * Returns the instance input context.
+   *
+   * @return The instance input context.
+   */
+  public InputContext input() {
+    return input.setInstanceContext(this);
+  }
+
+  /**
+   * Returns the instance output context.
+   *
+   * @return The instance output context.
+   */
+  public OutputContext output() {
+    return output.setInstanceContext(this);
   }
 
   /**
@@ -105,14 +124,110 @@ public final class InstanceContext implements Serializable {
    * 
    * @return The parent component context.
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <T extends ComponentContext> T componentContext() {
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public <T extends ComponentContext> T component() {
     return (T) component;
+  }
+
+  @Override
+  public void notify(InstanceContext update) {
+    super.notify(update);
+    input.notify(update.input());
+    output.notify(update.output());
   }
 
   @Override
   public String toString() {
     return address();
+  }
+
+  /**
+   * Instance context builder.
+   *
+   * @author Jordan Halterman
+   */
+  public static class Builder {
+    private InstanceContext context;
+
+    private Builder() {
+      context = new InstanceContext();
+    }
+
+    private Builder(InstanceContext context) {
+      this.context = context;
+    }
+
+    /**
+     * Creates a new context builder.
+     *
+     * @return A new instance context builder.
+     */
+    public static Builder newBuilder() {
+      return new Builder();
+    }
+
+    /**
+     * Creates a new context builder.
+     *
+     * @param context A starting instance context.
+     * @return A new instance context builder.
+     */
+    public static Builder newBuilder(InstanceContext context) {
+      return new Builder(context);
+    }
+
+    /**
+     * Sets the unique instance ID.
+     *
+     * @param id A unique ID.
+     * @return The context builder.
+     */
+    public Builder setId(String id) {
+      context.id = id;
+      return this;
+    }
+
+    /**
+     * Sets the instance number.
+     *
+     * @param number The instance number which should be unique to the component.
+     * @return The context builder.
+     */
+    public Builder setNumber(int number) {
+      context.number = number;
+      return this;
+    }
+
+    /**
+     * Sets the instance input context.
+     *
+     * @param input An input context.
+     * @return The context builder.
+     */
+    public Builder setInput(InputContext input) {
+      context.input = input;
+      return this;
+    }
+
+    /**
+     * Sets the instance output context.
+     *
+     * @param output An output context.
+     * @return The context builder.
+     */
+    public Builder setOutput(OutputContext output) {
+      context.output = output;
+      return this;
+    }
+
+    /**
+     * Builds the instance context.
+     *
+     * @return A new instance context.
+     */
+    public InstanceContext build() {
+      return context;
+    }
   }
 
 }

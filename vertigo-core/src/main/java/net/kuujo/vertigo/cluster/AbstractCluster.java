@@ -88,7 +88,7 @@ abstract class AbstractCluster implements Cluster {
           future.setFailure(result.cause());
         }
         else {
-          doDeployComponents(context.componentContexts(), new Handler<AsyncResult<Void>>() {
+          doDeployComponents(context.components(), new Handler<AsyncResult<Void>>() {
             @Override
             public void handle(AsyncResult<Void> result) {
               if (result.failed()) {
@@ -151,7 +151,7 @@ abstract class AbstractCluster implements Cluster {
     if (iterator.hasNext()) {
       ComponentContext<?> context = iterator.next();
       logger.info(String.format("Deploying component '%s'", context.address()));
-      doDeployInstances(context.instanceContexts(), new Handler<AsyncResult<Void>>() {
+      doDeployInstances(context.instances(), new Handler<AsyncResult<Void>>() {
         @Override
         public void handle(AsyncResult<Void> result) {
           if (result.failed()) {
@@ -181,9 +181,9 @@ abstract class AbstractCluster implements Cluster {
   private void doDeployInstances(final Iterator<InstanceContext> iterator, final Future<Void> future) {
     if (iterator.hasNext()) {
       InstanceContext context = iterator.next();
-      logger.info(String.format("Deploying '%s' instance %d", context.componentContext().address(), context.number()));
-      if (context.componentContext().isModule()) {
-        cluster.deployModule(context.address(), context.<ModuleContext> componentContext().module(), InstanceContext.toJson(context),
+      logger.info(String.format("Deploying '%s' instance %d", context.component().address(), context.number()));
+      if (context.component().isModule()) {
+        cluster.deployModule(context.address(), context.<ModuleContext> component().module(), InstanceContext.toJson(context),
             new Handler<AsyncResult<String>>() {
               @Override
               public void handle(AsyncResult<String> result) {
@@ -196,9 +196,9 @@ abstract class AbstractCluster implements Cluster {
               }
             });
       }
-      else if (((VerticleContext) context.componentContext()).isWorker()) {
-        cluster.deployWorkerVerticle(context.address(), context.<VerticleContext> componentContext().main(),
-            InstanceContext.toJson(context), context.<VerticleContext> componentContext().isMultiThreaded(),
+      else if (((VerticleContext) context.component()).isWorker()) {
+        cluster.deployWorkerVerticle(context.address(), context.<VerticleContext> component().main(),
+            InstanceContext.toJson(context), context.<VerticleContext> component().isMultiThreaded(),
             new Handler<AsyncResult<String>>() {
               @Override
               public void handle(AsyncResult<String> result) {
@@ -212,7 +212,7 @@ abstract class AbstractCluster implements Cluster {
             });
       }
       else {
-        cluster.deployVerticle(context.address(), context.<VerticleContext> componentContext().main(), InstanceContext.toJson(context),
+        cluster.deployVerticle(context.address(), context.<VerticleContext> component().main(), InstanceContext.toJson(context),
             new Handler<AsyncResult<String>>() {
               @Override
               public void handle(AsyncResult<String> result) {
@@ -250,7 +250,7 @@ abstract class AbstractCluster implements Cluster {
           future.setFailure(result.cause());
         }
         else {
-          doUndeployComponents(context.componentContexts(), new Handler<AsyncResult<Void>>() {
+          doUndeployComponents(context.components(), new Handler<AsyncResult<Void>>() {
             @Override
             public void handle(AsyncResult<Void> result) {
               if (result.failed()) {
@@ -313,7 +313,7 @@ abstract class AbstractCluster implements Cluster {
     if (iterator.hasNext()) {
       ComponentContext<?> context = iterator.next();
       logger.info(String.format("Undeploying component '%s'", context.address()));
-      doUndeployInstances(context.instanceContexts(), new Handler<AsyncResult<Void>>() {
+      doUndeployInstances(context.instances(), new Handler<AsyncResult<Void>>() {
         @Override
         public void handle(AsyncResult<Void> result) {
           if (result.failed()) {
@@ -343,8 +343,8 @@ abstract class AbstractCluster implements Cluster {
   private void doUndeployInstances(final Iterator<InstanceContext> iterator, final Future<Void> future) {
     if (iterator.hasNext()) {
       InstanceContext context = iterator.next();
-      logger.info(String.format("Undeploying '%s' instance %d", context.componentContext().address(), context.number()));
-      if (context.componentContext().isModule()) {
+      logger.info(String.format("Undeploying '%s' instance %d", context.component().address(), context.number()));
+      if (context.component().isModule()) {
         cluster.undeployModule(context.address(), new Handler<AsyncResult<Void>>() {
           @Override
           public void handle(AsyncResult<Void> result) {

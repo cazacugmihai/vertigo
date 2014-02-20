@@ -65,14 +65,14 @@ public class DefaultComponentFactory implements ComponentFactory {
   public <T extends Component<?>> T createComponent(Class<T> type, InstanceContext context) {
     // Validate a feeder.
     if (Feeder.class.isAssignableFrom(type)) {
-      if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.FEEDER)) {
+      if (!context.component().type().equals(net.kuujo.vertigo.network.Component.Type.FEEDER)) {
         throw new IllegalArgumentException(type.getCanonicalName() + " is not a valid feeder component.");
       }
     }
 
     // Validate a worker.
     if (Worker.class.isAssignableFrom(type)) {
-      if (!context.componentContext().type().equals(net.kuujo.vertigo.network.Component.Type.WORKER)) {
+      if (!context.component().type().equals(net.kuujo.vertigo.network.Component.Type.WORKER)) {
         throw new IllegalArgumentException(type.getCanonicalName() + " is not a valid worker component.");
       }
     }

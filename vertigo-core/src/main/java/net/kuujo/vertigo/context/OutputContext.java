@@ -24,43 +24,42 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
 import org.vertx.java.core.json.JsonObject;
 
 /**
- * Input context represents output information between a
+ * Output context represents output information between a
  * source component and a target component. This information
- * is used to indicate where the component should listen
- * for messages.
+ * is used to indicate where the component should send messages.
  *
  * @author Jordan Halterman
  */
-public class InputContext extends IOContext<InputContext> {
+public class OutputContext extends IOContext<OutputContext> {
 
   /**
-   * Creates a new input context from JSON.
+   * Creates a new output context from JSON.
    * 
-   * @param context A JSON representation of the input context.
-   * @return A new input context instance.
+   * @param context A JSON representation of the output context.
+   * @return A new output context instance.
    * @throws MalformedContextException If the JSON context is malformed.
    */
-  public static InputContext fromJson(JsonObject context) {
+  public static OutputContext fromJson(JsonObject context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
-    InputContext input = serializer.deserialize(context.getObject("input"), InputContext.class);
+    OutputContext output = serializer.deserialize(context.getObject("output"), OutputContext.class);
     InstanceContext instance = InstanceContext.fromJson(context);
-    return input.setInstanceContext(instance);
+    return output.setInstanceContext(instance);
   }
 
   /**
-   * Serializes an input context to JSON.
+   * Serializes an output context to JSON.
    * 
-   * @param context The input context to serialize.
-   * @return A Json representation of the input context.
+   * @param context The IO context to serialize.
+   * @return A Json representation of the IO context.
    */
-  public static JsonObject toJson(InputContext context) {
+  public static JsonObject toJson(OutputContext context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
     JsonObject json = InstanceContext.toJson(context.instance());
-    return json.putObject("input", serializer.serialize(context));
+    return json.putObject("output", serializer.serialize(context));
   }
 
   @Override
-  public void notify(InputContext update) {
+  public void notify(OutputContext update) {
     super.notify(update);
     for (StreamContext stream : streams) {
       boolean updated = false;
@@ -78,18 +77,18 @@ public class InputContext extends IOContext<InputContext> {
   }
 
   /**
-   * Input context builder.
+   * Output context builder.
    *
    * @author Jordan Halterman
    */
   public static class Builder {
-    private InputContext context;
+    private OutputContext context;
 
     private Builder() {
-      context = new InputContext();
+      context = new OutputContext();
     }
 
-    private Builder(InputContext context) {
+    private Builder(OutputContext context) {
       this.context = context;
     }
 
@@ -105,17 +104,17 @@ public class InputContext extends IOContext<InputContext> {
     /**
      * Creates a new context builder.
      *
-     * @param context A starting input context.
+     * @param context A starting output context.
      * @return A new context builder.
      */
-    public static Builder newBuilder(InputContext context) {
+    public static Builder newBuilder(OutputContext context) {
       return new Builder(context);
     }
 
     /**
-     * Sets the input streams.
+     * Sets the output streams.
      *
-     * @param streams An array of input stream contexts.
+     * @param streams An array of output stream contexts.
      * @return The context builder.
      */
     public Builder setStreams(StreamContext... streams) {
@@ -124,9 +123,9 @@ public class InputContext extends IOContext<InputContext> {
     }
 
     /**
-     * Sets the input streams.
+     * Sets the output streams.
      *
-     * @param streams A collection of input stream contexts.
+     * @param streams A collection of output stream contexts.
      * @return The context builder.
      */
     public Builder setStreams(Collection<StreamContext> streams) {
@@ -135,9 +134,9 @@ public class InputContext extends IOContext<InputContext> {
     }
 
     /**
-     * Adds a stream to the input.
+     * Adds a stream to the output.
      *
-     * @param stream An input stream context.
+     * @param stream An output stream context.
      * @return The context builder.
      */
     public Builder addStream(StreamContext stream) {
@@ -146,9 +145,9 @@ public class InputContext extends IOContext<InputContext> {
     }
 
     /**
-     * Removes a stream from the input.
+     * Removes a stream from the output.
      *
-     * @param stream An input stream context.
+     * @param stream An output stream context.
      * @return The context builder.
      */
     public Builder removeStream(StreamContext stream) {
@@ -157,11 +156,11 @@ public class InputContext extends IOContext<InputContext> {
     }
 
     /**
-     * Builds the input context.
+     * Builds the output context.
      *
-     * @return A new input context.
+     * @return A new output context.
      */
-    public InputContext build() {
+    public OutputContext build() {
       return context;
     }
   }

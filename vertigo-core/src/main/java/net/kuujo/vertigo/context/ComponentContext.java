@@ -44,15 +44,13 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "deploy")
 @JsonSubTypes({ @JsonSubTypes.Type(value = ModuleContext.class, name = Component.COMPONENT_DEPLOYMENT_MODULE),
     @JsonSubTypes.Type(value = VerticleContext.class, name = Component.COMPONENT_DEPLOYMENT_VERTICLE) })
-public abstract class ComponentContext<T extends ComponentContext<T>> implements Context {
-  private String address;
-  private Component.Type type;
-  private Map<String, Object> config;
-  private List<InstanceContext> instances = new ArrayList<>();
-  private long heartbeat = 5000;
-  private Set<String> targets = new HashSet<>();
-  private List<ComponentHook> hooks = new ArrayList<>();
-  private List<InputContext> inputs = new ArrayList<>();
+public abstract class ComponentContext<T extends ComponentContext<T>> extends Context<ComponentContext<?>> {
+  protected String address;
+  protected Component.Type type;
+  protected Map<String, Object> config;
+  protected List<InstanceContext> instances = new ArrayList<>();
+  protected Set<String> targets = new HashSet<>();
+  protected List<ComponentHook> hooks = new ArrayList<>();
   private @JsonIgnore
   NetworkContext network;
 
@@ -79,7 +77,7 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
    */
   public static <T extends ComponentContext<T>> JsonObject toJson(ComponentContext<T> context) {
     Serializer serializer = SerializerFactory.getSerializer(ComponentContext.class);
-    JsonObject json = NetworkContext.toJson(context.networkContext());
+    JsonObject json = NetworkContext.toJson(context.network());
     json.putObject("component", serializer.serialize(context));
     return json;
   }
@@ -159,7 +157,7 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
    * 
    * @return A list of component instance contexts.
    */
-  public List<InstanceContext> instanceContexts() {
+  public List<InstanceContext> instances() {
     for (InstanceContext instance : instances) {
       instance.setComponentContext(this);
     }
@@ -181,7 +179,7 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
    * @param id The instance ID.
    * @return A component instance or <code>null</code> if the instance doesn't exist.
    */
-  public InstanceContext instanceContext(int instanceNumber) {
+  public InstanceContext instance(int instanceNumber) {
     for (InstanceContext instance : instances) {
       if (instance.number() == instanceNumber) {
         return instance.setComponentContext(this);
@@ -196,22 +194,13 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
    * @param address The instance address.
    * @return A component instance or <code>null</code> if the instance doesn't exist.
    */
-  public InstanceContext instanceContext(String address) {
+  public InstanceContext instance(String address) {
     for (InstanceContext instance : instances) {
       if (instance.address().equals(address)) {
         return instance.setComponentContext(this);
       }
     }
     return null;
-  }
-
-  /**
-   * Gets the component heartbeat interval.
-   * 
-   * @return The component heartbeat interval.
-   */
-  public long heartbeatInterval() {
-    return heartbeat;
   }
 
   /**
@@ -246,24 +235,30 @@ public abstract class ComponentContext<T extends ComponentContext<T>> implements
   }
 
   /**
-   * Returns a list of component input contexts.
-   * 
-   * @return A list of component input contexts.
-   */
-  public List<InputContext> inputContexts() {
-    for (InputContext input : inputs) {
-      input.setComponentContext(this);
-    }
-    return inputs;
-  }
-
-  /**
    * Returns the parent network context.
    * 
    * @return The parent network context.
    */
-  public NetworkContext networkContext() {
+  public NetworkContext network() {
     return network;
+  }
+
+  @Override
+  public void notify(ComponentContext<?> update) {
+    super.notify(update);
+    for (InstanceContext instance : instances) {
+      boolean updated = false;
+      for (InstanceContext i : update.instances()) {
+        if (instance.equals(i)) {
+          instance.notify(i);
+          updated = true;
+          break;
+        }
+      }
+      if (!updated) {
+        instance.notify(null);
+      }
+    }
   }
 
   @Override
