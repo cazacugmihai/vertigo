@@ -48,7 +48,7 @@ public final class InstanceContext extends Context<InstanceContext> {
    */
   public static InstanceContext fromJson(JsonObject context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
-    InstanceContext instance = serializer.deserialize(context.getObject("instance"), InstanceContext.class);
+    InstanceContext instance = serializer.deserializeFromObject(context.getObject("instance"), InstanceContext.class);
     ComponentContext<?> component = ComponentContext.fromJson(context);
     return instance.setComponentContext(component);
   }
@@ -63,7 +63,7 @@ public final class InstanceContext extends Context<InstanceContext> {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
     JsonObject json = ComponentContext.toJson(context.component().isModule() ?
         context.<ModuleContext>component() : context.<VerticleContext>component());
-    return json.putObject("instance", serializer.serialize(context));
+    return json.putObject("instance", serializer.serializeToObject(context));
   }
 
   /**

@@ -43,7 +43,27 @@ public class DefaultSerializer implements Serializer {
   }
 
   @Override
-  public <T extends Serializable> JsonObject serialize(T object) {
+  public <T extends Serializable> String serializeToString(T object) {
+    try {
+      return mapper.writeValueAsString(object);
+    }
+    catch (Exception e) {
+      throw new SerializationException(e.getMessage());
+    }
+  }
+
+  @Override
+  public <T extends Serializable> T deserializeFromString(String json, Class<T> type) {
+    try {
+      return mapper.readValue(json, type);
+    }
+    catch (Exception e) {
+      throw new SerializationException(e.getMessage());
+    }
+  }
+
+  @Override
+  public <T extends Serializable> JsonObject serializeToObject(T object) {
     try {
       return new JsonObject(mapper.writeValueAsString(object));
     }
@@ -53,7 +73,7 @@ public class DefaultSerializer implements Serializer {
   }
 
   @Override
-  public <T extends Serializable> T deserialize(JsonObject json, Class<T> type) {
+  public <T extends Serializable> T deserializeFromObject(JsonObject json, Class<T> type) {
     try {
       return mapper.readValue(json.encode(), type);
     }

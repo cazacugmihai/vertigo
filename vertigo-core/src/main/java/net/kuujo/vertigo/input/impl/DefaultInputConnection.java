@@ -20,7 +20,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonObject;
 
 import net.kuujo.vertigo.input.InputConnection;
 import net.kuujo.vertigo.message.JsonMessage;
@@ -39,12 +38,12 @@ public class DefaultInputConnection implements InputConnection {
   private final EventBus eventBus;
   private Handler<JsonMessage> messageHandler;
 
-  private final Handler<Message<JsonObject>> handler = new Handler<Message<JsonObject>>() {
+  private final Handler<Message<String>> handler = new Handler<Message<String>>() {
     @Override
-    public void handle(Message<JsonObject> message) {
+    public void handle(Message<String> message) {
       if (messageHandler != null) {
         try {
-          messageHandler.handle(serializer.deserialize(message.body(), JsonMessage.class));
+          messageHandler.handle(serializer.deserializeFromString(message.body(), JsonMessage.class));
         }
         catch (SerializationException e) {
         }

@@ -56,38 +56,38 @@ public class EventBusHook implements ComponentHook {
 
   @Override
   public void handleReceive(MessageId messageId) {
-    eventBus.publish(String.format("vertigo.hooks.%s.receive", address), serializer.serialize(messageId));
+    eventBus.publish(String.format("vertigo.hooks.%s.receive", address), serializer.serializeToObject(messageId));
   }
 
   @Override
   public void handleAck(MessageId messageId) {
-    eventBus.publish(String.format("vertigo.hooks.%s.ack", address), serializer.serialize(messageId));
+    eventBus.publish(String.format("vertigo.hooks.%s.ack", address), serializer.serializeToObject(messageId));
   }
 
   @Override
   public void handleFail(MessageId messageId) {
-    eventBus.publish(String.format("vertigo.hooks.%s.fail", address), serializer.serialize(messageId));
+    eventBus.publish(String.format("vertigo.hooks.%s.fail", address), serializer.serializeToObject(messageId));
   }
 
   @Override
   public void handleEmit(MessageId messageId) {
-    eventBus.publish(String.format("vertigo.hooks.%s.emit", address), serializer.serialize(messageId));
+    eventBus.publish(String.format("vertigo.hooks.%s.emit", address), serializer.serializeToObject(messageId));
   }
 
   @Override
   public void handleAcked(MessageId messageId) {
-    eventBus.publish(String.format("vertigo.hooks.%s.acked", address), serializer.serialize(messageId));
+    eventBus.publish(String.format("vertigo.hooks.%s.acked", address), serializer.serializeToObject(messageId));
   }
 
   @Override
   public void handleFailed(MessageId messageId) {
-    eventBus.publish(String.format("vertigo.hooks.%s.failed", address), serializer.serialize(messageId));
+    eventBus.publish(String.format("vertigo.hooks.%s.failed", address), serializer.serializeToObject(messageId));
   }
 
   @Override
   public void handleTimeout(MessageId messageId) {
     eventBus.publish(String.format("vertigo.hooks.%s", address),
-        new JsonObject().putString("event", "timeout").putObject("id", serializer.serialize(messageId)));
+        new JsonObject().putString("event", "timeout").putObject("id", serializer.serializeToObject(messageId)));
   }
 
   @Override

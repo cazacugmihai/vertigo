@@ -44,7 +44,7 @@ public class InputContext extends IOContext<InputContext> {
    */
   public static InputContext fromJson(JsonObject context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
-    InputContext input = serializer.deserialize(context.getObject("input"), InputContext.class);
+    InputContext input = serializer.deserializeFromObject(context.getObject("input"), InputContext.class);
     InstanceContext instance = InstanceContext.fromJson(context);
     return input.setInstanceContext(instance);
   }
@@ -58,7 +58,7 @@ public class InputContext extends IOContext<InputContext> {
   public static JsonObject toJson(InputContext context) {
     Serializer serializer = SerializerFactory.getSerializer(InstanceContext.class);
     JsonObject json = InstanceContext.toJson(context.instance());
-    return json.putObject("input", serializer.serialize(context));
+    return json.putObject("input", serializer.serializeToObject(context));
   }
 
   /**

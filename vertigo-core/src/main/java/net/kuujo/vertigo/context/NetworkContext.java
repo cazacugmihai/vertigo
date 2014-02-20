@@ -53,7 +53,7 @@ public final class NetworkContext extends Context<NetworkContext> {
    * @throws MalformedContextException If the network context is malformed.
    */
   public static NetworkContext fromJson(JsonObject context) {
-    return SerializerFactory.getSerializer(Context.class).deserialize(context.getObject("network"), NetworkContext.class);
+    return SerializerFactory.getSerializer(Context.class).deserializeFromObject(context.getObject("network"), NetworkContext.class);
   }
 
   /**
@@ -63,7 +63,7 @@ public final class NetworkContext extends Context<NetworkContext> {
    * @return A serialized network context.
    */
   public static JsonObject toJson(NetworkContext context) {
-    return new JsonObject().putObject("network", SerializerFactory.getSerializer(NetworkContext.class).serialize(context));
+    return new JsonObject().putObject("network", SerializerFactory.getSerializer(NetworkContext.class).serializeToObject(context));
   }
 
   /**

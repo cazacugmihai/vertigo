@@ -36,7 +36,7 @@ public interface Serializer {
    * @return A Json representation of the serializable object.
    * @throws SerializationException If an error occurs during serialization.
    */
-  <T extends Serializable> JsonObject serialize(T object);
+  <T extends Serializable> String serializeToString(T object);
 
   /**
    * Deserializes an object from Json. If an error occurs during deserialization, a
@@ -47,6 +47,27 @@ public interface Serializer {
    * @return The deserialized object.
    * @throws DeserializationException If an error occurs during deserialization.
    */
-  <T extends Serializable> T deserialize(JsonObject json, Class<T> type);
+  <T extends Serializable> T deserializeFromString(String json, Class<T> type);
+
+  /**
+   * Serializes an object to Json. If an error occurs during serialization, a
+   * {@link SerializationException} will be thrown.
+   * 
+   * @param object The object to serialize.
+   * @return A Json representation of the serializable object.
+   * @throws SerializationException If an error occurs during serialization.
+   */
+  <T extends Serializable> JsonObject serializeToObject(T object);
+
+  /**
+   * Deserializes an object from Json. If an error occurs during deserialization, a
+   * {@link DeserializationException} will be thrown.
+   * 
+   * @param json A Json representation of the serializable object.
+   * @param type The type to which to deserialize the object.
+   * @return The deserialized object.
+   * @throws DeserializationException If an error occurs during deserialization.
+   */
+  <T extends Serializable> T deserializeFromObject(JsonObject json, Class<T> type);
 
 }

@@ -46,7 +46,7 @@ public class DefaultOutputConnection implements OutputConnection {
 
   @Override
   public MessageId write(JsonMessage message) {
-    eventBus.send(address, serializer.serialize(message));
+    eventBus.send(address, serializer.serializeToString(message));
     return message.messageId();
   }
 

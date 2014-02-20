@@ -74,49 +74,49 @@ abstract class DeployableHook implements ComponentHook {
   @Override
   public void handleReceive(MessageId messageId) {
     if (deployed()) {
-      eventBus.send(address, new JsonObject().putString("event", "receive").putObject("id", serializer.serialize(messageId)));
+      eventBus.send(address, new JsonObject().putString("event", "receive").putObject("id", serializer.serializeToObject(messageId)));
     }
   }
 
   @Override
   public void handleAck(MessageId messageId) {
     if (deployed()) {
-      eventBus.send(address, new JsonObject().putString("event", "ack").putObject("id", serializer.serialize(messageId)));
+      eventBus.send(address, new JsonObject().putString("event", "ack").putObject("id", serializer.serializeToObject(messageId)));
     }
   }
 
   @Override
   public void handleFail(MessageId messageId) {
     if (deployed()) {
-      eventBus.send(address, new JsonObject().putString("event", "fail").putObject("id", serializer.serialize(messageId)));
+      eventBus.send(address, new JsonObject().putString("event", "fail").putObject("id", serializer.serializeToObject(messageId)));
     }
   }
 
   @Override
   public void handleEmit(MessageId messageId) {
     if (deployed()) {
-      eventBus.send(address, new JsonObject().putString("event", "emit").putObject("id", serializer.serialize(messageId)));
+      eventBus.send(address, new JsonObject().putString("event", "emit").putObject("id", serializer.serializeToObject(messageId)));
     }
   }
 
   @Override
   public void handleAcked(MessageId messageId) {
     if (deployed()) {
-      eventBus.send(address, new JsonObject().putString("event", "acked").putObject("id", serializer.serialize(messageId)));
+      eventBus.send(address, new JsonObject().putString("event", "acked").putObject("id", serializer.serializeToObject(messageId)));
     }
   }
 
   @Override
   public void handleFailed(MessageId messageId) {
     if (deployed()) {
-      eventBus.send(address, new JsonObject().putString("event", "failed").putObject("id", serializer.serialize(messageId)));
+      eventBus.send(address, new JsonObject().putString("event", "failed").putObject("id", serializer.serializeToObject(messageId)));
     }
   }
 
   @Override
   public void handleTimeout(MessageId messageId) {
     if (deployed()) {
-      eventBus.send(address, new JsonObject().putString("event", "timeout").putObject("id", serializer.serialize(messageId)));
+      eventBus.send(address, new JsonObject().putString("event", "timeout").putObject("id", serializer.serializeToObject(messageId)));
     }
   }
 

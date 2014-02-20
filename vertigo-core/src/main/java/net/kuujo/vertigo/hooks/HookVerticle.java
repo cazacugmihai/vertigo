@@ -54,25 +54,25 @@ public abstract class HookVerticle extends Verticle {
               handleStart();
               break;
             case "receive":
-              handleReceive(serializer.deserialize(body.getObject("id"), MessageId.class));
+              handleReceive(serializer.deserializeFromObject(body.getObject("id"), MessageId.class));
               break;
             case "ack":
-              handleAck(serializer.deserialize(body.getObject("id"), MessageId.class));
+              handleAck(serializer.deserializeFromObject(body.getObject("id"), MessageId.class));
               break;
             case "fail":
-              handleFail(serializer.deserialize(body.getObject("id"), MessageId.class));
+              handleFail(serializer.deserializeFromObject(body.getObject("id"), MessageId.class));
               break;
             case "emit":
-              handleEmit(serializer.deserialize(body.getObject("id"), MessageId.class));
+              handleEmit(serializer.deserializeFromObject(body.getObject("id"), MessageId.class));
               break;
             case "acked":
-              handleAcked(serializer.deserialize(body.getObject("id"), MessageId.class));
+              handleAcked(serializer.deserializeFromObject(body.getObject("id"), MessageId.class));
               break;
             case "failed":
-              handleFailed(serializer.deserialize(body.getObject("id"), MessageId.class));
+              handleFailed(serializer.deserializeFromObject(body.getObject("id"), MessageId.class));
               break;
             case "timeout":
-              handleTimeout(serializer.deserialize(body.getObject("id"), MessageId.class));
+              handleTimeout(serializer.deserializeFromObject(body.getObject("id"), MessageId.class));
               break;
             case "stop":
               handleStop();

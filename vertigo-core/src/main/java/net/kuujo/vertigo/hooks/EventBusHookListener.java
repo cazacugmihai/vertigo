@@ -82,7 +82,7 @@ public class EventBusHookListener {
       public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
         if (body != null) {
-          receiveHandler.handle(serializer.deserialize(body, MessageId.class));
+          receiveHandler.handle(serializer.deserializeFromObject(body, MessageId.class));
         }
       }
     });
@@ -101,7 +101,7 @@ public class EventBusHookListener {
       public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
         if (body != null) {
-          ackHandler.handle(serializer.deserialize(body, MessageId.class));
+          ackHandler.handle(serializer.deserializeFromObject(body, MessageId.class));
         }
       }
     });
@@ -120,7 +120,7 @@ public class EventBusHookListener {
       public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
         if (body != null) {
-          failHandler.handle(serializer.deserialize(body, MessageId.class));
+          failHandler.handle(serializer.deserializeFromObject(body, MessageId.class));
         }
       }
     });
@@ -139,7 +139,7 @@ public class EventBusHookListener {
       public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
         if (body != null) {
-          emitHandler.handle(serializer.deserialize(body, MessageId.class));
+          emitHandler.handle(serializer.deserializeFromObject(body, MessageId.class));
         }
       }
     });
@@ -158,7 +158,7 @@ public class EventBusHookListener {
       public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
         if (body != null) {
-          ackedHandler.handle(serializer.deserialize(body, MessageId.class));
+          ackedHandler.handle(serializer.deserializeFromObject(body, MessageId.class));
         }
       }
     });
@@ -177,7 +177,7 @@ public class EventBusHookListener {
       public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
         if (body != null) {
-          failedHandler.handle(serializer.deserialize(body, MessageId.class));
+          failedHandler.handle(serializer.deserializeFromObject(body, MessageId.class));
         }
       }
     });
@@ -196,7 +196,7 @@ public class EventBusHookListener {
       public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
         if (body != null) {
-          timeoutHandler.handle(serializer.deserialize(body, MessageId.class));
+          timeoutHandler.handle(serializer.deserializeFromObject(body, MessageId.class));
         }
       }
     });

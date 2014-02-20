@@ -86,7 +86,7 @@ public abstract class Context<T extends Context<T>> implements Observable<T>, Se
    */
   @SuppressWarnings("unchecked")
   public T copy() {
-    return (T) serializer.deserialize(serializer.serialize(this), getClass());
+    return (T) serializer.deserializeFromString(serializer.serializeToString(this), getClass());
   }
 
 }

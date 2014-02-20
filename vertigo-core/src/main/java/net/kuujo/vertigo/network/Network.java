@@ -112,7 +112,7 @@ public final class Network implements Config {
    */
   public static Network fromJson(JsonObject json) {
     try {
-      return SerializerFactory.getSerializer(Network.class).deserialize(json, Network.class);
+      return SerializerFactory.getSerializer(Network.class).deserializeFromObject(json, Network.class);
     }
     catch (SerializationException e) {
       throw new MalformedNetworkException(e);

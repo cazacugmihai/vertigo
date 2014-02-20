@@ -64,7 +64,7 @@ public abstract class ComponentContext<T extends ComponentContext<T>> extends Co
   @SuppressWarnings("unchecked")
   public static <T extends ComponentContext<T>> T fromJson(JsonObject context) {
     Serializer serializer = SerializerFactory.getSerializer(ComponentContext.class);
-    T component = (T) serializer.deserialize(context.getObject("component"), ComponentContext.class);
+    T component = (T) serializer.deserializeFromObject(context.getObject("component"), ComponentContext.class);
     NetworkContext network = NetworkContext.fromJson(context);
     return (T) component.setNetworkContext(network);
   }
@@ -78,7 +78,7 @@ public abstract class ComponentContext<T extends ComponentContext<T>> extends Co
   public static <T extends ComponentContext<T>> JsonObject toJson(ComponentContext<T> context) {
     Serializer serializer = SerializerFactory.getSerializer(ComponentContext.class);
     JsonObject json = NetworkContext.toJson(context.network());
-    json.putObject("component", serializer.serialize(context));
+    json.putObject("component", serializer.serializeToObject(context));
     return json;
   }
 
