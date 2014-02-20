@@ -24,7 +24,6 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.impl.DefaultFutureResult;
 
 import net.kuujo.vertigo.acker.Acker;
-import net.kuujo.vertigo.acker.DefaultAcker;
 import net.kuujo.vertigo.context.InputContext;
 import net.kuujo.vertigo.context.InputStreamContext;
 import net.kuujo.vertigo.hooks.InputHook;
@@ -47,10 +46,10 @@ public class DefaultInputCollector implements InputCollector {
   private final List<InputStream> streams = new ArrayList<>();
   private Handler<JsonMessage> messageHandler;
 
-  public DefaultInputCollector(Vertx vertx, InputContext context) {
+  public DefaultInputCollector(Vertx vertx, InputContext context, Acker acker) {
     this.vertx = vertx;
     this.context = context;
-    acker = new DefaultAcker(context.instance().address(), vertx.eventBus());
+    this.acker = acker;
   }
 
   @Override

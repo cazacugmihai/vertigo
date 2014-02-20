@@ -26,7 +26,6 @@ import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
 
 import net.kuujo.vertigo.acker.Acker;
-import net.kuujo.vertigo.acker.DefaultAcker;
 import net.kuujo.vertigo.context.OutputContext;
 import net.kuujo.vertigo.context.OutputStreamContext;
 import net.kuujo.vertigo.hooks.OutputHook;
@@ -53,10 +52,10 @@ public class DefaultOutputCollector implements OutputCollector {
   private final Random random = new Random();
   private List<String> auditors;
 
-  public DefaultOutputCollector(Vertx vertx, OutputContext context) {
+  public DefaultOutputCollector(Vertx vertx, OutputContext context, Acker acker) {
     this.vertx = vertx;
     this.context = context;
-    acker = new DefaultAcker(context.instance().address(), vertx.eventBus());
+    this.acker = acker;
     auditors = new ArrayList<>();
     for (String auditor : context.instance().component().network().auditors()) {
       auditors.add(auditor);

@@ -143,8 +143,8 @@ public abstract class AbstractComponent<T extends Component<T>> implements Compo
     this.address = context.component().address();
     NetworkContext networkContext = context.component().network();
     networkAddress = networkContext.address();
-    input = new DefaultInputCollector(vertx, container, context, acker);
-    output = new DefaultOutputCollector(vertx, container, context, acker);
+    input = new DefaultInputCollector(vertx, context.input(), acker);
+    output = new DefaultOutputCollector(vertx, context.output(), acker);
     for (ComponentHook hook : context.<ComponentContext<?>>component().hooks()) {
       addHook(hook);
     }
