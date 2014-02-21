@@ -243,9 +243,10 @@ public class DefaultOutputCollector implements OutputCollector {
    */
   private JsonMessage createChildMessage(String stream, JsonObject body, JsonMessage parent) {
     MessageId messageId = DefaultMessageId.Builder.newBuilder()
+        .setCorrelationId(UUID.randomUUID().toString())
         .setAuditor(parent.messageId().auditor())
         .setCode(random.nextInt())
-        .setOwner(context.instance().address())
+        .setOwner(parent.messageId().owner())
         .setParent(parent.messageId().correlationId())
         .setRoot(parent.messageId().hasRoot() ? parent.messageId().root() : parent.messageId().correlationId())
         .build();
