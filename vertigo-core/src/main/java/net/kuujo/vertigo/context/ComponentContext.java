@@ -41,9 +41,15 @@ import net.kuujo.vertigo.serializer.SerializerFactory;
  * 
  * @author Jordan Halterman
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "deploy")
-@JsonSubTypes({ @JsonSubTypes.Type(value = ModuleContext.class, name = Component.COMPONENT_DEPLOYMENT_MODULE),
-    @JsonSubTypes.Type(value = VerticleContext.class, name = Component.COMPONENT_DEPLOYMENT_VERTICLE) })
+@JsonTypeInfo(
+  use=JsonTypeInfo.Id.NAME,
+  include=JsonTypeInfo.As.PROPERTY,
+  property="deploy"
+)
+@JsonSubTypes({
+  @JsonSubTypes.Type(value=ModuleContext.class, name=Component.COMPONENT_DEPLOYMENT_MODULE),
+  @JsonSubTypes.Type(value=VerticleContext.class, name=Component.COMPONENT_DEPLOYMENT_VERTICLE)
+})
 public abstract class ComponentContext<T extends ComponentContext<T>> extends Context<ComponentContext<?>> {
   protected String address;
   protected Component.Type type;

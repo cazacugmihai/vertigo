@@ -16,6 +16,7 @@
 package net.kuujo.vertigo.test.integration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -118,6 +119,51 @@ public class AuditorTest extends TestVerticle {
 
             for (MessageId child : children) {
               acker.ack(child);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testComplexAck() {
+    final String auditor = "auditor";
+    deployAuditor(auditor, 30000, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        final Acker acker = new DefaultAcker("test", vertx.eventBus());
+        acker.start(new Handler<AsyncResult<Void>>() {
+          @Override
+          public void handle(AsyncResult<Void> result) {
+            assertTrue(result.succeeded());
+
+            JsonMessage message = createNewMessage("default", new JsonObject().putString("foo", "bar"));
+            MessageId sourceId = message.messageId();
+            acker.ackHandler(ackHandler(sourceId));
+
+            List<JsonMessage> children = new ArrayList<>();
+            List<MessageId> childIds = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+              JsonMessage child = createChildMessage("default", new JsonObject().putString("foo", "bar"), message);
+              children.add(child);
+              childIds.add(child.messageId());
+            }
+            acker.fork(sourceId, childIds);
+            acker.create(sourceId);
+
+            List<MessageId> descendantIds = new ArrayList<>();
+            for (JsonMessage child : children) {
+              JsonMessage descendant = createChildMessage("default", new JsonObject().putString("foo", "bar"), child);
+              acker.fork(child.messageId(), Arrays.asList(new MessageId[]{descendant.messageId()}));
+              acker.create(child.messageId());
+              descendantIds.add(descendant.messageId());
+              acker.ack(child.messageId());
+            }
+
+            for (MessageId id : descendantIds) {
+              acker.ack(id);
             }
           }
         });
