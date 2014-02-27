@@ -1,0 +1,7 @@
+{
+  "description": "Vertigo utilities.",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "Jordan Halterman",
+  "keywords": ["vertigo", "event", "processing", "real-time"],
+  "homepage": "https://github.com/kuujo/vertigo"
+}
