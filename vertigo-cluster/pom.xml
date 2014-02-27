@@ -17,9 +17,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.kuujo</groupId>
-      <artifactId>copycat</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vertigo-utils</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>

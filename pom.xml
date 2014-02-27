@@ -87,8 +87,9 @@
   </dependencies>
 
   <modules>
-    <module>vertigo-core</module>
-    <module>vertigo-cluster</module>
+    <module>core</module>
+    <module>cluster</module>
+    <module>utils</module>
   </modules>
 
   <build>
