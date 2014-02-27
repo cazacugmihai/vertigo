@@ -58,7 +58,7 @@ public class LocalCluster extends AbstractCluster {
   @Override
   public void deployNetwork(final Network network, final Handler<AsyncResult<NetworkContext>> doneHandler) {
     final NetworkContext context = ContextBuilder.buildContext(network);
-    container.deployVerticle(VertigoNode.class.getName(),
+    container.deployVerticle(VertigoClusterManager.class.getName(),
         new JsonObject().putString("cluster", address).putString("address", UUID.randomUUID().toString()),
         new Handler<AsyncResult<String>>() {
           @Override
