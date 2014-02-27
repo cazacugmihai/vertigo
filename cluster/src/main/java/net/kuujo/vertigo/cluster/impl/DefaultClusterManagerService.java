@@ -99,12 +99,7 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
     public void handle(StateType type) {
       if (type.equals(StateType.LEADER) && !isLeader) {
         isLeader = true;
-        vertx.eventBus().registerHandler(address, clusterHandler, new Handler<AsyncResult<Void>>() {
-          @Override
-          public void handle(AsyncResult<Void> result) {
-            context.configure(config);
-          }
-        });
+        vertx.eventBus().registerHandler(address, clusterHandler);
       }
       else if (!type.equals(StateType.LEADER) && isLeader) {
         vertx.eventBus().unregisterHandler(cluster, clusterHandler);
@@ -225,6 +220,7 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
 
     // Start the replica first. We need the replica to start and determine a
     // cluster leader before registering handlers on the event bus.
+    context.configure(config);
     context.start(new Handler<AsyncResult<String>>() {
       @Override
       public void handle(AsyncResult<String> result) {
@@ -259,7 +255,6 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
                             else {
                               addNode(address, context.address());
                               context.transitionHandler(transitionHandler);
-                              context.configure(config);
                               new DefaultFutureResult<Void>((Void) null).setHandler(doneHandler);
                             }
                           }
@@ -387,7 +382,7 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
    * @return Indicates whether the node was successfully updated.
    */
   @Command(type = Command.Type.WRITE)
-  public boolean updateNode(@Argument("address") String address, @Argument("id") String id, @Argument("replica") String replica,
+  public boolean updateNode(@Argument("address") String address, @Argument("replica") String replica,
       @Argument(value = "info", required = false) NodeInfo info) {
     if (!nodes.containsKey(address)) {
       return false;
@@ -636,7 +631,7 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
         this.context.submitCommand("addNode", message.body(), new Handler<AsyncResult<Void>>() {
           @Override
           public void handle(AsyncResult<Void> result) {
-            if (nodes.containsKey(address)) {
+            if (result.succeeded() && nodes.containsKey(address)) {
               nodes.get(address).resetTimer();
             }
           }
@@ -646,7 +641,7 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
         this.context.submitCommand("updateNode", message.body(), new Handler<AsyncResult<Boolean>>() {
           @Override
           public void handle(AsyncResult<Boolean> result) {
-            if (nodes.containsKey(address)) {
+            if (result.succeeded() && nodes.containsKey(address)) {
               nodes.get(address).resetTimer();
             }
           }
