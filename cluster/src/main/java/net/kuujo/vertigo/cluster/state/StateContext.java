@@ -15,6 +15,9 @@
  */
 package net.kuujo.vertigo.cluster.state;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.kuujo.vertigo.cluster.ClusterException;
 import net.kuujo.vertigo.cluster.config.ClusterConfig;
 import net.kuujo.vertigo.cluster.log.Log;
@@ -48,6 +51,7 @@ public class StateContext {
   private Log log;
   private StateMachineExecutor stateMachine;
   private ClusterConfig cluster = new ClusterConfig();
+  private Set<String> members = new HashSet<>();
   private final StateFactory stateFactory = new StateFactory();
   private StateType stateType;
   private State state;
@@ -94,6 +98,7 @@ public class StateContext {
   public StateContext configure(ClusterConfig config) {
     config.addMember(address);
     this.cluster = config;
+    members = config.getMembers();
     if (state != null) {
       state.setConfig(config);
     }
@@ -107,6 +112,26 @@ public class StateContext {
    */
   public ClusterConfig config() {
     return cluster;
+  }
+
+  /**
+   * Returns a set of cluster members.
+   *
+   * @return A set of cluster members.
+   */
+  public Set<String> members() {
+    return members;
+  }
+
+  /**
+   * Sets the cluster members.
+   *
+   * @param members A set of cluster members.
+   * @return The state context.
+   */
+  public StateContext members(Set<String> members) {
+    this.members = members;
+    return this;
   }
 
   /**

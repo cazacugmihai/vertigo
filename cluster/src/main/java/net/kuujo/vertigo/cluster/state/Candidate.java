@@ -80,7 +80,7 @@ class Candidate extends State {
     // Send vote requests to all nodes. The vote request that is sent
     // to this node will be automatically successful.
     if (majority == null) {
-      majority = new Majority(members);
+      majority = new Majority(context.members());
       majority.start(new Handler<String>() {
         @Override
         public void handle(final String address) {
@@ -90,26 +90,28 @@ class Candidate extends State {
           // already.
           final long lastIndex = log.lastIndex();
           final Entry entry = log.getEntry(lastIndex);
+          long lastTerm = 0;
           if (entry != null) {
-            final long lastTerm = entry.term();
-            stateClient.poll(address, new PollRequest(context.currentTerm(), context.address(), lastIndex, lastTerm),
-                new Handler<AsyncResult<PollResponse>>() {
-                  @Override
-                  public void handle(AsyncResult<PollResponse> result) {
-                    // If the election is null then that means it was
-                    // already finished,
-                    // e.g. a majority of nodes responded.
-                    if (majority != null) {
-                      if (result.failed() || !result.result().voteGranted()) {
-                        majority.fail(address);
-                      }
-                      else {
-                        majority.succeed(address);
-                      }
+            lastTerm = entry.term();
+          }
+
+          stateClient.poll(address, new PollRequest(context.currentTerm(), context.address(), lastIndex, lastTerm),
+              new Handler<AsyncResult<PollResponse>>() {
+                @Override
+                public void handle(AsyncResult<PollResponse> result) {
+                  // If the election is null then that means it was
+                  // already finished,
+                  // e.g. a majority of nodes responded.
+                  if (majority != null) {
+                    if (result.failed() || !result.result().voteGranted()) {
+                      majority.fail(address);
+                    }
+                    else {
+                      majority.succeed(address);
                     }
                   }
-                });
-          }
+                }
+              });
         }
       }, new Handler<Boolean>() {
         @Override

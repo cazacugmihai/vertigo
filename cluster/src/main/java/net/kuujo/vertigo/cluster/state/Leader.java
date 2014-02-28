@@ -60,6 +60,8 @@ class Leader extends State implements Observer {
   private final StateLock configLock = new StateLock();
   private long pingTimer;
   private final Set<Long> periodicTimers = new HashSet<>();
+  private Set<String> members;
+  private Set<String> remoteMembers;
   private List<Replica> replicas;
   private Map<String, Replica> replicaMap = new HashMap<>();
   private final Set<Majority> majorities = new HashSet<>();
@@ -67,7 +69,7 @@ class Leader extends State implements Observer {
   @Override
   public void startUp(final Handler<Void> doneHandler) {
     // Create a set of replica references in the cluster.
-    members = config.getMembers();
+    members = context.members();
     remoteMembers = new HashSet<>(members);
     remoteMembers.remove(context.address());
     replicas = new ArrayList<>();
@@ -373,7 +375,8 @@ class Leader extends State implements Observer {
   /**
    * Pings a majority of the cluster.
    */
-  private void readMajority(final Handler<Boolean> doneHandler) {
+  private void readMajority(final Handler<Boolean> doneHandler) {System.out.println(members);
+  System.out.println(remoteMembers);
     final Majority majority = new Majority(remoteMembers).countSelf();
     majorities.add(majority);
     majority.start(new Handler<String>() {

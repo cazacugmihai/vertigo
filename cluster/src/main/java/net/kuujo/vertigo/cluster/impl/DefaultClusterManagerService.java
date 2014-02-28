@@ -99,7 +99,7 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
     public void handle(StateType type) {
       if (type.equals(StateType.LEADER) && !isLeader) {
         isLeader = true;
-        vertx.eventBus().registerHandler(address, clusterHandler);
+        vertx.eventBus().registerHandler(cluster, clusterHandler);
       }
       else if (!type.equals(StateType.LEADER) && isLeader) {
         vertx.eventBus().unregisterHandler(cluster, clusterHandler);
@@ -621,13 +621,13 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
    * cluster.
    */
   private void doClusterBroadcast(final Message<JsonObject> message) {
-    if (isLeader) {
-      final String address = message.body().getString("address");
-      final String replica = message.body().getString("replica");
-      if (!nodes.containsKey(address)) {
-        if (!config.containsMember(replica)) {
-          config.addMember(replica);
-        }
+    final String address = message.body().getString("address");
+    final String replica = message.body().getString("replica");
+    if (!nodes.containsKey(address)) {
+      if (!config.containsMember(replica)) {
+        config.addMember(replica);
+      }
+      if (isLeader) {
         this.context.submitCommand("addNode", message.body(), new Handler<AsyncResult<Void>>() {
           @Override
           public void handle(AsyncResult<Void> result) {
@@ -637,7 +637,9 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
           }
         });
       }
-      else if (!nodes.get(address).replica.equals(replica)) {
+    }
+    else if (!nodes.get(address).replica.equals(replica)) {
+      if (isLeader) {
         this.context.submitCommand("updateNode", message.body(), new Handler<AsyncResult<Boolean>>() {
           @Override
           public void handle(AsyncResult<Boolean> result) {
@@ -647,9 +649,9 @@ public class DefaultClusterManagerService implements ClusterManagerService, Stat
           }
         });
       }
-      else {
-        nodes.get(address).resetTimer();
-      }
+    }
+    else {
+      nodes.get(address).resetTimer();
     }
   }
 

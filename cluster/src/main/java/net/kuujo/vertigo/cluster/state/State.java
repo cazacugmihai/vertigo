@@ -15,9 +15,7 @@
  */
 package net.kuujo.vertigo.cluster.state;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import net.kuujo.vertigo.cluster.config.ClusterConfig;
 import net.kuujo.vertigo.cluster.log.CommandEntry;
@@ -46,8 +44,6 @@ abstract class State {
   protected Log log;
   protected ClusterConfig config;
   protected StateContext context;
-  protected Set<String> members = new HashSet<>();
-  protected Set<String> remoteMembers = new HashSet<>();
 
   /**
    * Sets the vertx instance.
@@ -296,7 +292,7 @@ abstract class State {
       // cluster membership during two-phase cluster configuration changes, so it's
       // safe to simply override the current cluster configuration.
       else if (entry.type().equals(Type.CONFIGURATION)) {
-        members = ((ConfigurationEntry) entry).members();
+        context.members(((ConfigurationEntry) entry).members());
       }
 
       // Continue on to apply the next commit.
@@ -324,7 +320,7 @@ abstract class State {
     // this replica) then reject the vote. This helps ensure that new cluster
     // members cannot become leader until at least a majority of the cluster
     // has been notified of their membership.
-    else if (!members.contains(request.candidate())) {
+    else if (!context.members().contains(request.candidate())) {
       return false;
     }
 

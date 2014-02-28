@@ -35,6 +35,7 @@ import static org.vertx.testtools.VertxAssert.testComplete;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.eventbus.ReplyException;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
@@ -351,50 +352,64 @@ public class ClusterManagerTest extends TestVerticle {
   }
 
   @Test
-  public void testRecoverKeysToSingleNodeCluster() {
-    container.deployVerticle(VertigoClusterManager.class.getName(), new JsonObject().putString("cluster", "test")
-        .putString("address", String.format("test.1")), new Handler<AsyncResult<String>>() {
+  public void testRecoverKeysToMultiNodeCluster() {
+    final ClusterManagerService test1 = new DefaultClusterManagerService("test.1", "test", vertx, container);
+    test1.start(new Handler<AsyncResult<Void>>() {
       @Override
-      public void handle(AsyncResult<String> result) {
-        final String deploymentID = result.result();
-        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
-        cluster.set("test1", "Hello world!", new Handler<AsyncResult<Void>>() {
+      public void handle(AsyncResult<Void> result) {
+        assertTrue(result.succeeded());
+        new DefaultClusterManagerService("test.2", "test", vertx, container).start(new Handler<AsyncResult<Void>>() {
           @Override
           public void handle(AsyncResult<Void> result) {
             assertTrue(result.succeeded());
-            cluster.set("test2", "Hello world!", new Handler<AsyncResult<Void>>() {
+            new DefaultClusterManagerService("test.3", "test", vertx, container).start(new Handler<AsyncResult<Void>>() {
               @Override
               public void handle(AsyncResult<Void> result) {
                 assertTrue(result.succeeded());
-                cluster.set("test3", "Hello world!", new Handler<AsyncResult<Void>>() {
+
+                final ClusterManager cluster = new DefaultClusterManager("test", vertx);
+                cluster.set("test1", "Hello world!", new Handler<AsyncResult<Void>>() {
                   @Override
                   public void handle(AsyncResult<Void> result) {
                     assertTrue(result.succeeded());
-                    container.undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
+                    cluster.set("test2", "Hello world!", new Handler<AsyncResult<Void>>() {
                       @Override
                       public void handle(AsyncResult<Void> result) {
                         assertTrue(result.succeeded());
-                        container.deployVerticle(VertigoClusterManager.class.getName(), new JsonObject().putString("cluster", "test")
-                            .putString("address", String.format("test.1")), new Handler<AsyncResult<String>>() {
+                        cluster.set("test3", "Hello world!", new Handler<AsyncResult<Void>>() {
                           @Override
-                          public void handle(AsyncResult<String> result) {
-                            final ClusterManager cluster = new DefaultClusterManager("test", vertx);
-                            cluster.get("test1", new Handler<AsyncResult<String>>() {
+                          public void handle(AsyncResult<Void> result) {
+                            assertTrue(result.succeeded());
+
+                            test1.stop(new Handler<AsyncResult<Void>>() {
                               @Override
-                              public void handle(AsyncResult<String> result) {
+                              public void handle(AsyncResult<Void> result) {
                                 assertTrue(result.succeeded());
-                                assertEquals("Hello world!", result.result());
-                                cluster.get("test2", new Handler<AsyncResult<String>>() {
+
+                                // Allow the cluster time to fail-over.
+                                vertx.setTimer(10000, new Handler<Long>() {
                                   @Override
-                                  public void handle(AsyncResult<String> result) {
-                                    assertTrue(result.succeeded());
-                                    assertEquals("Hello world!", result.result());
-                                    cluster.get("test3", new Handler<AsyncResult<String>>() {
+                                  public void handle(Long timerID) {
+                                    cluster.get("test1", new Handler<AsyncResult<String>>() {
                                       @Override
                                       public void handle(AsyncResult<String> result) {
                                         assertTrue(result.succeeded());
                                         assertEquals("Hello world!", result.result());
-                                        testComplete();
+                                        cluster.get("test2", new Handler<AsyncResult<String>>() {
+                                          @Override
+                                          public void handle(AsyncResult<String> result) {
+                                            assertTrue(result.succeeded());
+                                            assertEquals("Hello world!", result.result());
+                                            cluster.get("test3", new Handler<AsyncResult<String>>() {
+                                              @Override
+                                              public void handle(AsyncResult<String> result) {
+                                                assertTrue(result.succeeded());
+                                                assertEquals("Hello world!", result.result());
+                                                testComplete();
+                                              }
+                                            });
+                                          }
+                                        });
                                       }
                                     });
                                   }
@@ -406,50 +421,6 @@ public class ClusterManagerTest extends TestVerticle {
                       }
                     });
                   }
-                });
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-
-  @Test
-  public void testRecoverKeysViaSnapshotToSingleNodeCluster() {
-    container.deployVerticle(VertigoClusterManager.class.getName(), new JsonObject().putString("cluster", "test")
-        .putString("address", String.format("test.1")).putNumber("max_log_size", 1028), new Handler<AsyncResult<String>>() {
-      @Override
-      public void handle(AsyncResult<String> result) {
-        final String deploymentID = result.result();
-        final ClusterManager cluster = new DefaultClusterManager("test", vertx);
-        setKeys(cluster, "test", 100, new Handler<AsyncResult<Void>>() {
-          @Override
-          public void handle(AsyncResult<Void> result) {
-            if (result.failed()) {
-              fail(result.cause().getMessage());
-            }
-
-            container.undeployVerticle(deploymentID, new Handler<AsyncResult<Void>>() {
-              @Override
-              public void handle(AsyncResult<Void> result) {
-                assertTrue(result.succeeded());
-                container.deployVerticle(VertigoClusterManager.class.getName(), new JsonObject().putString("cluster", "test")
-                  .putString("address", String.format("test.1")).putNumber("max_log_size", 1028), new Handler<AsyncResult<String>>() {
-                    @Override
-                    public void handle(AsyncResult<String> result) {
-                      assertTrue(result.succeeded());
-                      cluster.get("test1", new Handler<AsyncResult<String>>() {
-                        @Override
-                        public void handle(AsyncResult<String> result) {
-                          if (result.failed()) {
-                            fail(result.cause().getMessage());
-                          }
-                          assertEquals("Hello world1!", result.result());
-                          testComplete();
-                        }
-                      });
-                    }
                 });
               }
             });
